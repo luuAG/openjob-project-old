@@ -1,9 +1,16 @@
 /.idea
 /openjob-common/.idea
 /openjob-common/target
+/openjob-common/openjob-common.iml
+
 /openjob-parent-api/.idea
 /openjob-parent-api/target
+/openjob-parent-api/openjob-parent-api.iml
+
 /openjob-parent-api/openjob-admin-api/.idea
 /openjob-parent-api/openjob-admin-api/target
+/openjob-parent-api/openjob-admin-api/openjob-admin-api.iml
+
 /openjob-parent-api/openjob-web-api/.idea
 /openjob-parent-api/openjob-web-api/target
+/openjob-parent-api/openjob-web-api/openjob-web-api.iml
