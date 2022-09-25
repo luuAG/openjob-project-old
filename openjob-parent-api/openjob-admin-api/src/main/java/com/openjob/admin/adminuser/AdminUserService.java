@@ -1,4 +1,4 @@
-package com.openjob.admin.user;
+package com.openjob.admin.adminuser;
 
 import com.openjob.admin.base.AbstractBaseService;
 import com.openjob.admin.exception.AdminUserNotFound;

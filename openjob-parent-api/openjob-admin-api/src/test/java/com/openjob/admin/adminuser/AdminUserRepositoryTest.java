@@ -1,4 +1,4 @@
-package com.openjob.admin.user;
+package com.openjob.admin.adminuser;
 
 import com.openjob.common.model.Admin;
 import org.junit.jupiter.api.Test;
