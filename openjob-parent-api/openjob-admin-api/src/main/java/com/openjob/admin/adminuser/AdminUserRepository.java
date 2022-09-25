@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface AdminUserRepository extends JpaRepository<Admin, String> {
@@ -22,4 +23,7 @@ public interface AdminUserRepository extends JpaRepository<Admin, String> {
     List<Admin> searchActiveByPage(@Param("keyword") String keyword,
                                 @Param("isActive") Boolean isActive,
                                 Pageable pageable);
+
+    @Query("select a from Admin a where a.username = :username")
+    Optional<Admin> findByUsername(@Param("username") String username);
 }
