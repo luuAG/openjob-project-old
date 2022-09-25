@@ -6,14 +6,20 @@ import com.openjob.common.model.Admin;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class AdminUserService extends AbstractBaseService<Admin> {
+public class AdminUserService extends AbstractBaseService<Admin> implements UserDetailsService {
     private final Integer NUMBER_OF_ITEM_IN_ONE_PAGE = 10;
     private final AdminUserRepository adminUserRepo;
     private final BCryptPasswordEncoder passwordEncoder;
@@ -61,9 +67,13 @@ public class AdminUserService extends AbstractBaseService<Admin> {
     }
 
     @Override
-    public Admin save(Admin obj) {
+    public Admin save(Admin obj) throws SQLException {
         obj.setPassword(passwordEncoder.encode(obj.getPassword()));
-        return adminUserRepo.save(obj);
+        try {
+            return adminUserRepo.save(obj);
+        } catch (Exception ex){
+            throw new SQLException("Object to be saved is invalid");
+        }
     }
 
     @Override
@@ -71,7 +81,7 @@ public class AdminUserService extends AbstractBaseService<Admin> {
     }
 
     @Override
-    public void activate(String id) throws AdminUserNotFound {
+    public void activate(String id) throws AdminUserNotFound, SQLException {
         Optional<Admin> admin = adminUserRepo.findById(id);
         if (admin.isPresent()){
             admin.get().setIsActive(true);
@@ -82,7 +92,7 @@ public class AdminUserService extends AbstractBaseService<Admin> {
     }
 
     @Override
-    public void deactivate(String id) throws AdminUserNotFound {
+    public void deactivate(String id) throws AdminUserNotFound, SQLException {
         Optional<Admin> admin = adminUserRepo.findById(id);
         if (admin.isPresent()){
             admin.get().setIsActive(false);
@@ -93,4 +103,21 @@ public class AdminUserService extends AbstractBaseService<Admin> {
     }
 
 
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Optional<Admin> user = adminUserRepo.findByUsername(username);
+        if (user.isPresent()){
+            Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+            authorities.add(new SimpleGrantedAuthority(user.get().getRole().name()));
+            return new User(
+                    user.get().getUsername(),
+                    user.get().getPassword(),
+                    authorities);
+        }
+        throw new UsernameNotFoundException("Admin user not found for username: "+username);
+    }
+
+    public Optional<Admin> findByUsername(String username) {
+        return adminUserRepo.findByUsername(username);
+    }
 }
