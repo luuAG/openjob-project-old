@@ -25,7 +25,7 @@ public class AdminModuleExceptionHandler extends ResponseEntityExceptionHandler 
     @ExceptionHandler(SQLException.class)
     public ResponseEntity<ErrorResponse> handleSQLException(SQLException ex){
         ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setErrorMessage(ex.getMessage());
+        errorResponse.setErrorMessage(ex.getLocalizedMessage());
         errorResponse.setErrorCode(HttpStatus.BAD_REQUEST.value());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }

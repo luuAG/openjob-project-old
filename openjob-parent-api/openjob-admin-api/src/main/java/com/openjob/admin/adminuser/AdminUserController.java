@@ -59,6 +59,19 @@ public class AdminUserController {
         return new ResponseEntity<>(savedAdmin, HttpStatus.CREATED);
     }
 
+    @PutMapping(path = "/adminuser/update", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Admin> updateAdmin(@Valid @RequestBody final Admin admin) throws SQLException {
+        if (Objects.isNull(admin)){
+            throw new IllegalArgumentException("Object is null");
+        }
+        Admin savedAdmin = null;
+        if (adminUserService.isExisting(admin.getId())){
+            savedAdmin = adminUserService.save(admin);
+            savedAdmin.setPassword("hidden-for-security");
+        }
+        return ResponseEntity.ok(savedAdmin);
+    }
+
     @DeleteMapping(path = "/adminuser/deactivate/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MessageResponse> deactivateAdminUser(@PathVariable final String id) throws AdminUserNotFound, SQLException {
         if (Objects.isNull(id)){

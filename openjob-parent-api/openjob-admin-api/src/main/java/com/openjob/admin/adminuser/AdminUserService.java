@@ -24,6 +24,13 @@ public class AdminUserService extends AbstractBaseService<Admin> implements User
     private final AdminUserRepository adminUserRepo;
     private final BCryptPasswordEncoder passwordEncoder;
 
+    public Boolean isExisting(String id){
+        if (Objects.nonNull(id) && !id.isBlank()){
+            return get(id).isPresent();
+        }
+        return false;
+    }
+
     @Override
     public Optional<Admin> get(String id) throws IllegalArgumentException {
         Optional<Admin> admin = adminUserRepo.findById(id);
