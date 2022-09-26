@@ -14,7 +14,7 @@ import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
-public class AdminUserRepositoryTest {
+public class AdminWebUserRepositoryTest {
 
     @Mock
     private AdminUserRepository adminUserRepo;

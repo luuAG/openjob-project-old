@@ -14,7 +14,7 @@ public class Admin {
     @GenericGenerator(name = "uuid", strategy = "uuid")
     @Column(columnDefinition = "CHAR(32)")
     @Id
-    private String id;
+    protected String id;
     @Column(nullable = false, unique = true, length = 20)
     private String username;
     @Column(nullable = false)
