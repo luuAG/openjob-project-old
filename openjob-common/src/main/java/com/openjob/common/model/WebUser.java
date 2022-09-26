@@ -8,8 +8,8 @@ import javax.validation.constraints.Size;
 
 @Data
 @Entity
-@Table(name="hr")
-public class HR {
+@Table(name="web_user")
+public class WebUser {
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
     @Column(columnDefinition = "CHAR(32)")
@@ -21,7 +21,7 @@ public class HR {
     @Size(min = 8, max = 32)
     private String password;
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "default 'RECRUITER'")
+    @Column(columnDefinition = "default 'CANDIDATE'", nullable = false)
     private Role role;
     @Column(nullable = false, columnDefinition = "default true")
     private Boolean isActive;
