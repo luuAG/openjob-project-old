@@ -41,12 +41,13 @@ public class AdminUserController {
         throw new AdminUserNotFound("Admin user not found for ID: " + id);
     }
 
-    @GetMapping(path = "/adminusers/page/{pageNumber}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/adminusers", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<Admin>> getAdminUserByPage(
-            @PathVariable final Integer pageNumber,
+            @RequestParam Integer page,
+            @RequestParam Integer size,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Boolean isActive){
-        return ResponseEntity.ok(adminUserService.searchByPage(keyword, pageNumber, isActive));
+        return ResponseEntity.ok(adminUserService.searchByPage(page, size, keyword, isActive));
     }
 
     @PostMapping(path = "/adminuser/create", produces = MediaType.APPLICATION_JSON_VALUE)

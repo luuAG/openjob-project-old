@@ -20,7 +20,6 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class AdminUserService extends AbstractBaseService<Admin> implements UserDetailsService {
-    private final Integer NUMBER_OF_ITEM_IN_ONE_PAGE = 10;
     private final AdminUserRepository adminUserRepo;
     private final BCryptPasswordEncoder passwordEncoder;
 
@@ -44,8 +43,8 @@ public class AdminUserService extends AbstractBaseService<Admin> implements User
         return null;
     }
 
-    public Collection<Admin> getAllByPage(Integer pageNumber, Boolean isActive) {
-        Pageable pageable = PageRequest.of(pageNumber - 1, this.NUMBER_OF_ITEM_IN_ONE_PAGE);
+    public Collection<Admin> getAllByPage(Integer pageNumber, Integer size, Boolean isActive) {
+        Pageable pageable = PageRequest.of(pageNumber - 1, size);
         List<Admin> listAdmin;
         if (Objects.isNull(isActive))
             listAdmin = adminUserRepo.searchAllByPage("", pageable);
@@ -58,10 +57,10 @@ public class AdminUserService extends AbstractBaseService<Admin> implements User
 
 
 
-    public Collection<Admin> searchByPage(String keyword, Integer pageNumber, Boolean isActive) {
+    public Collection<Admin> searchByPage(Integer page, Integer size, String keyword, Boolean isActive) {
         if (Objects.isNull(keyword) || keyword.isEmpty())
-            return getAllByPage(pageNumber, isActive);
-        Pageable pageable = PageRequest.of(pageNumber - 1, this.NUMBER_OF_ITEM_IN_ONE_PAGE);
+            return getAllByPage(page, size, isActive);
+        Pageable pageable = PageRequest.of(page - 1, size);
         List<Admin> listAdmin;
         if (Objects.isNull(isActive)){
             listAdmin = adminUserRepo.searchAllByPage(keyword, pageable);
