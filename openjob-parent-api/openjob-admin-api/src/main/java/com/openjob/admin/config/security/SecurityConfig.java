@@ -43,7 +43,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.authorizeRequests().antMatchers("/login", "/token/refresh").permitAll();
+        http.authorizeRequests().antMatchers("/login",
+                "/token/refresh",
+                "/swagger-ui/**",
+                "/swagger-ui.html",
+                "/webjars/**",
+                "/v2/**",
+                "/swagger-resources/**").permitAll();
         http.authorizeRequests()
                 .antMatchers("/adminuser/create/**", "/adminuser/activate/**", "/adminuser/deactivate/**")
                 .hasAuthority(Role.SUPER_ADMIN.name());
