@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.springframework.lang.NonNull;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 
 @Data
 @Entity
@@ -15,9 +16,11 @@ public class Admin {
     @Column(columnDefinition = "CHAR(32)")
     @Id
     protected String id;
-    @Column(nullable = false, unique = true, length = 20)
+    @Column(nullable = false, unique = true)
+    @Size(min=3, max = 20)
     private String username;
     @Column(nullable = false)
+    @Size(min=8, max = 32)
     private String password;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -25,8 +28,10 @@ public class Admin {
     @Column(nullable = false, columnDefinition = "default true")
     private Boolean isActive;
     @Column(nullable = false)
+    @Size(max = 20)
     private String firstName;
     @Column(nullable = false)
+    @Size(max = 20)
     private String lastName;
 
 

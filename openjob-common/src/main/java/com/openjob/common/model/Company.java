@@ -25,12 +25,12 @@ public class Company {
     @Column
     private Integer totalEmployee;
     @Column(nullable = false)
-    private String logoURL;
+    private String logoUrl;
     @Column
-    private String wallpaperURL;
+    private String wallpaperUrl;
 
     @OneToOne
-    @JoinColumn(name = "headHunterId", unique = true, nullable = false)
+    @JoinColumn(referencedColumnName = "id", unique = true, nullable = false)
     private HR headHunter;
 
 

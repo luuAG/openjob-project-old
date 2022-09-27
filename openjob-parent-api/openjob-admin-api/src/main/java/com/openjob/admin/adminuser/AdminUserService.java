@@ -1,7 +1,7 @@
 package com.openjob.admin.adminuser;
 
 import com.openjob.admin.base.AbstractBaseService;
-import com.openjob.admin.exception.AdminUserNotFound;
+import com.openjob.admin.exception.UserNotFoundException;
 import com.openjob.common.model.Admin;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -38,10 +38,6 @@ public class AdminUserService extends AbstractBaseService<Admin> implements User
         return admin;
     }
 
-    @Override
-    public Collection<Admin> getAll() {
-        return null;
-    }
 
     public Collection<Admin> getAllByPage(Integer pageNumber, Integer size, Boolean isActive) {
         Pageable pageable = PageRequest.of(pageNumber - 1, size);
@@ -86,25 +82,23 @@ public class AdminUserService extends AbstractBaseService<Admin> implements User
     public void delete(String id) {
     }
 
-    @Override
-    public void activate(String id) throws AdminUserNotFound, SQLException {
+    public void activate(String id) throws UserNotFoundException, SQLException {
         Optional<Admin> admin = adminUserRepo.findById(id);
         if (admin.isPresent()){
             admin.get().setIsActive(true);
             save(admin.get());
         } else {
-            throw new AdminUserNotFound("Admin user not found with ID: " + id);
+            throw new UserNotFoundException("Admin user not found with ID: " + id);
         }
     }
 
-    @Override
-    public void deactivate(String id) throws AdminUserNotFound, SQLException {
+    public void deactivate(String id) throws UserNotFoundException, SQLException {
         Optional<Admin> admin = adminUserRepo.findById(id);
         if (admin.isPresent()){
             admin.get().setIsActive(false);
             save(admin.get());
         } else {
-            throw new AdminUserNotFound("Admin user not found with ID: " + id);
+            throw new UserNotFoundException("Admin user not found with ID: " + id);
         }
     }
 

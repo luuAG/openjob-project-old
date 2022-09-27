@@ -1,4 +1,4 @@
-package com.openjob.admin.user;
+package com.openjob.admin.hr;
 
 import com.openjob.common.model.HR;
 import org.springframework.data.jpa.repository.JpaRepository;

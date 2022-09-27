@@ -29,8 +29,8 @@ public class AdminModuleExceptionHandler extends ResponseEntityExceptionHandler 
         errorResponse.setErrorCode(HttpStatus.BAD_REQUEST.value());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
-    @ExceptionHandler(AdminUserNotFound.class)
-    public ResponseEntity<ErrorResponse> handleAdminUserNotFound(AdminUserNotFound ex){
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleAdminUserNotFound(UserNotFoundException ex){
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setErrorMessage(ex.getMessage());
         errorResponse.setErrorCode(HttpStatus.NOT_FOUND.value());

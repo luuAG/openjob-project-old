@@ -7,7 +7,6 @@ import javax.persistence.*;
 import javax.validation.constraints.Size;
 
 @MappedSuperclass
-@Data
 public class BaseUser {
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
@@ -22,7 +21,7 @@ public class BaseUser {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     protected Role role;
-    @Column(nullable = false, columnDefinition = "default true")
+    @Column(nullable = false, columnDefinition = "bit(1) default true")
     protected Boolean isActive;
     @Column(nullable = false)
     @Size(max = 20)
@@ -31,7 +30,7 @@ public class BaseUser {
     @Size(max = 20)
     protected String lastName;
     @Column
-    protected String avatarURL;
+    protected String avatarUrl;
 
 
 }
