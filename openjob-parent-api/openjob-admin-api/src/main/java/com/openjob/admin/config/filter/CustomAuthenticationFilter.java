@@ -7,6 +7,11 @@ import com.openjob.admin.adminuser.AdminUserService;
 import com.openjob.admin.config.ConfigProperty;
 import com.openjob.common.model.Admin;
 import com.openjob.common.response.ErrorResponse;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.SneakyThrows;
+import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,6 +25,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,14 +45,38 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         this.adminUserService = adminUserService;
     }
 
+    @Data
+    static class Credential {
+        String username, password;
+    }
 
+    @SneakyThrows
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
 
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
+        String bodyParams = getParamsFromPost(request);
+        Credential credential = new ObjectMapper().readValue(bodyParams, Credential.class);
+
+
+        UsernamePasswordAuthenticationToken token =
+                new UsernamePasswordAuthenticationToken(credential.username, credential.password);
         return authenticationManager.authenticate(token);
+    }
+    private String getParamsFromPost(HttpServletRequest request) throws IOException {
+        BufferedReader reader = request.getReader();
+        StringBuilder sb = new StringBuilder();
+        String line = reader.readLine();
+        while (line != null) {
+            sb.append(line + "\n");
+            line = reader.readLine();
+        }
+        reader.close();
+        String params = sb.toString();
+        String[] _params = params.split("&");
+        for (String param : _params) {
+            System.out.println("params(POST)-->" + param);
+        }
+        return params;
     }
 
     @Override
