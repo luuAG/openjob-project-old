@@ -7,6 +7,9 @@ import com.openjob.admin.adminuser.AdminUserService;
 import com.openjob.admin.config.ConfigProperty;
 import com.openjob.common.model.Admin;
 import com.openjob.common.response.ErrorResponse;
+import com.openjob.common.util.OpenJobUtils;
+import lombok.Data;
+import lombok.SneakyThrows;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,6 +31,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 
+
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
     private final ConfigProperty configProperties;
@@ -39,15 +43,22 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         this.adminUserService = adminUserService;
     }
 
+    @Data
+    static class Credential {
+        String username, password;
+    }
 
+    @SneakyThrows
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
+        String bodyParams = OpenJobUtils.getParamsFromPost(request);
+        Credential credential = new ObjectMapper().readValue(bodyParams, Credential.class);
 
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
+        UsernamePasswordAuthenticationToken token =
+                new UsernamePasswordAuthenticationToken(credential.username, credential.password);
         return authenticationManager.authenticate(token);
     }
+
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException {
