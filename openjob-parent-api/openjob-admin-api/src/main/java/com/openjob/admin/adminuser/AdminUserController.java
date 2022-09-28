@@ -6,11 +6,13 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openjob.admin.config.ConfigProperty;
+import com.openjob.admin.dto.AdminPaginationDTO;
 import com.openjob.admin.exception.AdminUserNotFound;
 import com.openjob.common.model.Admin;
 import com.openjob.common.response.ErrorResponse;
 import com.openjob.common.response.MessageResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -42,12 +44,17 @@ public class AdminUserController {
     }
 
     @GetMapping(path = "/adminusers", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<Admin>> getAdminUserByPage(
+    public ResponseEntity<AdminPaginationDTO> getAdminUserByPage(
             @RequestParam Integer page,
             @RequestParam Integer size,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Boolean isActive){
-        return ResponseEntity.ok(adminUserService.searchByPage(page, size, keyword, isActive));
+        Page<Admin> pageAdmin = adminUserService.searchByPage(page, size, keyword, isActive);
+        return ResponseEntity.ok(new AdminPaginationDTO(
+                pageAdmin.getContent(),
+                pageAdmin.getTotalPages(),
+                pageAdmin.getTotalElements()
+        ));
     }
 
     @PostMapping(path = "/adminuser/create", produces = MediaType.APPLICATION_JSON_VALUE)

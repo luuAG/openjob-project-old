@@ -4,6 +4,7 @@ import com.openjob.admin.base.AbstractBaseService;
 import com.openjob.admin.exception.AdminUserNotFound;
 import com.openjob.common.model.Admin;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -43,33 +44,32 @@ public class AdminUserService extends AbstractBaseService<Admin> implements User
         return null;
     }
 
-    public Collection<Admin> getAllByPage(Integer pageNumber, Integer size, Boolean isActive) {
+    public Page<Admin> getAllByPage(Integer pageNumber, Integer size, Boolean isActive) {
         Pageable pageable = PageRequest.of(pageNumber - 1, size);
-        List<Admin> listAdmin;
+        Page<Admin> pageAdmin;
         if (Objects.isNull(isActive))
-            listAdmin = adminUserRepo.searchAllByPage("", pageable);
+            pageAdmin = adminUserRepo.searchAllByPage("", pageable);
         else
-            listAdmin = adminUserRepo.searchActiveByPage("", isActive, pageable);
-
-        listAdmin.forEach(admin -> admin.setPassword("hidden-for-security"));
-        return listAdmin;
+            pageAdmin = adminUserRepo.searchActiveByPage("", isActive, pageable);
+        pageAdmin.getContent().forEach(admin -> admin.setPassword("đã che"));
+        return pageAdmin;
     }
 
 
 
-    public Collection<Admin> searchByPage(Integer page, Integer size, String keyword, Boolean isActive) {
+    public Page<Admin> searchByPage(Integer page, Integer size, String keyword, Boolean isActive) {
         if (Objects.isNull(keyword) || keyword.isEmpty())
             return getAllByPage(page, size, isActive);
         Pageable pageable = PageRequest.of(page - 1, size);
-        List<Admin> listAdmin;
+        Page<Admin> pageAdmin;
         if (Objects.isNull(isActive)){
-            listAdmin = adminUserRepo.searchAllByPage(keyword, pageable);
+            pageAdmin = adminUserRepo.searchAllByPage(keyword, pageable);
         } else {
 
-            listAdmin = adminUserRepo.searchActiveByPage(keyword, isActive, pageable);
+            pageAdmin = adminUserRepo.searchActiveByPage(keyword, isActive, pageable);
         }
-        listAdmin.forEach(admin -> admin.setPassword("hidden-for-security"));
-        return listAdmin;
+        pageAdmin.getContent().forEach(admin -> admin.setPassword("đã che"));
+        return pageAdmin;
     }
 
     @Override
