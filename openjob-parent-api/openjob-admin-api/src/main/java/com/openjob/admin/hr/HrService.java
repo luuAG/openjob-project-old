@@ -1,6 +1,5 @@
 package com.openjob.admin.hr;
 
-import com.openjob.admin.adminuser.AdminUserRepository;
 import com.openjob.admin.base.AbstractBaseService;
 import com.openjob.common.model.HR;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +16,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class HrService extends AbstractBaseService<HR> implements UserDetailsService {
-    private final AdminUserRepository adminUserRepo;
+    private final HrRepository hrRepo;
     private final BCryptPasswordEncoder passwordEncoder;
 
     public Boolean isExisting(String id){
@@ -30,7 +29,7 @@ public class HrService extends AbstractBaseService<HR> implements UserDetailsSer
 
     @Override
     public Optional<HR> get(String id) {
-        return Optional.empty();
+        return hrRepo.findById(id);
     }
 
     @Override

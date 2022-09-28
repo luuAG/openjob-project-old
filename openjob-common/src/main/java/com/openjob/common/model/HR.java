@@ -12,7 +12,7 @@ import javax.validation.constraints.Size;
 public class HR extends BaseUser {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "companyId", nullable = false)
+    @JoinColumn(nullable = false)
     private Company company;
 
 
