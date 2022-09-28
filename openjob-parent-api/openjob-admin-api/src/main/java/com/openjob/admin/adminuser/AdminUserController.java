@@ -7,7 +7,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openjob.admin.config.ConfigProperty;
 import com.openjob.admin.dto.AdminPaginationDTO;
-import com.openjob.admin.exception.AdminUserNotFound;
+import com.openjob.admin.exception.UserNotFoundException;
 import com.openjob.common.model.Admin;
 import com.openjob.common.response.ErrorResponse;
 import com.openjob.common.response.MessageResponse;
@@ -33,14 +33,14 @@ public class AdminUserController {
     private final ConfigProperty configProperties;
 
     @GetMapping(path = "/adminuser/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Admin> getAdminUser(@PathVariable final String id) throws AdminUserNotFound {
+    public ResponseEntity<Admin> getAdminUser(@PathVariable final String id) throws UserNotFoundException {
         if (Objects.isNull(id) || id.isEmpty()){
             throw new IllegalArgumentException("ID is null or empty");
         }
         Optional<Admin> admin = adminUserService.get(id);
         if (admin.isPresent())
             return ResponseEntity.ok(admin.get());
-        throw new AdminUserNotFound("Admin user not found for ID: " + id);
+        throw new UserNotFoundException("Admin user not found for ID: " + id);
     }
 
     @GetMapping(path = "/adminusers", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -81,7 +81,7 @@ public class AdminUserController {
     }
 
     @DeleteMapping(path = "/adminuser/deactivate/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<MessageResponse> deactivateAdminUser(@PathVariable final String id) throws AdminUserNotFound, SQLException {
+    public ResponseEntity<MessageResponse> deactivateAdminUser(@PathVariable final String id) throws UserNotFoundException, SQLException {
         if (Objects.isNull(id)){
             throw new IllegalArgumentException("ID is null");
         }
@@ -91,7 +91,7 @@ public class AdminUserController {
     }
 
     @PostMapping(path = "/adminuser/activate/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<MessageResponse> activateAdminUser(@PathVariable final String id) throws AdminUserNotFound, SQLException {
+    public ResponseEntity<MessageResponse> activateAdminUser(@PathVariable final String id) throws UserNotFoundException, SQLException {
         if (Objects.isNull(id)){
             throw new IllegalArgumentException("ID is null");
         }
@@ -126,7 +126,7 @@ public class AdminUserController {
 
                     new ObjectMapper().writeValue(response.getOutputStream(), tokens);
                 } else
-                    throw new AdminUserNotFound("Admin user not found with username: " + username);
+                    throw new UserNotFoundException("Admin user not found with username: " + username);
 
             } catch (Exception e) {
                 ErrorResponse errorResponse = new ErrorResponse();
