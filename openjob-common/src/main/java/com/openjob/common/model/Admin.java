@@ -24,7 +24,7 @@ public class Admin {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
-    @Column(nullable = false, columnDefinition = "default true")
+    @Column(nullable = false, columnDefinition = "bit(1) default true")
     private Boolean isActive;
     @Column(nullable = false)
     @Size(max = 20)

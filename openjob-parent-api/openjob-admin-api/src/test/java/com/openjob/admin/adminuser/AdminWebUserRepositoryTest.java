@@ -1,20 +1,30 @@
 package com.openjob.admin.adminuser;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import com.openjob.common.model.Admin;
+import com.openjob.common.model.Role;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(SpringRunner.class)
 @SpringBootTest
 public class AdminWebUserRepositoryTest {
 
-    @Mock
+    @Autowired
     private AdminUserRepository adminUserRepo;
 
     @Test
-    public void testSearchActiveByPage(){
-
+    public void testInsertAdmin(){
+        Admin admin = new Admin();
+        admin.setPassword("12345678");
+        admin.setUsername("admin");
+        admin.setLastName("Admin");
+        admin.setFirstName("Normal");
+        admin.setIsActive(true);
+        admin.setRole(Role.ADMIN);
+        Assert.assertNotNull(adminUserRepo.save(admin));
     }
 }

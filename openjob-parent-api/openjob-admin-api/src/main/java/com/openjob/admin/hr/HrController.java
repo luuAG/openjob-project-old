@@ -13,7 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +26,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class HrController {
     private final HrService hrService;
-    private final JavaMailSender mailSender;
+//    private final JavaMailSender mailSender;
 
     @GetMapping(path = "/hr/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getHr(@PathVariable("id") String id) {
@@ -120,7 +119,7 @@ public class HrController {
                         "Password: 12345678\n" +
                         "Vui lòng đổi mật khẩu sau khi đăng nhập lần đầu!", true);
             };
-            mailSender.send(message);
+//            mailSender.send(message);
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 new CompanyHeadhunterResponseDTO(savedHr, savedHr.getCompany())
