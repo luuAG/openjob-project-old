@@ -155,7 +155,7 @@ public class AdminUserController {
     }
 
     @PostMapping(path = "/adminuser/check-password", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<MessageResponse> checkCorrectPassword(@Valid @RequestBody Admin admin){
+    public ResponseEntity<MessageResponse> checkCorrectPassword(@RequestBody Admin admin){
         Optional<Admin> existingAdmin = adminUserService.get(admin.getId());
         boolean correct = false;
         if (existingAdmin.isPresent()){
