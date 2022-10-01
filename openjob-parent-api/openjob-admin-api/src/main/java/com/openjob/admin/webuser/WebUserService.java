@@ -3,9 +3,6 @@ package com.openjob.admin.webuser;
 import com.openjob.admin.base.AbstractBaseService;
 import com.openjob.common.model.WebUser;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +12,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class WebUserService extends AbstractBaseService<WebUser> implements UserDetailsService {
+public class WebUserService extends AbstractBaseService<WebUser> {
     private final WebUserRepository webUserRepo;
     private final BCryptPasswordEncoder passwordEncoder;
 
@@ -42,8 +39,4 @@ public class WebUserService extends AbstractBaseService<WebUser> implements User
 
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return null;
-    }
 }

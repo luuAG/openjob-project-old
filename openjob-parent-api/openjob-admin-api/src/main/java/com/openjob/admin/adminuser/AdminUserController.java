@@ -64,7 +64,7 @@ public class AdminUserController {
         }
         Admin savedAdmin = adminUserService.save(admin);
         savedAdmin.setPassword("hidden-for-security");
-        return new ResponseEntity<>(savedAdmin, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedAdmin);
     }
 
     @PutMapping(path = "/adminuser/update", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -72,11 +72,18 @@ public class AdminUserController {
         if (Objects.isNull(admin)){
             throw new IllegalArgumentException("Object is null");
         }
+        Optional<Admin> optionalAdmin = adminUserService.get(admin.getId());
         Admin savedAdmin = null;
-        if (adminUserService.isExisting(admin.getId())){
-            savedAdmin = adminUserService.save(admin);
-            savedAdmin.setPassword("hidden-for-security");
+        if (optionalAdmin.isPresent()){
+            Admin existingAdmin = optionalAdmin.get();
+            existingAdmin.setFirstName(admin.getFirstName());
+            existingAdmin.setIsActive(admin.getIsActive());
+            existingAdmin.setRole(admin.getRole());
+            existingAdmin.setLastName(admin.getLastName());
+            existingAdmin.setUsername(admin.getUsername());
+            savedAdmin = adminUserService.save(existingAdmin);
         }
+
         return ResponseEntity.ok(savedAdmin);
     }
 
@@ -124,17 +131,20 @@ public class AdminUserController {
                     Map<String, String> tokens = new HashMap<>();
                     tokens.put("access-token", accessToken);
 
+                    response.setStatus(HttpStatus.OK.value());
                     new ObjectMapper().writeValue(response.getOutputStream(), tokens);
                 } else
                     throw new UserNotFoundException("Admin user not found with username: " + username);
 
             } catch (Exception e) {
+                response.setStatus(HttpStatus.FORBIDDEN.value());
                 ErrorResponse errorResponse = new ErrorResponse();
                 errorResponse.setErrorMessage(e.getMessage());
                 errorResponse.setErrorCode(HttpStatus.FORBIDDEN.value());
                 new ObjectMapper().writeValue(response.getOutputStream(), errorResponse);
             }
         } else {
+            response.setStatus(HttpStatus.FORBIDDEN.value());
             ErrorResponse errorResponse = new ErrorResponse();
             errorResponse.setErrorMessage("Refresh token is not valid");
             errorResponse.setErrorCode(HttpStatus.FORBIDDEN.value());

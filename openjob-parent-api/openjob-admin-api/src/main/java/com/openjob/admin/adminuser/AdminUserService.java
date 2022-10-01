@@ -4,6 +4,7 @@ import com.openjob.admin.base.AbstractBaseService;
 import com.openjob.admin.exception.UserNotFoundException;
 import com.openjob.common.model.Admin;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.NestedExceptionUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -74,7 +75,7 @@ public class AdminUserService extends AbstractBaseService<Admin> implements User
         try {
             return adminUserRepo.save(obj);
         } catch (Exception ex){
-            throw new SQLException("Object to be saved is invalid");
+            throw new SQLException(NestedExceptionUtils.getMostSpecificCause(ex).getMessage());
         }
     }
 

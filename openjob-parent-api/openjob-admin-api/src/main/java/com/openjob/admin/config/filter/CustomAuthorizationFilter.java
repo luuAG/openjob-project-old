@@ -37,13 +37,15 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         } else {
             String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
             if (Objects.nonNull(authorizationHeader) && authorizationHeader.startsWith("Bearer ")){
-               try{
+                String username = null;
+                String role = null;
+                try{
                    String token = authorizationHeader.substring("Bearer ".length());
                    Algorithm algorithm = Algorithm.HMAC256(configProperties.getConfigValue("secret-key").getBytes());
                    JWTVerifier verifier = JWT.require(algorithm).build();
                    DecodedJWT decodedJWT = verifier.verify(token);
-                   String username = decodedJWT.getSubject();
-                   String role = decodedJWT.getClaim("role").asArray(String.class)[0];
+                   username = decodedJWT.getSubject();
+                   role = decodedJWT.getClaim("role").asArray(String.class)[0];
                    Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
                    authorities.add(new SimpleGrantedAuthority(role));
 
@@ -53,10 +55,12 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                    filterChain.doFilter(request, response);
                } catch (Exception e) {
                    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                   response.setStatus(HttpStatus.FORBIDDEN.value());
                    ErrorResponse errorResponse = new ErrorResponse();
-                   errorResponse.setErrorMessage(e.getMessage());
+                   errorResponse.setErrorMessage("Username "+username+ " with role " + role + " doesnt have permission");
                    errorResponse.setErrorCode(HttpStatus.FORBIDDEN.value());
                    new ObjectMapper().writeValue(response.getOutputStream(), errorResponse);
+                   response.getOutputStream().flush();
                }
             }
             else {

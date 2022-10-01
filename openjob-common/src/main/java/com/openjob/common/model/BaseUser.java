@@ -6,6 +6,7 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 
+@Data
 @MappedSuperclass
 public class BaseUser {
     @GeneratedValue(generator = "uuid")

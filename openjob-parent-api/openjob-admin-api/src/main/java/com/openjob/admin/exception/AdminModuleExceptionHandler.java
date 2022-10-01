@@ -20,14 +20,14 @@ public class AdminModuleExceptionHandler extends ResponseEntityExceptionHandler 
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setErrorMessage(ex.getMessage());
         errorResponse.setErrorCode(HttpStatus.BAD_REQUEST.value());
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.badRequest().body(errorResponse);
     }
     @ExceptionHandler(SQLException.class)
     public ResponseEntity<ErrorResponse> handleSQLException(SQLException ex){
         ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setErrorMessage(ex.getLocalizedMessage());
+        errorResponse.setErrorMessage(ex.getMessage());
         errorResponse.setErrorCode(HttpStatus.BAD_REQUEST.value());
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.badRequest().body(errorResponse);
     }
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleAdminUserNotFound(UserNotFoundException ex){
@@ -49,7 +49,7 @@ public class AdminModuleExceptionHandler extends ResponseEntityExceptionHandler 
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setErrorMessage(ex.getMessage());
         errorResponse.setErrorCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseEntity.internalServerError().body(errorResponse);
     }
 
     @Override
@@ -57,6 +57,6 @@ public class AdminModuleExceptionHandler extends ResponseEntityExceptionHandler 
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setErrorMessage("Request body object is not valid");
         errorResponse.setErrorCode(HttpStatus.BAD_REQUEST.value());
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.badRequest().body(errorResponse);
     }
 }

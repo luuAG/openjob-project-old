@@ -1,13 +1,17 @@
 package com.openjob.admin.config.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openjob.admin.adminuser.AdminUserService;
 import com.openjob.admin.config.ConfigProperty;
 import com.openjob.admin.config.filter.CustomAuthenticationFilter;
 import com.openjob.admin.config.filter.CustomAuthorizationFilter;
 import com.openjob.common.model.Role;
+import com.openjob.common.response.ErrorResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,9 +20,12 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+
+import javax.servlet.ServletOutputStream;
 
 @Configuration
 @EnableWebSecurity
@@ -63,7 +70,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().anyRequest().authenticated();
         http.addFilter(new CustomAuthenticationFilter(authenticationManagerBean(), configProperties, adminUserService));
         http.addFilterBefore(new CustomAuthorizationFilter(configProperties), CustomAuthenticationFilter.class);
-//        http.authorizeRequests().anyRequest().permitAll();
+        http.exceptionHandling().accessDeniedHandler(accessDeniedHandler());
+
+    }
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return (request, response, ex) -> {
+            response.setStatus(HttpStatus.FORBIDDEN.value());
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
+            ServletOutputStream out = response.getOutputStream();
+            ErrorResponse errorResponse = new ErrorResponse();
+            errorResponse.setErrorMessage("User does not have permission. "+ex.getMessage());
+            errorResponse.setErrorCode(HttpStatus.FORBIDDEN.value());
+            new ObjectMapper().writeValue(out, errorResponse);
+            out.flush();
+        };
     }
 
     @Bean

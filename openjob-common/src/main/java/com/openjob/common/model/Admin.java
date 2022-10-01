@@ -20,7 +20,6 @@ public class Admin {
     @Size(min=3, max = 20)
     private String username;
     @Column(nullable = false)
-    @Size(min=8, max = 32)
     private String password;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
