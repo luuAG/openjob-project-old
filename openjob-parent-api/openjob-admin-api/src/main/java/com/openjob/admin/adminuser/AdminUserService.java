@@ -35,8 +35,6 @@ public class AdminUserService extends AbstractBaseService<Admin> implements User
     @Override
     public Optional<Admin> get(String id) throws IllegalArgumentException {
         Optional<Admin> admin = adminUserRepo.findById(id);
-        if (admin.isPresent())
-            admin.get().setPassword("hidden-for-security");
         return admin;
     }
 

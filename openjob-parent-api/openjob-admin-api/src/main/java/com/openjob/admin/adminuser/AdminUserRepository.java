@@ -24,6 +24,6 @@ public interface AdminUserRepository extends JpaRepository<Admin, String> {
                                 @Param("isActive") Boolean isActive,
                                 Pageable pageable);
 
-    @Query("select a from Admin a where a.username = :username")
-    Optional<Admin> findByUsername(@Param("username") String username);
+    @Query("select a from Admin a where a.username like ?1")
+    Optional<Admin> findByUsername(String username);
 }

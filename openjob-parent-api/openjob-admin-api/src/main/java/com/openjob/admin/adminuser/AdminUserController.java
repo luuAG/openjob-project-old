@@ -7,6 +7,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openjob.admin.config.ConfigProperty;
 import com.openjob.admin.dto.AdminPaginationDTO;
+import com.openjob.admin.dto.UsernameDTO;
 import com.openjob.admin.exception.UserNotFoundException;
 import com.openjob.common.model.Admin;
 import com.openjob.common.response.ErrorResponse;
@@ -40,8 +41,10 @@ public class AdminUserController {
             throw new IllegalArgumentException("ID is null or empty");
         }
         Optional<Admin> admin = adminUserService.get(id);
-        if (admin.isPresent())
+        if (admin.isPresent()){
+            admin.get().setPassword("đã che");
             return ResponseEntity.ok(admin.get());
+        }
         throw new UserNotFoundException("Admin user not found for ID: " + id);
     }
 
@@ -167,10 +170,11 @@ public class AdminUserController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse("Wrong password"));
     }
 
-    @PostMapping(path = "/adminuser/check-username", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<MessageResponse> checkExistingUsername(@RequestBody String username){
-        Optional<Admin> existing = adminUserService.findByUsername(username);
-
+    @PostMapping(path = "/adminuser/check-username",
+            produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MessageResponse> checkExistingUsername(@RequestBody UsernameDTO body) {
+        Optional<Admin> existing = adminUserService.findByUsername(body.getUsername());
         if (existing.isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse("Username existing"));
         }
