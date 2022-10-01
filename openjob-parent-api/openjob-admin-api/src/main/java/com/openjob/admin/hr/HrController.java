@@ -1,5 +1,7 @@
 package com.openjob.admin.hr;
 
+import com.openjob.admin.dto.CompanyHeadhunterRequestDTO;
+import com.openjob.admin.dto.CompanyHeadhunterResponseDTO;
 import com.openjob.admin.dto.HrPaginationDTO;
 import com.openjob.admin.exception.UserNotFoundException;
 import com.openjob.common.model.Company;
@@ -16,9 +18,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.web.bind.annotation.*;
 
-import javax.mail.internet.MimeMessage;
 import java.sql.SQLException;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -84,13 +84,15 @@ public class HrController {
         return ResponseEntity.ok(new MessageResponse("HR user is deactivated, ID: " + id));
     }
 
-    @PostMapping(path = "/hr/create-head-hunter", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<HR> createHeadHunter(@RequestBody Map<String, Object> body) throws SQLException {
-        HR hr = (HR) body.get("headHunter");
-        Company company = (Company) body.get("company");
 
-        if (Objects.isNull(hr) || Objects.isNull(company)){
-            throw new IllegalArgumentException("Object is null");
+    @PostMapping(path = "/hr/create-head-hunter", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CompanyHeadhunterResponseDTO> createHeadHunter(@RequestBody CompanyHeadhunterRequestDTO body) throws SQLException {
+        HR hr = body.getHeadHunter();
+        Company company = new Company();
+        company.setName(body.getCompanyName());
+
+        if (Objects.isNull(hr)){
+            throw new IllegalArgumentException("Head hunter is null");
         }
         if (Objects.isNull(hr.getEmail()) || hr.getEmail().isBlank()){
             throw new IllegalArgumentException("Head hunter's email is null or blank");
@@ -100,28 +102,29 @@ public class HrController {
         }
 
         company.setHeadHunter(hr);
+
         hr.setCompany(company);
         hr.setRole(Role.HEAD_HUNTER);
         hr.setPassword("12345678");
         HR savedHr = hrService.save(hr);
+
         if (Objects.nonNull(savedHr)){
-            MimeMessagePreparator message = new MimeMessagePreparator() {
-                @Override
-                public void prepare(MimeMessage mimeMessage) throws Exception {
-                    MimeMessageHelper message = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-                    message.setFrom("duongvannam2001@gmail.com");
-                    message.setTo(savedHr.getEmail());
-                    message.setSubject("Tài khoản OpenJob đã được tạo");
-                    message.setText("Kính gửi Phòng tuyển dụng công ty "+company.getName()+", \n" +
-                            "Tài khoản cho Quản lý bộ phận tuyển dụng ở OpenJob: \n" +
-                            "Username: "+ savedHr.getEmail() + "\n" +
-                            "Password: 12345678\n" +
-                            "Vui lòng đổi mật khẩu sau khi đăng nhập lần đầu!", true);
-                }
+            MimeMessagePreparator message = mimeMessage -> {
+                MimeMessageHelper message1 = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+                message1.setFrom("duongvannam2001@gmail.com");
+                message1.setTo(savedHr.getEmail());
+                message1.setSubject("Tài khoản OpenJob đã được tạo");
+                message1.setText("Kính gửi Phòng tuyển dụng công ty "+company.getName()+", \n" +
+                        "Tài khoản cho Quản lý bộ phận tuyển dụng ở OpenJob: \n" +
+                        "Username: "+ savedHr.getEmail() + "\n" +
+                        "Password: 12345678\n" +
+                        "Vui lòng đổi mật khẩu sau khi đăng nhập lần đầu!", true);
             };
             mailSender.send(message);
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedHr);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                new CompanyHeadhunterResponseDTO(savedHr, savedHr.getCompany())
+        );
     }
 
 

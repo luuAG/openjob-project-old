@@ -2,6 +2,7 @@ package com.openjob.common.model;
 
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
@@ -17,7 +18,6 @@ public class BaseUser {
     @Column(unique = true, nullable = false)
     protected String email;
     @Column(nullable = false)
-    @Size(min = 8, max = 32)
     protected String password;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

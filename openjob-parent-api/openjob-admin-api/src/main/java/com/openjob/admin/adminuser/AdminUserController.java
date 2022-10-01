@@ -164,17 +164,17 @@ public class AdminUserController {
         if (correct) {
             return ResponseEntity.ok(new MessageResponse("OK"));
         }
-        return ResponseEntity.status(HttpStatus.SEE_OTHER).body(new MessageResponse("Wrong password"));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse("Wrong password"));
     }
 
     @PostMapping(path = "/adminuser/check-username", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<MessageResponse> checkExistingUsername(@RequestBody Admin admin){
-        boolean existing = adminUserService.isExisting(admin.getId());
+    public ResponseEntity<MessageResponse> checkExistingUsername(@RequestBody String username){
+        Optional<Admin> existing = adminUserService.findByUsername(username);
 
-        if (!existing) {
-            return ResponseEntity.ok(new MessageResponse("Accepted"));
+        if (existing.isPresent()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse("Username existing"));
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("Username existing"));
+        return ResponseEntity.ok(new MessageResponse("Accepted"));
     }
 
 

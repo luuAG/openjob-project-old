@@ -1,5 +1,6 @@
 package com.openjob.common.model;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -11,8 +12,8 @@ import javax.validation.constraints.Size;
 @Table(name="hr")
 public class HR extends BaseUser {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
+    @ApiModelProperty(hidden = true)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Company company;
 
 
