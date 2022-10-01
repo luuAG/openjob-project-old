@@ -17,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +32,7 @@ import java.util.*;
 public class AdminUserController {
     private final AdminUserService adminUserService;
     private final ConfigProperty configProperties;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @GetMapping(path = "/adminuser/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Admin> getAdminUser(@PathVariable final String id) throws UserNotFoundException {
@@ -150,6 +152,29 @@ public class AdminUserController {
             errorResponse.setErrorCode(HttpStatus.FORBIDDEN.value());
             new ObjectMapper().writeValue(response.getOutputStream(), errorResponse);
         }
+    }
+
+    @PostMapping(path = "/adminuser/check-password", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MessageResponse> checkCorrectPassword(@Valid @RequestBody Admin admin){
+        Optional<Admin> existingAdmin = adminUserService.get(admin.getId());
+        boolean correct = false;
+        if (existingAdmin.isPresent()){
+            correct = passwordEncoder.matches(admin.getPassword(), existingAdmin.get().getPassword());
+        }
+        if (correct) {
+            return ResponseEntity.ok(new MessageResponse("OK"));
+        }
+        return ResponseEntity.status(HttpStatus.SEE_OTHER).body(new MessageResponse("Wrong password"));
+    }
+
+    @PostMapping(path = "/adminuser/check-username", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MessageResponse> checkExistingUsername(@RequestBody Admin admin){
+        boolean existing = adminUserService.isExisting(admin.getId());
+
+        if (!existing) {
+            return ResponseEntity.ok(new MessageResponse("Accepted"));
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("Username existing"));
     }
 
 
