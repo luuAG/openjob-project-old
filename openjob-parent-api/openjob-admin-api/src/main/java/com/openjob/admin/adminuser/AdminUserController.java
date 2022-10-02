@@ -42,7 +42,6 @@ public class AdminUserController {
         }
         Optional<Admin> admin = adminUserService.get(id);
         if (admin.isPresent()){
-            admin.get().setPassword("đã che");
             return ResponseEntity.ok(admin.get());
         }
         throw new UserNotFoundException("Admin user not found for ID: " + id);
@@ -72,7 +71,7 @@ public class AdminUserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedAdmin);
     }
 
-    @PutMapping(path = "/adminuser/update", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/adminuser/update", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Admin> updateAdmin(@Valid @RequestBody final Admin admin) throws SQLException {
         if (Objects.isNull(admin)){
             throw new IllegalArgumentException("Object is null");
@@ -86,10 +85,11 @@ public class AdminUserController {
             existingAdmin.setRole(admin.getRole());
             existingAdmin.setLastName(admin.getLastName());
             existingAdmin.setUsername(admin.getUsername());
+            existingAdmin.setPassword(admin.getPassword());
             savedAdmin = adminUserService.save(existingAdmin);
         }
 
-        return ResponseEntity.ok(savedAdmin);
+        return ResponseEntity.badRequest().body(savedAdmin);
     }
 
     @DeleteMapping(path = "/adminuser/deactivate/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

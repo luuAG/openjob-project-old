@@ -18,7 +18,7 @@ public class SettingRepositoryTest {
     public void testInsertSetting(){
         Setting s = new Setting();
         s.setName("MAIL_PASSWORD");
-        s.setValue("mailcanhan");
+        s.setValue("yhvuypsmxrtrakzc");
         Setting saved = settingRepo.save(s);
         Assert.notNull(saved, "ALO");
     }

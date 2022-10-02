@@ -1,4 +1,4 @@
-package com.openjob.admin.hr;
+package com.openjob.admin.company;
 
 import com.openjob.admin.base.AbstractBaseService;
 import com.openjob.admin.exception.UserNotFoundException;
@@ -60,21 +60,21 @@ public class HrService extends AbstractBaseService<HR>  {
     public Page<HR> searchByKeyword(Integer page, Integer size, String keyword) {
         if (Objects.isNull(keyword) || keyword.isEmpty())
             return getAll(page, size);
-        Pageable pageable = PageRequest.of(page - 1, size);
+        Pageable pageable = PageRequest.of(page, size);
         Page<HR> pageHr = hrRepo.search(keyword, pageable);
         pageHr.getContent().forEach(admin -> admin.setPassword("đã che"));
         return pageHr;
     }
 
     private Page<HR> getAll(Integer page, Integer size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
+        Pageable pageable = PageRequest.of(page, size);
         Page<HR> pageHr = hrRepo.findAll(pageable);
         pageHr.getContent().forEach(admin -> admin.setPassword("đã che"));
         return pageHr;
     }
 
     public Page<HR> searchByCompany(Integer page, Integer size, String keyword) {
-        Pageable pageable = PageRequest.of(page - 1, size);
+        Pageable pageable = PageRequest.of(page, size);
         if (Objects.isNull(keyword) || keyword.isBlank())
             keyword = "";
         Page<HR> pageHr = hrRepo.searchByCompany(keyword ,pageable);

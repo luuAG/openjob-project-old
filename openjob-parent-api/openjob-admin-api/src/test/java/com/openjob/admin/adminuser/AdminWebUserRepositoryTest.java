@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
@@ -15,14 +16,16 @@ public class AdminWebUserRepositoryTest {
 
     @Autowired
     private AdminUserRepository adminUserRepo;
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     @Test
     public void testInsertAdmin(){
         Admin admin = new Admin();
-        admin.setPassword("12345678");
-        admin.setUsername("admin");
+        admin.setPassword(passwordEncoder.encode("12345678"));
+        admin.setUsername("superadmin");
         admin.setLastName("Admin");
-        admin.setFirstName("Normal");
+        admin.setFirstName("Super");
         admin.setIsActive(true);
         admin.setRole(Role.ADMIN);
         Assert.assertNotNull(adminUserRepo.save(admin));

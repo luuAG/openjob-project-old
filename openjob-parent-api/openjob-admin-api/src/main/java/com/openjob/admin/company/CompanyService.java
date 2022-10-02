@@ -1,4 +1,4 @@
-package com.openjob.admin.hr;
+package com.openjob.admin.company;
 
 import com.openjob.admin.base.AbstractBaseService;
 import com.openjob.admin.exception.UserNotFoundException;

@@ -1,17 +1,15 @@
 package com.openjob.admin.dto;
 
-import com.openjob.common.model.Company;
-import com.openjob.common.model.HR;
 import lombok.Getter;
 
 @Getter
 public class CompanyHeadhunterResponseDTO {
 
-    private  Company company;
-    private  HR headHunter;
+    private String companyId;
+    private String headHunterId;
 
-    public CompanyHeadhunterResponseDTO(HR savedHr, Company company) {
-        this.company = company;
-        this.headHunter = savedHr;
+    public CompanyHeadhunterResponseDTO(String companyId, String headHunterId) {
+        this.companyId = companyId;
+        this.headHunterId = headHunterId;
     }
 }

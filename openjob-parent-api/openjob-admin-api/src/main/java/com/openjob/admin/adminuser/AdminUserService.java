@@ -40,13 +40,13 @@ public class AdminUserService extends AbstractBaseService<Admin> implements User
 
 
     public Page<Admin> getAllByPage(Integer pageNumber, Integer size, Boolean isActive) {
-        Pageable pageable = PageRequest.of(pageNumber - 1, size);
+        Pageable pageable = PageRequest.of(pageNumber, size);
         Page<Admin> pageAdmin;
         if (Objects.isNull(isActive))
             pageAdmin = adminUserRepo.searchAllByPage("", pageable);
         else
             pageAdmin = adminUserRepo.searchActiveByPage("", isActive, pageable);
-        pageAdmin.getContent().forEach(admin -> admin.setPassword("đã che"));
+        
         return pageAdmin;
     }
 
@@ -55,7 +55,7 @@ public class AdminUserService extends AbstractBaseService<Admin> implements User
     public Page<Admin> searchByPage(Integer page, Integer size, String keyword, Boolean isActive) {
         if (Objects.isNull(keyword) || keyword.isEmpty())
             return getAllByPage(page, size, isActive);
-        Pageable pageable = PageRequest.of(page - 1, size);
+        Pageable pageable = PageRequest.of(page, size);
         Page<Admin> pageAdmin;
         if (Objects.isNull(isActive)){
             pageAdmin = adminUserRepo.searchAllByPage(keyword, pageable);
@@ -63,7 +63,7 @@ public class AdminUserService extends AbstractBaseService<Admin> implements User
 
             pageAdmin = adminUserRepo.searchActiveByPage(keyword, isActive, pageable);
         }
-        pageAdmin.getContent().forEach(admin -> admin.setPassword("đã che"));
+        
         return pageAdmin;
     }
 

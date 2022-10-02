@@ -1,4 +1,4 @@
-package com.openjob.admin.hr;
+package com.openjob.admin.company;
 
 import com.openjob.admin.dto.CompanyHeadhunterRequestDTO;
 import com.openjob.admin.dto.CompanyHeadhunterResponseDTO;
@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.web.bind.annotation.*;
@@ -24,9 +25,9 @@ import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
-public class HrController {
+public class CompanyHrController {
     private final HrService hrService;
-//    private final JavaMailSender mailSender;
+    private final JavaMailSender mailSender;
 
     @GetMapping(path = "/hr/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getHr(@PathVariable("id") String id) {
@@ -40,7 +41,7 @@ public class HrController {
     }
 
     @GetMapping(path = "/hrs", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<HrPaginationDTO> getAdminUserByPage(
+    public ResponseEntity<HrPaginationDTO> getHrs(
             @RequestParam Integer page,
             @RequestParam Integer size,
             @RequestParam(required = false) String keyword,
@@ -84,7 +85,7 @@ public class HrController {
     }
 
 
-    @PostMapping(path = "/hr/create-head-hunter", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/company/create-head-hunter", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CompanyHeadhunterResponseDTO> createHeadHunter(@RequestBody CompanyHeadhunterRequestDTO body) throws SQLException {
         HR hr = body.getHeadHunter();
         Company company = new Company();
@@ -119,13 +120,14 @@ public class HrController {
                         "Password: 12345678\n" +
                         "Vui lòng đổi mật khẩu sau khi đăng nhập lần đầu!", true);
             };
-//            mailSender.send(message);
+            mailSender.send(message);
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                new CompanyHeadhunterResponseDTO(savedHr, savedHr.getCompany())
+                new CompanyHeadhunterResponseDTO(savedHr.getId(), savedHr.getCompany().getId())
         );
     }
 
-
+//    @GetMapping(path = "/companies", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<CompanyPaginationDTO> getCompanies()
 
 }
