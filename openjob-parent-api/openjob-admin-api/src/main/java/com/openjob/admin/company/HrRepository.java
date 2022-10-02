@@ -25,4 +25,7 @@ public interface HrRepository extends JpaRepository<HR, String> {
 
     @Query("select hr from HR hr where hr.company.name like '%?1%'")
     Page<HR> searchByCompany(String keyword, Pageable pageable);
+
+    @Query("select hr from HR hr where hr.company.id like '?1'")
+    Page<HR> findByCompanyId(String companyId, Pageable pageable);
 }

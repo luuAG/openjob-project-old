@@ -2,6 +2,7 @@ package com.openjob.admin.company;
 
 import com.openjob.admin.dto.CompanyHeadhunterRequestDTO;
 import com.openjob.admin.dto.CompanyHeadhunterResponseDTO;
+import com.openjob.admin.dto.CompanyPaginationDTO;
 import com.openjob.admin.dto.HrPaginationDTO;
 import com.openjob.admin.exception.UserNotFoundException;
 import com.openjob.common.model.Company;
@@ -27,9 +28,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CompanyHrController {
     private final HrService hrService;
+    private final CompanyService companyService;
     private final JavaMailSender mailSender;
 
-    @GetMapping(path = "/hr/get/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/hr/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getHr(@PathVariable("id") String id) {
         if (Objects.isNull(id)){
             throw new IllegalArgumentException("ID is null");
@@ -71,7 +73,7 @@ public class CompanyHrController {
             return ResponseEntity.ok(new MessageResponse("HR user is activated, ID: " + id));
     }
 
-    @PostMapping(path = "/hr/deactivate/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(path = "/hr/deactivate/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MessageResponse> deactivateHr(@PathVariable String id) throws SQLException, UserNotFoundException {
         Optional<HR> optionalHR = hrService.get(id);
         if (optionalHR.isPresent()){
@@ -127,7 +129,29 @@ public class CompanyHrController {
         );
     }
 
-//    @GetMapping(path = "/companies", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<CompanyPaginationDTO> getCompanies()
+    @GetMapping(path = "/companies", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CompanyPaginationDTO> getCompanies(
+            @RequestParam Integer page,
+            @RequestParam Integer size,
+            @RequestParam(required = false) String keyword) {
+        Page<Company> pageCompany = companyService.search(page, size, keyword);
+        return ResponseEntity.ok(new CompanyPaginationDTO(
+                pageCompany.getContent(),
+                pageCompany.getTotalPages(),
+                pageCompany.getTotalElements())
+        );
+    }
+    @GetMapping(path = "/company/{companyId}/hrs", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<HrPaginationDTO> getHrsOfCompany(
+            @RequestParam Integer page,
+            @RequestParam Integer size,
+            @PathVariable String companyId) {
+        Page<HR> pageHr = hrService.findByCompanyId(page, size, companyId);
+        return ResponseEntity.ok(new HrPaginationDTO(
+                pageHr.getContent(),
+                pageHr.getTotalPages(),
+                pageHr.getTotalElements())
+        );
+    }
 
 }

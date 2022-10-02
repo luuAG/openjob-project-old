@@ -7,6 +7,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openjob.admin.config.ConfigProperty;
 import com.openjob.admin.dto.AdminPaginationDTO;
+import com.openjob.admin.dto.PasswordDTO;
 import com.openjob.admin.dto.UsernameDTO;
 import com.openjob.admin.exception.UserNotFoundException;
 import com.openjob.common.model.Admin;
@@ -85,7 +86,22 @@ public class AdminUserController {
             existingAdmin.setRole(admin.getRole());
             existingAdmin.setLastName(admin.getLastName());
             existingAdmin.setUsername(admin.getUsername());
-            existingAdmin.setPassword(admin.getPassword());
+            savedAdmin = adminUserService.saveWithoutPassword(existingAdmin);
+        }
+
+        return ResponseEntity.badRequest().body(savedAdmin);
+    }
+
+    @PostMapping(path = "/adminuser/change-password", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Admin> changePasswordAdmin(@RequestBody final PasswordDTO body) throws SQLException {
+        if (Objects.isNull(body)){
+            throw new IllegalArgumentException("Object is null");
+        }
+        Optional<Admin> optionalAdmin = adminUserService.get(body.getId());
+        Admin savedAdmin = null;
+        if (optionalAdmin.isPresent()){
+            Admin existingAdmin = optionalAdmin.get();
+            existingAdmin.setPassword(body.getPassword());
             savedAdmin = adminUserService.save(existingAdmin);
         }
 

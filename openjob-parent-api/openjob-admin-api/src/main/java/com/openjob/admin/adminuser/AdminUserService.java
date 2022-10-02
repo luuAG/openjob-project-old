@@ -78,6 +78,15 @@ public class AdminUserService extends AbstractBaseService<Admin> implements User
     }
 
     @Override
+    public Admin saveWithoutPassword(Admin object) throws SQLException {
+        try {
+            return adminUserRepo.save(object);
+        } catch (Exception ex){
+            throw new SQLException(NestedExceptionUtils.getMostSpecificCause(ex).getMessage());
+        }
+    }
+
+    @Override
     public void delete(String id) {
     }
 

@@ -47,6 +47,15 @@ public class HrService extends AbstractBaseService<HR>  {
     }
 
     @Override
+    public HR saveWithoutPassword(HR object) throws SQLException {
+        try {
+            return hrRepo.save(object);
+        } catch (Exception ex){
+            throw new SQLException(NestedExceptionUtils.getMostSpecificCause(ex).getMessage());
+        }
+    }
+
+    @Override
     public void delete(String id) throws UserNotFoundException {
         Optional<HR> hr = hrRepo.findById(id);
         if (hr.isPresent())
@@ -62,14 +71,12 @@ public class HrService extends AbstractBaseService<HR>  {
             return getAll(page, size);
         Pageable pageable = PageRequest.of(page, size);
         Page<HR> pageHr = hrRepo.search(keyword, pageable);
-        pageHr.getContent().forEach(admin -> admin.setPassword("đã che"));
         return pageHr;
     }
 
     private Page<HR> getAll(Integer page, Integer size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<HR> pageHr = hrRepo.findAll(pageable);
-        pageHr.getContent().forEach(admin -> admin.setPassword("đã che"));
         return pageHr;
     }
 
@@ -78,7 +85,14 @@ public class HrService extends AbstractBaseService<HR>  {
         if (Objects.isNull(keyword) || keyword.isBlank())
             keyword = "";
         Page<HR> pageHr = hrRepo.searchByCompany(keyword ,pageable);
-        pageHr.getContent().forEach(admin -> admin.setPassword("đã che"));
+        return pageHr;
+    }
+
+    public Page<HR> findByCompanyId(Integer page, Integer size, String companyId) {
+        Pageable pageable = PageRequest.of(page, size);
+        if (Objects.isNull(companyId) || companyId.isBlank())
+            throw new IllegalArgumentException("Company ID is null or blank");
+        Page<HR> pageHr = hrRepo.findByCompanyId(companyId, pageable);
         return pageHr;
     }
 }
