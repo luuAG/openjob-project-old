@@ -1,0 +1,50 @@
+
+server:
+    port: 8080
+    servlet:
+        context-path: /api/web
+spring:
+    datasource:
+        hikari:
+            auto-commit: false
+            maximum-pool-size: 1
+            minimum-idle: 1
+        password: DeoaolGAcfXkG4dsXGn5
+        url: jdbc:mysql://be7rthtqxjtp0hj0gdjh-mysql.services.clever-cloud.com:3306/be7rthtqxjtp0hj0gdjh
+        username: u1wnjbbsiay1iy1h
+    jpa:
+        hibernate:
+            ddl-auto: update
+        properties:
+            hibernate:
+                connection:
+                    provider_disables_autocommit: true
+                dialect: org.hibernate.dialect.MySQL8Dialect
+                format_sql: true
+        show-sql: true
+    servlet:
+        multipart:
+            max-file-size: 1MB
+            max-request-size: 2MB
+    security:
+        oauth2:
+            client:
+                registration:
+                    google:
+                        clientId: 1050028138582-oef0g8noo73q2aeds0pq1d617v2bii0k.apps.googleusercontent.com
+                        clientSecret: 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
+                        redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
+                        scope:
+                            - email
+                            - profile
+app:
+    auth:
+        tokenSecret: 04ca023b39512e46d0c2cf4b48d5aac61d34302994c87ed4eff225dcf3b0a218739f3897051a057f9b846a69ea2927a587044164b7bae5e1306219d50b588cb1
+        tokenExpirationMsec: 864000000
+    oauth2:
+        # After successfully authenticating with the OAuth2 Provider,
+        # we'll be generating an auth token for the user and sending the token to the
+        # redirectUri mentioned by the client in the /oauth2/authorize request.
+        # We're not using cookies because they won't work well in mobile clients.
+        authorizedRedirectUris:
+            - http://localhost:3000/oauth2/redirect

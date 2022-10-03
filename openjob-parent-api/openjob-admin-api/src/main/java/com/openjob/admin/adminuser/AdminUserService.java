@@ -94,7 +94,7 @@ public class AdminUserService extends AbstractBaseService<Admin> implements User
         Optional<Admin> admin = adminUserRepo.findById(id);
         if (admin.isPresent()){
             admin.get().setIsActive(true);
-            save(admin.get());
+            saveWithoutPassword(admin.get());
         } else {
             throw new UserNotFoundException("Admin user not found with ID: " + id);
         }
@@ -104,7 +104,7 @@ public class AdminUserService extends AbstractBaseService<Admin> implements User
         Optional<Admin> admin = adminUserRepo.findById(id);
         if (admin.isPresent()){
             admin.get().setIsActive(false);
-            save(admin.get());
+            saveWithoutPassword(admin.get());
         } else {
             throw new UserNotFoundException("Admin user not found with ID: " + id);
         }

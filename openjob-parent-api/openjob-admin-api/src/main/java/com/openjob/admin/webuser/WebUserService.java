@@ -1,7 +1,7 @@
 package com.openjob.admin.webuser;
 
 import com.openjob.admin.base.AbstractBaseService;
-import com.openjob.common.model.WebUser;
+import com.openjob.common.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class WebUserService extends AbstractBaseService<WebUser> {
+public class WebUserService extends AbstractBaseService<User> {
     private final WebUserRepository webUserRepo;
     private final BCryptPasswordEncoder passwordEncoder;
 
@@ -28,18 +28,18 @@ public class WebUserService extends AbstractBaseService<WebUser> {
 
 
     @Override
-    public Optional<WebUser> get(String id) {
+    public Optional<User> get(String id) {
         return webUserRepo.findById(id);
     }
 
     @Override
-    public WebUser save(WebUser object) throws SQLException {
+    public User save(User object) throws SQLException {
         object.setPassword(passwordEncoder.encode(object.getPassword()));
         return webUserRepo.save(object);
     }
 
     @Override
-    public WebUser saveWithoutPassword(WebUser object) throws SQLException {
+    public User saveWithoutPassword(User object) throws SQLException {
         return webUserRepo.save(object);
     }
 
@@ -48,19 +48,19 @@ public class WebUserService extends AbstractBaseService<WebUser> {
 
     }
 
-    public Page<WebUser> searchByCompany(Integer page, Integer size, String keyword) {
+    public Page<User> searchByCompany(Integer page, Integer size, String keyword) {
         Pageable pageable = PageRequest.of(page, size);
         if (Objects.isNull(keyword) || keyword.isBlank())
             keyword = "";
-        Page<WebUser> pageUser = webUserRepo.searchByCompany(keyword ,pageable);
+        Page<User> pageUser = webUserRepo.searchByCompany(keyword ,pageable);
         return pageUser;
     }
 
-    public Page<WebUser> searchByKeyword(Integer page, Integer size, String keyword) {
+    public Page<User> searchByKeyword(Integer page, Integer size, String keyword) {
         Pageable pageable = PageRequest.of(page, size);
         if (Objects.isNull(keyword) || keyword.isBlank())
             keyword = "";
-        Page<WebUser> pageUser = webUserRepo.searchByKeyword(keyword ,pageable);
+        Page<User> pageUser = webUserRepo.searchByKeyword(keyword ,pageable);
         return pageUser;
     }
 }

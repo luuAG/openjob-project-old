@@ -2,7 +2,7 @@ package com.openjob.admin.webuser;
 
 import com.openjob.admin.dto.UserPaginationDTO;
 import com.openjob.admin.exception.UserNotFoundException;
-import com.openjob.common.model.WebUser;
+import com.openjob.common.model.User;
 import com.openjob.common.response.MessageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,7 +26,7 @@ public class WebUserController {
         if (Objects.isNull(id)){
             throw new IllegalArgumentException("ID is null");
         }
-        Optional<WebUser> userOptional = userService.get(id);
+        Optional<User> userOptional = userService.get(id);
         if (userOptional.isPresent())
             return ResponseEntity.ok(userOptional.get());
         return ResponseEntity.badRequest().body(null);
@@ -38,7 +38,7 @@ public class WebUserController {
             @RequestParam Integer size,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Boolean byCompany){
-        Page<WebUser> pageUser;
+        Page<User> pageUser;
         if (Objects.nonNull(byCompany) && byCompany)
             pageUser = userService.searchByCompany(page, size, keyword);
         else
@@ -52,11 +52,11 @@ public class WebUserController {
 
     @PostMapping(path = "/user/activate/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MessageResponse> activateUser(@PathVariable String id) throws UserNotFoundException, SQLException {
-        Optional<WebUser> optionalWebUser = userService.get(id);
+        Optional<User> optionalWebUser = userService.get(id);
         if (optionalWebUser.isPresent()){
-            WebUser webUser = optionalWebUser.get();
+            User webUser = optionalWebUser.get();
             webUser.setIsActive(true);
-            userService.save(webUser);
+            userService.saveWithoutPassword(webUser);
         } else {
             throw new UserNotFoundException("HR user not found with ID: " + id);
         }
@@ -65,11 +65,11 @@ public class WebUserController {
 
     @DeleteMapping(path = "/user/deactivate/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MessageResponse> deactivateHr(@PathVariable String id) throws UserNotFoundException, SQLException {
-        Optional<WebUser> optionalWebUser = userService.get(id);
+        Optional<User> optionalWebUser = userService.get(id);
         if (optionalWebUser.isPresent()){
-            WebUser webUser = optionalWebUser.get();
+            User webUser = optionalWebUser.get();
             webUser.setIsActive(false);
-            userService.save(webUser);
+            userService.saveWithoutPassword(webUser);
         } else {
             throw new UserNotFoundException("HR user not found with ID: " + id);
         }

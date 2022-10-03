@@ -3,11 +3,11 @@ package com.openjob.admin.company;
 import com.openjob.admin.dto.CompanyHeadhunterRequestDTO;
 import com.openjob.admin.dto.CompanyHeadhunterResponseDTO;
 import com.openjob.admin.dto.CompanyPaginationDTO;
-import com.openjob.admin.dto.HrPaginationDTO;
+import com.openjob.admin.dto.UserPaginationDTO;
 import com.openjob.admin.exception.UserNotFoundException;
 import com.openjob.common.model.Company;
-import com.openjob.common.model.HR;
 import com.openjob.common.model.Role;
+import com.openjob.common.model.User;
 import com.openjob.common.response.MessageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -36,24 +36,24 @@ public class CompanyHrController {
         if (Objects.isNull(id)){
             throw new IllegalArgumentException("ID is null");
         }
-        Optional<HR> hrOptional = hrService.get(id);
+        Optional<User> hrOptional = hrService.get(id);
         if (hrOptional.isPresent())
             return ResponseEntity.ok(hrOptional.get());
         return ResponseEntity.badRequest().body(null);
     }
 
     @GetMapping(path = "/hrs", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<HrPaginationDTO> getHrs(
+    public ResponseEntity<UserPaginationDTO> getHrs(
             @RequestParam Integer page,
             @RequestParam Integer size,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Boolean byCompany){
-        Page<HR> pageHr;
+        Page<User> pageHr;
         if (Objects.nonNull(byCompany) && byCompany)
             pageHr = hrService.searchByCompany(page, size, keyword);
         else
             pageHr = hrService.searchByKeyword(page, size, keyword);
-        return ResponseEntity.ok(new HrPaginationDTO(
+        return ResponseEntity.ok(new UserPaginationDTO(
                 pageHr.getContent(),
                 pageHr.getTotalPages(),
                 pageHr.getTotalElements()
@@ -62,11 +62,11 @@ public class CompanyHrController {
 
     @PostMapping(path = "/hr/activate/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MessageResponse> activateHr(@PathVariable String id) throws SQLException, UserNotFoundException {
-            Optional<HR> optionalHR = hrService.get(id);
+            Optional<User> optionalHR = hrService.get(id);
             if (optionalHR.isPresent()){
-                HR existingHr = optionalHR.get();
+                User existingHr = optionalHR.get();
                 existingHr.setIsActive(true);
-                hrService.save(existingHr);
+                hrService.saveWithoutPassword(existingHr);
             } else {
                 throw new UserNotFoundException("HR user not found with ID: " + id);
             }
@@ -75,11 +75,11 @@ public class CompanyHrController {
 
     @DeleteMapping(path = "/hr/deactivate/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MessageResponse> deactivateHr(@PathVariable String id) throws SQLException, UserNotFoundException {
-        Optional<HR> optionalHR = hrService.get(id);
+        Optional<User> optionalHR = hrService.get(id);
         if (optionalHR.isPresent()){
-            HR existingHr = optionalHR.get();
+            User existingHr = optionalHR.get();
             existingHr.setIsActive(false);
-            hrService.save(existingHr);
+            hrService.saveWithoutPassword(existingHr);
         } else {
             throw new UserNotFoundException("HR user not found with ID: " + id);
         }
@@ -89,7 +89,7 @@ public class CompanyHrController {
 
     @PostMapping(path = "/company/create-head-hunter", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CompanyHeadhunterResponseDTO> createHeadHunter(@RequestBody CompanyHeadhunterRequestDTO body) throws SQLException {
-        HR hr = body.getHeadHunter();
+        User hr = body.getHeadHunter();
         Company company = new Company();
         company.setName(body.getCompanyName());
 
@@ -108,7 +108,7 @@ public class CompanyHrController {
         hr.setCompany(company);
         hr.setRole(Role.HEAD_HUNTER);
         hr.setPassword("12345678");
-        HR savedHr = hrService.save(hr);
+        User savedHr = hrService.save(hr);
 
         if (Objects.nonNull(savedHr)){
             MimeMessagePreparator message = mimeMessage -> {
@@ -142,12 +142,12 @@ public class CompanyHrController {
         );
     }
     @GetMapping(path = "/company/{companyId}/hrs", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<HrPaginationDTO> getHrsOfCompany(
+    public ResponseEntity<UserPaginationDTO> getHrsOfCompany(
             @RequestParam Integer page,
             @RequestParam Integer size,
             @PathVariable String companyId) {
-        Page<HR> pageHr = hrService.findByCompanyId(page, size, companyId);
-        return ResponseEntity.ok(new HrPaginationDTO(
+        Page<User> pageHr = hrService.findByCompanyId(page, size, companyId);
+        return ResponseEntity.ok(new UserPaginationDTO(
                 pageHr.getContent(),
                 pageHr.getTotalPages(),
                 pageHr.getTotalElements())

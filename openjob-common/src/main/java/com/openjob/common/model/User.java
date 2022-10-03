@@ -2,14 +2,14 @@ package com.openjob.common.model;
 
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 
 @Data
-@MappedSuperclass
-public class BaseUser {
+@Entity
+@Table
+public class User {
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
     @Column(columnDefinition = "CHAR(32)")
@@ -22,6 +22,9 @@ public class BaseUser {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     protected Role role;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "varchar(10) default 'DATABASE'")
+    protected AuthProvider authProvider;
     @Column(nullable = false, columnDefinition = "bit(1) default true")
     protected Boolean isActive;
     @Column(nullable = false)
@@ -32,6 +35,10 @@ public class BaseUser {
     protected String lastName;
     @Column
     protected String avatarUrl;
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn
+    private Company company;
 
 
 }

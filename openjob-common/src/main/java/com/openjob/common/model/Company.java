@@ -30,8 +30,8 @@ public class Company {
     private String wallpaperUrl;
 
     @OneToOne
-    @JoinColumn(referencedColumnName = "id", unique = true, nullable = false)
-    private HR headHunter;
+    @JoinColumn(referencedColumnName = "id", unique = true)
+    private User headHunter;
 
 
 }
