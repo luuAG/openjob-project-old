@@ -27,7 +27,7 @@ public class AdminWebUserRepositoryTest {
         admin.setLastName("Admin");
         admin.setFirstName("Super");
         admin.setIsActive(true);
-        admin.setRole(Role.ADMIN);
+        admin.setRole(Role.SUPER_ADMIN);
         Assert.assertNotNull(adminUserRepo.save(admin));
     }
 }

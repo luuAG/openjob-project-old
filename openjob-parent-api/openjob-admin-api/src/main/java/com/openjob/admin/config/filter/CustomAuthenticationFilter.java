@@ -86,6 +86,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         responseDTO.put("role", admin.get().getRole().name());
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setStatus(HttpStatus.OK.value());
         new ObjectMapper().writeValue(response.getOutputStream(), responseDTO);
     }
 
@@ -95,6 +96,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         errorResponse.setErrorCode(HttpStatus.UNAUTHORIZED.value());
         errorResponse.setErrorMessage("Bad credentials");
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
         new ObjectMapper().writeValue(response.getOutputStream(), errorResponse);
 
     }
