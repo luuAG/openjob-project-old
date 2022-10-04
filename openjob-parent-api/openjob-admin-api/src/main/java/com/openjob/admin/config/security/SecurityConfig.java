@@ -62,7 +62,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/v2/**",
                 "/swagger-resources/**").permitAll();
         http.authorizeRequests()
-                .antMatchers("/adminuser/create/**", "/adminuser/activate/**", "/adminuser/deactivate/**")
+                .antMatchers("/adminuser/create/**", "/adminuser/update/**","/adminuser/activate/**", "/adminuser/deactivate/**")
                 .hasAuthority(Role.SUPER_ADMIN.name());
         http.authorizeRequests()
                 .antMatchers("/**")
