@@ -3,6 +3,7 @@ package com.openjob.web.config;
 import com.openjob.web.security.user.filter.TokenAuthenticationFilter;
 import com.openjob.web.security.user.handler.OAuth2AuthenticationFailureHandler;
 import com.openjob.web.security.user.handler.OAuth2AuthenticationSuccessHandler;
+import com.openjob.web.security.user.handler.RestAuthenticationEntryPoint;
 import com.openjob.web.security.user.repository.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.openjob.web.security.user.service.CustomOAuth2UserService;
 import com.openjob.web.security.user.service.CustomUserDetailsService;
@@ -18,6 +19,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -63,8 +65,39 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http.cors();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.httpBasic().disable();
+        http.formLogin().disable();
+        http.exceptionHandling().authenticationEntryPoint(new RestAuthenticationEntryPoint());
+        http.authorizeRequests()
+                .antMatchers("/",
+                        "/error",
+                        "/favicon.ico",
+                        "/**/*.png",
+                        "/**/*.gif",
+                        "/**/*.svg",
+                        "/**/*.jpg",
+                        "/**/*.html",
+                        "/**/*.css",
+                        "/**/*.js").permitAll()
+                .antMatchers("/auth/**", "/oauth2/**").permitAll()
+                .anyRequest().authenticated();
+        http.oauth2Login()
+                .authorizationEndpoint()
+                    .baseUri("/oauth2/authorize")
+                    .authorizationRequestRepository(cookieAuthorizationRequestRepository())
+                    .and()
+                .redirectionEndpoint()
+                    .baseUri("/oauth2/callback/*")
+                    .and()
+                .userInfoEndpoint()
+                    .userService(customOAuth2UserService)
+                    .and()
+                .successHandler(oAuth2AuthenticationSuccessHandler)
+                .failureHandler(oAuth2AuthenticationFailureHandler);
 
 
+
+        http.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
     @Bean(BeanIds.AUTHENTICATION_MANAGER)
