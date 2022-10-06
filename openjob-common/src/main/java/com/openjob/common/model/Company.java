@@ -1,5 +1,6 @@
 package com.openjob.common.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -30,7 +31,8 @@ public class Company {
     private String wallpaperUrl;
 
     @OneToOne
-    @JoinColumn(referencedColumnName = "id", unique = true)
+    @JoinColumn
+    @JsonIgnore
     private User headHunter;
 
 
