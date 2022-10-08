@@ -1,7 +1,7 @@
 package com.openjob.admin.adminuser;
 
 import com.openjob.common.model.Admin;
-import com.openjob.common.model.Role;
+import com.openjob.common.enums.Role;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

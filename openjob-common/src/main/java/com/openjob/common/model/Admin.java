@@ -1,8 +1,8 @@
 package com.openjob.common.model;
 
+import com.openjob.common.enums.Role;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
-import org.springframework.lang.NonNull;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;

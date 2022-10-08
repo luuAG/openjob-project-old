@@ -1,6 +1,7 @@
 package com.openjob.admin.exception;
 
 import com.openjob.common.response.ErrorResponse;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class AdminModuleExceptionHandler extends ResponseEntityExceptionHandler 
     @ExceptionHandler(SQLException.class)
     public ResponseEntity<ErrorResponse> handleSQLException(SQLException ex){
         ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setErrorMessage(ex.getCause().getMessage());
+        errorResponse.setErrorMessage(ex.getMessage());
         errorResponse.setErrorCode(HttpStatus.BAD_REQUEST.value());
         return ResponseEntity.badRequest().body(errorResponse);
     }
@@ -44,13 +45,6 @@ public class AdminModuleExceptionHandler extends ResponseEntityExceptionHandler 
         return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(errorResponse);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleException(Exception ex){
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setErrorMessage(ex.getMessage());
-        errorResponse.setErrorCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        return ResponseEntity.internalServerError().body(errorResponse);
-    }
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
@@ -58,5 +52,21 @@ public class AdminModuleExceptionHandler extends ResponseEntityExceptionHandler 
         errorResponse.setErrorMessage("Request body object is not valid");
         errorResponse.setErrorCode(HttpStatus.BAD_REQUEST.value());
         return ResponseEntity.badRequest().body(errorResponse);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDIVException(Exception ex){
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setErrorMessage(ex.getMessage());
+        errorResponse.setErrorCode(HttpStatus.BAD_REQUEST.value());
+        return ResponseEntity.badRequest().body(errorResponse);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleException(Exception ex){
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setErrorMessage(ex.getMessage());
+        errorResponse.setErrorCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        return ResponseEntity.internalServerError().body(errorResponse);
     }
 }

@@ -5,6 +5,7 @@ import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Data
 @Entity
@@ -29,6 +30,9 @@ public class Company {
     private String logoUrl;
     @Column
     private String wallpaperUrl;
+    @Column
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date contractEndDate;
 
     @OneToOne
     @JoinColumn

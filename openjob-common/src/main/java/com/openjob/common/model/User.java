@@ -1,5 +1,7 @@
 package com.openjob.common.model;
 
+import com.openjob.common.enums.AuthProvider;
+import com.openjob.common.enums.Role;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -14,27 +16,30 @@ public class User {
     @GenericGenerator(name = "uuid", strategy = "uuid")
     @Column(columnDefinition = "CHAR(32)")
     @Id
-    protected String id;
+    private String id;
     @Column(unique = true, nullable = false)
-    protected String email;
+    private String email;
     @Column(nullable = false)
-    protected String password;
+    private String password;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    protected Role role;
+    private Role role;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "varchar(10) default 'DATABASE'")
-    protected AuthProvider authProvider;
+    private AuthProvider authProvider;
     @Column(nullable = false, columnDefinition = "bit(1) default true")
-    protected Boolean isActive;
+    private Boolean isActive;
     @Column(nullable = false)
     @Size(max = 20)
-    protected String firstName;
+    private String firstName;
     @Column(nullable = false)
     @Size(max = 20)
-    protected String lastName;
+    private String lastName;
     @Column
-    protected String avatarUrl;
+    private String avatarUrl;
+
+    @Column
+    private Integer reports;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn

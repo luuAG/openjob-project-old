@@ -10,6 +10,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CompanyRepository extends JpaRepository<Company, String> {
 
-    @Query("select c from Company c where c.name like '%?1%'")
+    @Query("select c from Company c where c.name like %?1%")
     Page<Company> findByKeyword(String keyword, Pageable pageable);
+
+
+
+
+
 }
