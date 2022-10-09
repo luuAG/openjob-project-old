@@ -33,6 +33,8 @@ public class Company {
     @Column
     @Temporal(TemporalType.TIMESTAMP)
     private Date contractEndDate;
+    @Column
+    private Double accountBalance;
 
     @OneToOne
     @JoinColumn
