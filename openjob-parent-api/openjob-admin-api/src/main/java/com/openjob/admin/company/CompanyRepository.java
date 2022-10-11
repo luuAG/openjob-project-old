@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface CompanyRepository extends JpaRepository<Company, String> {
 
@@ -14,7 +16,5 @@ public interface CompanyRepository extends JpaRepository<Company, String> {
     Page<Company> findByKeyword(String keyword, Pageable pageable);
 
 
-
-
-
+    Optional<Company> findByName(String name);
 }

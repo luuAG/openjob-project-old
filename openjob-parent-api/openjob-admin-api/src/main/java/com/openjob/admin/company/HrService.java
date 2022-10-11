@@ -41,10 +41,15 @@ public class HrService {
     }
 
     public User update(User hr, Boolean updatePassword) {
-        User existingHr = hrRepo.getById(hr.getId());
-        if (updatePassword)
-            hr.setPassword(passwordEncoder.encode(hr.getPassword()));
-        return hrRepo.save(hr);
+        try {
+            if (hrRepo.findById(hr.getId()).isEmpty())
+                return null;
+            if (updatePassword)
+                hr.setPassword(passwordEncoder.encode(hr.getPassword()));
+            return hrRepo.save(hr);
+        } catch (DataIntegrityViolationException e){
+            throw new DataIntegrityViolationException(NestedExceptionUtils.getMostSpecificCause(e).getMessage());
+        }
     }
 
     public void delete(User hr) {

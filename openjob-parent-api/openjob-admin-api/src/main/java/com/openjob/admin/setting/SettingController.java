@@ -22,6 +22,13 @@ public class SettingController {
     public ResponseEntity<Collection<Setting>> getAllSetting() {
         return ResponseEntity.ok(settingService.getAll());
     }
+    @GetMapping(path = "/setting/check_exist/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MessageResponse> checkSettingExist(@PathVariable("name") String name) {
+        boolean isExisting = settingService.isExistByName(name);
+        if (isExisting)
+            return ResponseEntity.badRequest().body(new MessageResponse("Setting exist"));
+        return ResponseEntity.ok(new MessageResponse("Accepted"));
+    }
 
     @GetMapping(path = "/setting/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Setting> getSetting(@PathVariable String name) {
@@ -62,4 +69,6 @@ public class SettingController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
 
     }
+
+
 }

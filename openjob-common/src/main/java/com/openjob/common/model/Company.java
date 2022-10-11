@@ -35,6 +35,8 @@ public class Company {
     private Date contractEndDate;
     @Column
     private Double accountBalance;
+    @Column
+    private Boolean isActive;
 
     @OneToOne
     @JoinColumn

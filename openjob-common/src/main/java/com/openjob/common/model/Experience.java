@@ -1,5 +1,6 @@
 package com.openjob.common.model;
 
+import com.openjob.common.enums.ExperienceValue;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -14,5 +15,5 @@ public class Experience {
 
     @Column(columnDefinition = "default 'ANY'")
     @Enumerated(value = EnumType.STRING)
-    private String value;
+    private ExperienceValue value;
 }

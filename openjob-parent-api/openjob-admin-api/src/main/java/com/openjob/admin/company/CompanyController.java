@@ -30,12 +30,23 @@ public class CompanyController {
     private final JavaMailSender mailSender;
 
     @GetMapping(path = "/company/{id}/hr", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getHr(@PathVariable("id") String id) {
+    public ResponseEntity<User> getHr(@PathVariable("id") String id) {
         if (Objects.isNull(id)){
             throw new IllegalArgumentException("ID is null");
         }
         User hr = hrService.getByCompany(id);
         return ResponseEntity.ok(hr);
+    }
+
+    @GetMapping(path = "/company/check_exist/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MessageResponse> checkCompanyExistByName(@PathVariable("name") String name) {
+        if (Objects.isNull(name) || name.isBlank()){
+            throw new IllegalArgumentException("Name is null or blank");
+        }
+        boolean isExisting = companyService.isExistByName(name);
+        if (isExisting)
+            return ResponseEntity.badRequest().body(new MessageResponse("Company name exist"));
+        return ResponseEntity.ok(new MessageResponse("Accepted"));
     }
 
 
@@ -118,6 +129,8 @@ public class CompanyController {
             @RequestParam("updatePassword") Boolean updatePassword) {
         User hr = hrService.getByCompany(companyId);
         User updatedUser = hrService.update(hr, updatePassword);
-        return ResponseEntity.ok(updatedUser);
+        if (Objects.nonNull(updatedUser))
+            return ResponseEntity.ok(updatedUser);
+        return ResponseEntity.badRequest().body(null);
     }
 }

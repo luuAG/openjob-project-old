@@ -1,6 +1,6 @@
 package com.openjob.common.enums;
 
-public enum Experience {
+public enum ExperienceValue {
     ANY,
     LESS_THAN_ONE_YEAR,
     ONE_TO_THREE_YEARS,

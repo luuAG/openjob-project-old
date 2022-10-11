@@ -36,4 +36,8 @@ public class SettingService {
     public Optional<Setting> getByName(String name) {
         return settingRepo.findByName(name);
     }
+
+    public boolean isExistByName(String name) {
+        return settingRepo.findByName(name).isPresent();
+    }
 }

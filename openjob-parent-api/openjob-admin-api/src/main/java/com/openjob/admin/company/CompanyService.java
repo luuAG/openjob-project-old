@@ -35,4 +35,8 @@ public class CompanyService  {
         }
         return companyRepo.findByKeyword(keyword, pageable);
     }
+
+    public boolean isExistByName(String name) {
+        return companyRepo.findByName(name).isPresent();
+    }
 }
