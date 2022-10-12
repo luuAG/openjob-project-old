@@ -16,7 +16,7 @@ public class Major {
     @Column
     private String name;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "major_id", referencedColumnName = "id")
     private Collection<Specialization> specializations;
 }

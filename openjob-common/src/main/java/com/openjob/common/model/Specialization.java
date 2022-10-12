@@ -16,7 +16,7 @@ public class Specialization {
     @Column
     private String name;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "specialization_id", referencedColumnName = "id")
     private Collection<Skill> skills;
 }

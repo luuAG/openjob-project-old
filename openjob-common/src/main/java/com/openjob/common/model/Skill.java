@@ -15,4 +15,7 @@ public class Skill {
     @Column
     private String name;
 
+    @Column
+    private Boolean isVerified;
+
 }

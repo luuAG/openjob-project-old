@@ -13,7 +13,7 @@ public class Experience {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(columnDefinition = "default 'ANY'")
+    @Column(columnDefinition = "varchar(50) default 'ANY'")
     @Enumerated(value = EnumType.STRING)
     private ExperienceValue value;
 }
