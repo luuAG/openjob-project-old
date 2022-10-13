@@ -18,4 +18,7 @@ public class Skill {
     @Column
     private Boolean isVerified;
 
+    @ManyToOne
+    private Specialization specialization;
+
 }

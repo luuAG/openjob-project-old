@@ -27,4 +27,12 @@ public class SkillService {
     public void delete(Integer id) {
         skillRepo.delete(skillRepo.getById(id));
     }
+
+    public boolean checkExistByName(String name) {
+        return skillRepo.findByName(name).isPresent();
+    }
+
+    public Collection<Skill> getBySpecialization(Integer speId) {
+        return skillRepo.getBySpecialization(speId);
+    }
 }

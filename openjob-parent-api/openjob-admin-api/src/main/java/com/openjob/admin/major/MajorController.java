@@ -43,4 +43,12 @@ public class MajorController {
         majorService.delete(id);
         return ResponseEntity.ok(new MessageResponse("Major is deleted"));
     }
+
+    @GetMapping(path = "/major/check-exist/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MessageResponse> checkMajorExist(@PathVariable("name") String name) {
+        if (majorService.checkExistByName(name)){
+            return ResponseEntity.badRequest().body(new MessageResponse("Major exists"));
+        }
+        return ResponseEntity.ok(new MessageResponse("Accepted"));
+    }
 }

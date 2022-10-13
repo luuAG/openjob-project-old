@@ -16,7 +16,9 @@ public class Specialization {
     @Column
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "specialization_id", referencedColumnName = "id")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "specialization")
     private Collection<Skill> skills;
+
+    @ManyToOne
+    private Major major;
 }

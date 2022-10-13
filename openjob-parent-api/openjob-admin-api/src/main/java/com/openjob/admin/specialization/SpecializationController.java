@@ -43,4 +43,17 @@ public class SpecializationController {
         specializationService.delete(id);
         return ResponseEntity.ok(new MessageResponse("Specilization is deleted"));
     }
+
+    @GetMapping(path = "/specialization/check-exist/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MessageResponse> checkSpecializationExist(@PathVariable("name") String name) {
+        if (specializationService.checkExistByName(name)){
+            return ResponseEntity.badRequest().body(new MessageResponse("Major exists"));
+        }
+        return ResponseEntity.ok(new MessageResponse("Accepted"));
+    }
+
+    @GetMapping(path = "/specialization/bymajor/{majorId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Collection<Specialization>> getByMajor(@PathVariable("majorId") Integer majorId){
+        return ResponseEntity.ok(specializationService.getByMajor(majorId));
+    }
 }

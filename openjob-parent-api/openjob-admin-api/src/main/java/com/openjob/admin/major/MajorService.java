@@ -26,4 +26,8 @@ public class MajorService {
     public void delete(Integer id) {
         majorRepo.delete(majorRepo.getById(id));
     }
+
+    public boolean checkExistByName(String name) {
+        return majorRepo.findByName(name).isPresent();
+    }
 }

@@ -15,6 +15,10 @@ public class SpecializationService {
         return specializationRepo.findAll();
     }
 
+    public Collection<Specialization> getByMajor(Integer majorId){
+        return specializationRepo.findByMajor(majorId);
+    }
+
     public Specialization save(Specialization specialization){
         return specializationRepo.save(specialization);
     }
@@ -25,5 +29,9 @@ public class SpecializationService {
 
     public void delete(Integer id) {
         specializationRepo.delete(specializationRepo.getById(id));
+    }
+
+    public boolean checkExistByName(String name) {
+        return specializationRepo.findByName(name).isPresent();
     }
 }

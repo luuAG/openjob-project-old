@@ -3,12 +3,15 @@ package com.openjob.admin.skill;
 import com.openjob.admin.dto.JobPaginationDTO;
 import com.openjob.admin.job.JobService;
 import com.openjob.common.model.Job;
+import com.openjob.common.model.Skill;
 import com.openjob.common.response.MessageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Collection;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,5 +40,18 @@ public class SkillController {
     public ResponseEntity<MessageResponse> deleteSkill(@PathVariable("id") Integer id){
         skillService.delete(id);
         return ResponseEntity.ok(new MessageResponse("Skill is deleted"));
+    }
+
+    @GetMapping(path = "/skill/check-exist/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MessageResponse> checkSkillExist(@PathVariable("name") String name) {
+        if (skillService.checkExistByName(name)){
+            return ResponseEntity.badRequest().body(new MessageResponse("Skill exists"));
+        }
+        return ResponseEntity.ok(new MessageResponse("Accepted"));
+    }
+
+    @GetMapping(path = "/skill/byspecialization/{speId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Collection<Skill>> getBySpecialization(@PathVariable("speId") Integer speId){
+        return ResponseEntity.ok(skillService.getBySpecialization(speId));
     }
 }
