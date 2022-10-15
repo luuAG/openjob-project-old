@@ -6,7 +6,6 @@ import com.openjob.admin.job.JobService;
 import com.openjob.admin.specialization.SpecializationService;
 import com.openjob.common.model.Job;
 import com.openjob.common.model.Skill;
-import com.openjob.common.model.Specialization;
 import com.openjob.common.response.MessageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
