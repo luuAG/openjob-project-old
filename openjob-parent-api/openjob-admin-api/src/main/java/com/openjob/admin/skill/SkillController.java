@@ -6,6 +6,7 @@ import com.openjob.admin.job.JobService;
 import com.openjob.admin.specialization.SpecializationService;
 import com.openjob.common.model.Job;
 import com.openjob.common.model.Skill;
+import com.openjob.common.model.Specialization;
 import com.openjob.common.response.MessageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -68,6 +69,15 @@ public class SkillController {
         if (Objects.nonNull(savedSkill)){
             return ResponseEntity.ok(savedSkill);
         }
+        return ResponseEntity.badRequest().body(null);
+    }
+    @PutMapping(path = "/skill/update", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Skill> updateSkill(@RequestBody Skill skill) {
+        if (!skillService.checkExist(skill.getId()))
+            throw new IllegalArgumentException("Skill does not exist");
+        Skill savedSkill = skillService.save(skill);
+        if (Objects.nonNull(savedSkill))
+            return ResponseEntity.ok(savedSkill);
         return ResponseEntity.badRequest().body(null);
     }
 }

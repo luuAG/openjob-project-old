@@ -35,4 +35,8 @@ public class SkillService {
     public Collection<Skill> getBySpecialization(Integer speId) {
         return skillRepo.getBySpecialization(speId);
     }
+
+    public boolean checkExist(Integer id) {
+        return skillRepo.existsById(id);
+    }
 }
