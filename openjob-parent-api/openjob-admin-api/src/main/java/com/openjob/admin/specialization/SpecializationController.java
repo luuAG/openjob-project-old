@@ -1,5 +1,7 @@
 package com.openjob.admin.specialization;
 
+import com.openjob.admin.dto.NewSpecializationDTO;
+import com.openjob.admin.major.MajorService;
 import com.openjob.common.model.Specialization;
 import com.openjob.common.response.MessageResponse;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class SpecializationController {
     private final SpecializationService specializationService;
+    private final MajorService majorService;
 
     @GetMapping(path = "/specializations", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<Specialization>> getAllSpecializations(){
@@ -21,7 +24,9 @@ public class SpecializationController {
     }
 
     @PostMapping(path = "/specialization/create", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Specialization> createSpecialization(@RequestBody Specialization specialization) {
+    public ResponseEntity<Specialization> createSpecialization(@RequestBody NewSpecializationDTO body) {
+        Specialization specialization = body.getSpecialization();
+        specialization.setMajor(majorService.getById(body.getMajorId()));
         Specialization savedSpecialization = specializationService.save(specialization);
         if (Objects.nonNull(savedSpecialization))
             return ResponseEntity.ok(savedSpecialization);

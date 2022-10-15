@@ -1,7 +1,9 @@
 package com.openjob.admin.skill;
 
 import com.openjob.admin.dto.JobPaginationDTO;
+import com.openjob.admin.dto.NewSkillDTO;
 import com.openjob.admin.job.JobService;
+import com.openjob.admin.specialization.SpecializationService;
 import com.openjob.common.model.Job;
 import com.openjob.common.model.Skill;
 import com.openjob.common.response.MessageResponse;
@@ -12,12 +14,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
+import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
 public class SkillController {
     private final JobService jobService;
     private final SkillService skillService;
+    private final SpecializationService specializationService;
 
     @GetMapping(path = "/skills-to-verify", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<JobPaginationDTO> getAllSkillsNotverified(
@@ -53,5 +57,17 @@ public class SkillController {
     @GetMapping(path = "/skill/byspecialization/{speId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Collection<Skill>> getBySpecialization(@PathVariable("speId") Integer speId){
         return ResponseEntity.ok(skillService.getBySpecialization(speId));
+    }
+
+    @PostMapping(path = "/skill/create", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Skill> createSkill(@RequestBody NewSkillDTO body){
+        Skill skill = body.getSkill();
+        skill.setSpecialization(specializationService.getById(body.getSpecializationId()));
+
+        Skill savedSkill = skillService.save(skill);
+        if (Objects.nonNull(savedSkill)){
+            return ResponseEntity.ok(savedSkill);
+        }
+        return ResponseEntity.badRequest().body(null);
     }
 }

@@ -34,4 +34,8 @@ public class SpecializationService {
     public boolean checkExistByName(String name) {
         return specializationRepo.findByName(name).isPresent();
     }
+
+    public Specialization getById(Integer specializationId) {
+        return specializationRepo.getById(specializationId);
+    }
 }

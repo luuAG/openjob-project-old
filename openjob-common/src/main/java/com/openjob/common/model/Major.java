@@ -1,5 +1,6 @@
 package com.openjob.common.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -16,6 +17,7 @@ public class Major {
     @Column
     private String name;
 
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "major")
     private Collection<Specialization> specializations;
 }

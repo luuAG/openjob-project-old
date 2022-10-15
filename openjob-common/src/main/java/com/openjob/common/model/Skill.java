@@ -1,5 +1,6 @@
 package com.openjob.common.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -15,10 +16,12 @@ public class Skill {
     @Column
     private String name;
 
-    @Column
+    @Column(columnDefinition = "bit(1) default true")
     private Boolean isVerified;
 
+    @JsonIgnore
     @ManyToOne
+    @JoinColumn
     private Specialization specialization;
 
 }

@@ -30,4 +30,8 @@ public class MajorService {
     public boolean checkExistByName(String name) {
         return majorRepo.findByName(name).isPresent();
     }
+
+    public Major getById(Integer majorId) {
+        return majorRepo.getById(majorId);
+    }
 }
