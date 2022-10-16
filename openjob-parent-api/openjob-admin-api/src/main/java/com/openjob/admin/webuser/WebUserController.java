@@ -36,13 +36,8 @@ public class WebUserController {
     public ResponseEntity<UserPaginationDTO> getUsers(
             @RequestParam Integer page,
             @RequestParam Integer size,
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) Boolean byCompany){
-        Page<User> pageUser;
-        if (Objects.nonNull(byCompany) && byCompany)
-            pageUser = userService.searchByCompany(page, size, keyword);
-        else
-            pageUser = userService.searchByKeyword(page, size, keyword);
+            @RequestParam(required = false) String keyword){
+        Page<User> pageUser = userService.searchByKeyword(page, size, keyword);
         return ResponseEntity.ok(new UserPaginationDTO(
                 pageUser.getContent(),
                 pageUser.getTotalPages(),
@@ -54,26 +49,22 @@ public class WebUserController {
     public ResponseEntity<MessageResponse> activateUser(@PathVariable String id) throws UserNotFoundException, SQLException {
         Optional<User> optionalWebUser = userService.get(id);
         if (optionalWebUser.isPresent()){
-            User webUser = optionalWebUser.get();
-            webUser.setIsActive(true);
-            userService.saveWithoutPassword(webUser);
+            userService.activate(id);
         } else {
-            throw new UserNotFoundException("HR user not found with ID: " + id);
+            throw new UserNotFoundException("User not found with ID: " + id);
         }
-        return ResponseEntity.ok(new MessageResponse("HR user is activated, ID: " + id));
+        return ResponseEntity.ok(new MessageResponse("User is activated, ID: " + id));
     }
 
     @DeleteMapping(path = "/user/deactivate/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MessageResponse> deactivateHr(@PathVariable String id) throws UserNotFoundException, SQLException {
         Optional<User> optionalWebUser = userService.get(id);
         if (optionalWebUser.isPresent()){
-            User webUser = optionalWebUser.get();
-            webUser.setIsActive(false);
-            userService.saveWithoutPassword(webUser);
+            userService.deactivate(id);
         } else {
-            throw new UserNotFoundException("HR user not found with ID: " + id);
+            throw new UserNotFoundException("User not found with ID: " + id);
         }
-        return ResponseEntity.ok(new MessageResponse("HR user is deactivated, ID: " + id));
+        return ResponseEntity.ok(new MessageResponse("User is deactivated, ID: " + id));
     }
 
 

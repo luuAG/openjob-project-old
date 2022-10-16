@@ -13,12 +13,7 @@ public interface WebUserRepository extends JpaRepository<User, String> {
 
 
     @Query("select u from User u " +
-            "where u.company.name like '%?1%' " +
-            "and (u.role = 'CANDIDATE' or u.role = 'EMPLOYEE')")
-    Page<User> searchByCompany(String keyword, Pageable pageable);
-
-    @Query("select u from User u " +
-            "where concat(u.lastName, ' ', u.firstName, ' ', u.email) like '%?1%' " +
-            "and (u.role = 'CANDIDATE' or u.role = 'EMPLOYEE')")
+            "where concat(u.lastName, ' ', u.firstName, ' ', u.email) like %?1% " +
+            "and u.role = 'USER'")
     Page<User> searchByKeyword(String keyword, Pageable pageable);
 }

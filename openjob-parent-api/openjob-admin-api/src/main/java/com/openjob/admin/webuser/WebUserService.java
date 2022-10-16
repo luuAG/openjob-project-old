@@ -1,6 +1,5 @@
 package com.openjob.admin.webuser;
 
-import com.openjob.admin.base.AbstractBaseService;
 import com.openjob.common.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -9,13 +8,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.sql.SQLException;
 import java.util.Objects;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class WebUserService extends AbstractBaseService<User> {
+public class WebUserService {
     private final WebUserRepository webUserRepo;
     private final BCryptPasswordEncoder passwordEncoder;
 
@@ -26,34 +24,19 @@ public class WebUserService extends AbstractBaseService<User> {
         return false;
     }
 
-
-    @Override
     public Optional<User> get(String id) {
         return webUserRepo.findById(id);
     }
 
-    @Override
-    public User save(User object) throws SQLException {
-        object.setPassword(passwordEncoder.encode(object.getPassword()));
-        return webUserRepo.save(object);
+    public void activate(String id) {
+        User user = webUserRepo.getById(id);
+        user.setIsActive(true);
+        webUserRepo.save(user);
     }
-
-    @Override
-    public User saveWithoutPassword(User object) throws SQLException {
-        return webUserRepo.save(object);
-    }
-
-    @Override
-    public void delete(String id) {
-
-    }
-
-    public Page<User> searchByCompany(Integer page, Integer size, String keyword) {
-        Pageable pageable = PageRequest.of(page, size);
-        if (Objects.isNull(keyword) || keyword.isBlank())
-            keyword = "";
-        Page<User> pageUser = webUserRepo.searchByCompany(keyword ,pageable);
-        return pageUser;
+    public void deactivate(String id) {
+        User user = webUserRepo.getById(id);
+        user.setIsActive(false);
+        webUserRepo.save(user);
     }
 
     public Page<User> searchByKeyword(Integer page, Integer size, String keyword) {

@@ -1,9 +1,11 @@
 package com.openjob.common.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Data
 @Entity
@@ -28,9 +30,17 @@ public class Company {
     private String logoUrl;
     @Column
     private String wallpaperUrl;
+    @Column
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date contractEndDate;
+    @Column
+    private Double accountBalance;
+    @Column
+    private Boolean isActive;
 
     @OneToOne
-    @JoinColumn(referencedColumnName = "id", unique = true)
+    @JoinColumn
+    @JsonIgnore
     private User headHunter;
 
 

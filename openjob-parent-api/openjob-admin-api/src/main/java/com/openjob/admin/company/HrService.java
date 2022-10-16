@@ -1,98 +1,58 @@
 package com.openjob.admin.company;
 
-import com.openjob.admin.base.AbstractBaseService;
-import com.openjob.admin.exception.UserNotFoundException;
 import com.openjob.common.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.NestedExceptionUtils;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.SQLException;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
-public class HrService extends AbstractBaseService<User>  {
+public class HrService {
     private final HrRepository hrRepo;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public Boolean isExisting(String id){
-        if (Objects.nonNull(id) && !id.isBlank()){
-            return get(id).isPresent();
-        }
-        return false;
+    public void activate(String companyId){
+        hrRepo.activate(companyId);
     }
 
-
-    @Override
-    public Optional<User> get(String id) {
-        return hrRepo.findById(id);
+    public void deactivate(String companyId){
+        hrRepo.deactivate(companyId);
     }
 
-    @Override
-    public User save(User object) throws SQLException {
-        object.setPassword(passwordEncoder.encode(object.getPassword()));
-        try {
-            return hrRepo.save(object);
-        } catch (Exception ex){
-            throw new SQLException(NestedExceptionUtils.getMostSpecificCause(ex).getMessage());
-        }
-    }
-
-    @Override
-    public User saveWithoutPassword(User object) throws SQLException {
-        try {
-            return hrRepo.save(object);
-        } catch (Exception ex){
-            throw new SQLException(NestedExceptionUtils.getMostSpecificCause(ex).getMessage());
-        }
-    }
-
-    @Override
-    public void delete(String id) throws UserNotFoundException {
-        Optional<User> hr = hrRepo.findById(id);
-        if (hr.isPresent())
-            hrRepo.delete(hr.get());
+    public User getByCompany(String companyId) {
+        Optional<User> optionalUser = hrRepo.findByCompany(companyId);
+        if (optionalUser.isPresent())
+            return optionalUser.get();
         else
-            throw new UserNotFoundException("User not found for ID: " + id);
+            throw new IllegalArgumentException("HR not found for company ID: " + companyId);
     }
 
-
-
-    public Page<User> searchByKeyword(Integer page, Integer size, String keyword) {
-        if (Objects.isNull(keyword) || keyword.isEmpty())
-            return getAll(page, size);
-        Pageable pageable = PageRequest.of(page, size);
-        Page<User> pageHr = hrRepo.search(keyword, pageable);
-        return pageHr;
+    public User create(User hr) {
+        try {
+            hr.setPassword(passwordEncoder.encode(hr.getPassword()));
+            return hrRepo.save(hr);
+        } catch (DataIntegrityViolationException e){
+            throw new DataIntegrityViolationException(NestedExceptionUtils.getMostSpecificCause(e).getMessage());
+        }
     }
 
-    private Page<User> getAll(Integer page, Integer size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<User> pageHr = hrRepo.findAll(pageable);
-        return pageHr;
+    public User update(User hr, Boolean updatePassword) {
+        try {
+            if (hrRepo.findById(hr.getId()).isEmpty())
+                return null;
+            if (updatePassword)
+                hr.setPassword(passwordEncoder.encode(hr.getPassword()));
+            return hrRepo.save(hr);
+        } catch (DataIntegrityViolationException e){
+            throw new DataIntegrityViolationException(NestedExceptionUtils.getMostSpecificCause(e).getMessage());
+        }
     }
 
-    public Page<User> searchByCompany(Integer page, Integer size, String keyword) {
-        Pageable pageable = PageRequest.of(page, size);
-        if (Objects.isNull(keyword) || keyword.isBlank())
-            keyword = "";
-        Page<User> pageHr = hrRepo.searchByCompany(keyword ,pageable);
-        return pageHr;
-    }
-
-    public Page<User> findByCompanyId(Integer page, Integer size, String companyId) {
-        Pageable pageable = PageRequest.of(page, size);
-        if (Objects.isNull(companyId) || companyId.isBlank())
-            throw new IllegalArgumentException("Company ID is null or blank");
-        Page<User> pageHr = hrRepo.findByCompanyId(companyId, pageable);
-        return pageHr;
+    public void delete(User hr) {
+        hrRepo.delete(hr);
     }
 }

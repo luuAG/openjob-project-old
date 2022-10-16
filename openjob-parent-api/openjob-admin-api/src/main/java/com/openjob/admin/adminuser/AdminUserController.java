@@ -87,9 +87,10 @@ public class AdminUserController {
             existingAdmin.setLastName(admin.getLastName());
             existingAdmin.setUsername(admin.getUsername());
             savedAdmin = adminUserService.saveWithoutPassword(existingAdmin);
+            return ResponseEntity.ok(savedAdmin);
         }
 
-        return ResponseEntity.badRequest().body(savedAdmin);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(savedAdmin);
     }
 
     @PostMapping(path = "/adminuser/change-password", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -103,9 +104,10 @@ public class AdminUserController {
             Admin existingAdmin = optionalAdmin.get();
             existingAdmin.setPassword(body.getPassword());
             savedAdmin = adminUserService.save(existingAdmin);
+            return ResponseEntity.ok(savedAdmin);
         }
 
-        return ResponseEntity.badRequest().body(savedAdmin);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(savedAdmin);
     }
 
     @DeleteMapping(path = "/adminuser/deactivate/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

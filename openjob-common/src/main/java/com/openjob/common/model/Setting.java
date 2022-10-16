@@ -24,4 +24,7 @@ public class Setting {
 
     @Column(unique = true, nullable = false, columnDefinition = "text")
     private String value;
+
+    @Column(columnDefinition = "text")
+    private String extraValue;
 }

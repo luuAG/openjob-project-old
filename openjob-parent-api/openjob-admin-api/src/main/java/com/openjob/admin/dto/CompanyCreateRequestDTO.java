@@ -4,7 +4,7 @@ import com.openjob.common.model.User;
 import lombok.Getter;
 
 @Getter
-public class CompanyHeadhunterRequestDTO {
+public class CompanyCreateRequestDTO {
 
     private String companyName;
     private User headHunter;
