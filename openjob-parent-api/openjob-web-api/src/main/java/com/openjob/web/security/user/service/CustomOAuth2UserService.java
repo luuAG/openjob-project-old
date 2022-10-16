@@ -1,6 +1,6 @@
 package com.openjob.web.security.user.service;
 
-import com.openjob.common.model.AuthProvider;
+import com.openjob.common.enums.AuthProvider;
 import com.openjob.common.model.User;
 import com.openjob.web.exception.OAuth2AuthenticationProcessingException;
 import com.openjob.web.security.user.UserPrincipal;

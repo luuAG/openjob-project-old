@@ -1,6 +1,6 @@
 package com.openjob.web.security.user.info;
 
-import com.openjob.common.model.AuthProvider;
+import com.openjob.common.enums.AuthProvider;
 import com.openjob.web.exception.OAuth2AuthenticationProcessingException;
 
 import java.util.Map;
