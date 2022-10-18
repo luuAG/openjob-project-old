@@ -20,7 +20,9 @@ public class SpecializationService {
     }
 
     public Specialization save(Specialization specialization){
-        return specializationRepo.save(specialization);
+        Specialization existingSpe = specializationRepo.getById(specialization.getId());
+        existingSpe.setName(specialization.getName());
+        return specializationRepo.save(existingSpe);
     }
 
     public boolean checkExist(Integer id) {

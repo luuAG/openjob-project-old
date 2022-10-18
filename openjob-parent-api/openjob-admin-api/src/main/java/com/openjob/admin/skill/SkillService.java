@@ -20,8 +20,10 @@ public class SkillService {
         return skillRepo.findAll();
     }
 
-    public Skill save(Skill specialization){
-        return skillRepo.save(specialization);
+    public Skill save(Skill skill){
+        Skill existingSkill = skillRepo.getById(skill.getId());
+        existingSkill.setName(skill.getName());
+        return skillRepo.save(existingSkill);
     }
 
     public void delete(Integer id) {
