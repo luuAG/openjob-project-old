@@ -1,8 +1,8 @@
-package com.openjob.web.security.user.service;
+package com.openjob.web.config.security.service;
 
 import com.openjob.common.model.User;
 import com.openjob.web.exception.ResourceNotFoundException;
-import com.openjob.web.security.user.UserPrincipal;
+import com.openjob.web.config.security.info.UserPrincipal;
 import com.openjob.web.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

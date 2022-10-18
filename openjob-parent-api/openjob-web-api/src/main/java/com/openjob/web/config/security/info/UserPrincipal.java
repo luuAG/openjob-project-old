@@ -1,4 +1,4 @@
-package com.openjob.web.security.user;
+package com.openjob.web.config.security.info;
 
 import com.openjob.common.model.User;
 import org.springframework.security.core.GrantedAuthority;
@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
 
 public class UserPrincipal implements OAuth2User, UserDetails {
     private String id;
@@ -27,7 +28,7 @@ public class UserPrincipal implements OAuth2User, UserDetails {
 
     public static UserPrincipal create(User user) {
         List<GrantedAuthority> authorities = Collections.
-                singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+                singletonList(new SimpleGrantedAuthority("USER"));
 
         return new UserPrincipal(
                 user.getId(),

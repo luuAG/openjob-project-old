@@ -1,4 +1,4 @@
-package com.openjob.web.security.user.info;
+package com.openjob.web.config.security.info;
 
 import java.util.Map;
 

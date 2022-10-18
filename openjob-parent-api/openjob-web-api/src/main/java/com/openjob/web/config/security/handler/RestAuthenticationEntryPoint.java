@@ -1,4 +1,4 @@
-package com.openjob.web.security.user.handler;
+package com.openjob.web.config.security.handler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

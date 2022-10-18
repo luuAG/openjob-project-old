@@ -14,7 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @EnableConfigurationProperties(AppProperties.class)
 @EnableJpaRepositories(basePackages = "com.openjob.web.*")
 @ComponentScan(basePackages = "com.openjob.web.*")
-@EntityScan(basePackages = "com.openjob.common.model.*")
+@EntityScan(basePackages = "com.openjob.common.*")
 public class WebMain {
     public static void main(String[] args) {
         SpringApplication.run(WebMain.class, args);

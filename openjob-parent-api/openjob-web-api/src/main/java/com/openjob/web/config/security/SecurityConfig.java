@@ -1,12 +1,12 @@
-package com.openjob.web.config;
+package com.openjob.web.config.security;
 
-import com.openjob.web.security.user.filter.TokenAuthenticationFilter;
-import com.openjob.web.security.user.handler.OAuth2AuthenticationFailureHandler;
-import com.openjob.web.security.user.handler.OAuth2AuthenticationSuccessHandler;
-import com.openjob.web.security.user.handler.RestAuthenticationEntryPoint;
-import com.openjob.web.security.user.repository.HttpCookieOAuth2AuthorizationRequestRepository;
-import com.openjob.web.security.user.service.CustomOAuth2UserService;
-import com.openjob.web.security.user.service.CustomUserDetailsService;
+import com.openjob.web.config.security.filter.TokenAuthenticationFilter;
+import com.openjob.web.config.security.handler.OAuth2AuthenticationFailureHandler;
+import com.openjob.web.config.security.handler.OAuth2AuthenticationSuccessHandler;
+import com.openjob.web.config.security.handler.RestAuthenticationEntryPoint;
+import com.openjob.web.config.security.repository.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.openjob.web.config.security.service.CustomOAuth2UserService;
+import com.openjob.web.config.security.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -76,7 +76,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.html",
                         "/**/*.css",
                         "/**/*.js").permitAll()
-                .antMatchers("/auth/**", "/oauth2/**").permitAll()
+                .antMatchers("/auth/**", "/oauth2/**", "/login", "/signup").permitAll()
                 .anyRequest().authenticated();
         http.oauth2Login()
                 .authorizationEndpoint()

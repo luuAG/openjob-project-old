@@ -5,7 +5,7 @@ import com.openjob.admin.adminuser.AdminUserService;
 import com.openjob.admin.config.ConfigProperty;
 import com.openjob.admin.config.filter.CustomAuthenticationFilter;
 import com.openjob.admin.config.filter.CustomAuthorizationFilter;
-import com.openjob.common.enums.Role;
+import com.openjob.common.model.Role;
 import com.openjob.common.response.ErrorResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

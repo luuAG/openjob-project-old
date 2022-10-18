@@ -1,6 +1,6 @@
-package com.openjob.web.security.user.handler;
+package com.openjob.web.config.security.handler;
 
-import com.openjob.web.security.user.repository.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.openjob.web.config.security.repository.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.openjob.web.util.CookieUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticationException;
@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static com.openjob.web.security.user.repository.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
+import static com.openjob.web.config.security.repository.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
 
 @Component
 public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {

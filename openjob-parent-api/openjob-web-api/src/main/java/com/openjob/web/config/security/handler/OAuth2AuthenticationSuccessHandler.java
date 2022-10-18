@@ -1,12 +1,18 @@
-package com.openjob.web.security.user.handler;
+package com.openjob.web.config.security.handler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.openjob.common.model.User;
 import com.openjob.web.config.properties.AppProperties;
+import com.openjob.web.config.security.repository.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.openjob.web.config.security.service.TokenProvider;
 import com.openjob.web.exception.BadRequestException;
-import com.openjob.web.security.user.repository.HttpCookieOAuth2AuthorizationRequestRepository;
-import com.openjob.web.security.user.service.TokenProvider;
+import com.openjob.web.user.UserRepository;
 import com.openjob.web.util.CookieUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -17,9 +23,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
-
-import static com.openjob.web.security.user.repository.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
 
 @Component
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
@@ -28,6 +34,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private AppProperties appProperties;
 
     private HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
+
+    @Autowired
+    private UserRepository userRepo;
 
 
     @Autowired
@@ -40,19 +49,36 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        String targetUrl = determineTargetUrl(request, response, authentication);
+//        String targetUrl = determineTargetUrl(request, response, authentication);
+
+        String accessToken = tokenProvider.createAccessToken(authentication);
+        String refreshToken = tokenProvider.createRefreshToken(authentication);
 
         if (response.isCommitted()) {
-            logger.debug("Response has already been committed. Unable to redirect to " + targetUrl);
+            logger.debug("Response has already been committed.");
             return;
         }
 
         clearAuthenticationAttributes(request, response);
-        getRedirectStrategy().sendRedirect(request, response, targetUrl);
+
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        Optional<User> userOptional = userRepo.findByEmail(userDetails.getUsername());
+
+        Map<String, String> responseDTO = new HashMap<>();
+        responseDTO.put("access-token", accessToken);
+        responseDTO.put("refresh-token", refreshToken);
+        responseDTO.put("id", userOptional.get().getId());
+        responseDTO.put("role", userOptional.get().getRole().name());
+
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setStatus(HttpStatus.OK.value());
+        new ObjectMapper().writeValue(response.getOutputStream(), responseDTO);
+
+//        getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 
     protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-        Optional<String> redirectUri = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
+        Optional<String> redirectUri = CookieUtils.getCookie(request, HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME)
                 .map(Cookie::getValue);
 
         if(redirectUri.isPresent() && !isAuthorizedRedirectUri(redirectUri.get())) {
@@ -61,10 +87,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
 
-        String token = tokenProvider.createToken(authentication);
 
         return UriComponentsBuilder.fromUriString(targetUrl)
-                .queryParam("token", token)
                 .build().toUriString();
     }
 

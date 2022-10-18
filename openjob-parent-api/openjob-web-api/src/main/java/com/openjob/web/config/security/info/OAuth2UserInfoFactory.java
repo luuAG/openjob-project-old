@@ -1,4 +1,4 @@
-package com.openjob.web.security.user.info;
+package com.openjob.web.config.security.info;
 
 import com.openjob.common.enums.AuthProvider;
 import com.openjob.web.exception.OAuth2AuthenticationProcessingException;

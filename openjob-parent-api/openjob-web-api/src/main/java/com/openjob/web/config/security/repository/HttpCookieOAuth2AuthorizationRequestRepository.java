@@ -1,4 +1,4 @@
-package com.openjob.web.security.user.repository;
+package com.openjob.web.config.security.repository;
 
 import com.openjob.web.util.CookieUtils;
 import org.apache.commons.lang3.StringUtils;

@@ -1,11 +1,12 @@
-package com.openjob.web.security.user.service;
+package com.openjob.web.config.security.service;
 
 import com.openjob.common.enums.AuthProvider;
+import com.openjob.common.enums.Role;
 import com.openjob.common.model.User;
+import com.openjob.web.config.security.info.UserPrincipal;
 import com.openjob.web.exception.OAuth2AuthenticationProcessingException;
-import com.openjob.web.security.user.UserPrincipal;
-import com.openjob.web.security.user.info.OAuth2UserInfo;
-import com.openjob.web.security.user.info.OAuth2UserInfoFactory;
+import com.openjob.web.config.security.info.OAuth2UserInfo;
+import com.openjob.web.config.security.info.OAuth2UserInfoFactory;
 import com.openjob.web.user.UserRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +52,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             if(!user.getAuthProvider().name()
                     .equalsIgnoreCase(oAuth2UserRequest.getClientRegistration().getRegistrationId())) {
                 throw new OAuth2AuthenticationProcessingException("Looks like you're signed up with " +
-                        user.getAuthProvider() + " account. Please use your " + user.getAuthProvider() +
+                        user.getAuthProvider().name() + " account. Please use your " + user.getAuthProvider().name() +
                         " account to login.");
             }
             user = updateExistingUser(user, oAuth2UserInfo);
@@ -64,7 +65,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private User registerNewUser(OAuth2UserRequest oAuth2UserRequest, OAuth2UserInfo oAuth2UserInfo) {
         User user = new User();
-        user.setAuthProvider(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()));
+        user.setRole(Role.USER);
+        user.setIsActive(true);
+        user.setPassword("");
+        user.setAuthProvider(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId().toUpperCase()));
+        user.setFirstName("");
         user.setLastName(oAuth2UserInfo.getName());
         user.setEmail(oAuth2UserInfo.getEmail());
         user.setAvatarUrl(oAuth2UserInfo.getImageUrl());
@@ -72,6 +77,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private User updateExistingUser(User existingUser, OAuth2UserInfo oAuth2UserInfo) {
+        existingUser.setFirstName("");
         existingUser.setLastName(oAuth2UserInfo.getName());
         existingUser.setAvatarUrl(oAuth2UserInfo.getImageUrl());
         return userRepository.save(existingUser);
