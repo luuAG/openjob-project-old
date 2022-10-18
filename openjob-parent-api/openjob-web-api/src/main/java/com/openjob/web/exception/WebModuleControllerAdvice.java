@@ -18,4 +18,12 @@ public class WebModuleControllerAdvice {
         errorResponse.setErrorCode(HttpStatus.UNAUTHORIZED.value());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleException(
+            InternalAuthenticationServiceException ex) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setErrorMessage(ex.getMessage());
+        errorResponse.setErrorCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
 }

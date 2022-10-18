@@ -1,6 +1,5 @@
 package com.openjob.web.config.security.handler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openjob.common.model.User;
 import com.openjob.web.config.properties.AppProperties;
 import com.openjob.web.config.security.repository.HttpCookieOAuth2AuthorizationRequestRepository;
@@ -9,8 +8,6 @@ import com.openjob.web.exception.BadRequestException;
 import com.openjob.web.user.UserRepository;
 import com.openjob.web.util.CookieUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -23,8 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @Component
@@ -49,10 +44,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-//        String targetUrl = determineTargetUrl(request, response, authentication);
-
-        String accessToken = tokenProvider.createAccessToken(authentication);
-        String refreshToken = tokenProvider.createRefreshToken(authentication);
+        String targetUrl = determineTargetUrl(request, response, authentication);
 
         if (response.isCommitted()) {
             logger.debug("Response has already been committed.");
@@ -60,21 +52,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         }
 
         clearAuthenticationAttributes(request, response);
-
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        Optional<User> userOptional = userRepo.findByEmail(userDetails.getUsername());
-
-        Map<String, String> responseDTO = new HashMap<>();
-        responseDTO.put("access-token", accessToken);
-        responseDTO.put("refresh-token", refreshToken);
-        responseDTO.put("id", userOptional.get().getId());
-        responseDTO.put("role", userOptional.get().getRole().name());
-
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setStatus(HttpStatus.OK.value());
-        new ObjectMapper().writeValue(response.getOutputStream(), responseDTO);
-
-//        getRedirectStrategy().sendRedirect(request, response, targetUrl);
+        getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 
     protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
@@ -87,8 +65,18 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
 
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        Optional<User> userOptional = userRepo.findByEmail(userDetails.getUsername());
+        String accessToken = tokenProvider.createAccessToken(authentication);
+        String refreshToken = tokenProvider.createRefreshToken(authentication);
+        String role = userOptional.get().getRole().name();
+        String id = userOptional.get().getId().toString();
 
         return UriComponentsBuilder.fromUriString(targetUrl)
+                .queryParam("role", role)
+                .queryParam("id", id)
+                .queryParam("access-token", accessToken)
+                .queryParam("refresh-token", refreshToken)
                 .build().toUriString();
     }
 
