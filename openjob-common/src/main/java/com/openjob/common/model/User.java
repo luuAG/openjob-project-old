@@ -27,12 +27,12 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "varchar(10) default 'DATABASE'")
     private AuthProvider authProvider;
-    @Column(nullable = false, columnDefinition = "bit(1) default true")
+    @Column(columnDefinition = "bit(1) default true")
     private Boolean isActive;
-    @Column(nullable = false)
+    @Column
     @Size(max = 20)
     private String firstName;
-    @Column(nullable = false)
+    @Column
     @Size(max = 20)
     private String lastName;
     @Column

@@ -18,12 +18,20 @@ public class UserService {
         return userRepo.findById(id);
     }
 
-    public User saveWithPassword(User user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+    public User save(User user, boolean withPassword) {
+        if (withPassword){
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
         return userRepo.save(user);
     }
 
-    public User saveWithoutPassword(User user) {
-        return userRepo.save(user);
+    public boolean existsByEmail(String email) {
+        return userRepo.existsByEmail(email);
+    }
+
+    public User getByEmail(String email) {
+        Optional<User> userOptional = userRepo.findByEmail(email);
+        return userOptional.orElse(null);
     }
 }
