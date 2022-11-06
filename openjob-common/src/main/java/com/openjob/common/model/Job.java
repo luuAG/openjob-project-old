@@ -1,5 +1,6 @@
 package com.openjob.common.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.openjob.common.enums.WorkPlace;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
@@ -31,7 +32,7 @@ public class Job {
     private Integer quantity;
 
     @Column
-    private Double salary;
+    private String salary;
 
     @Column
     @Temporal(value = TemporalType.TIMESTAMP)
@@ -54,8 +55,16 @@ public class Job {
     private Specialization specialization;
 
     @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(referencedColumnName = "id")
+    @JoinTable(
+            name="job_skill_experience",
+            joinColumns = @JoinColumn( name="job_id"),
+            inverseJoinColumns = @JoinColumn( name="skill_experience_id")
+    )
     private Collection<SkillExperience> listSkillExperience;
+
+    @OneToOne
+    @JoinColumn
+    private Company company;
 
     public Job(String id, String title, Date expiredAt, Major major, Specialization specialization, Collection<SkillExperience> listSkillExperience) {
         this.id = id;
