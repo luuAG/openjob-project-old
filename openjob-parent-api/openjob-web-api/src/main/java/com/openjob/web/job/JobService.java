@@ -60,7 +60,7 @@ public class JobService {
                 if (Objects.isNull(skill.getId())){
                     skill.setSpecialization(job.getSpecialization());
                     skill.setIsVerified(false);
-                    Skill savedSkill = skillRepo.saveAndFlush(skill);
+                    Skill savedSkill = skillRepo.save(skill);
                     SEfromRequest.setSkill(savedSkill);
                     SkillExperience savedSE = skillExperienceService.saveUpdate(SEfromRequest);
                     if (Objects.nonNull(savedSE))

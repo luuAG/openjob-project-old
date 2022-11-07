@@ -1,10 +1,15 @@
 package com.openjob.web.job;
 
+import com.openjob.common.model.Company;
 import com.openjob.common.model.Job;
+import com.openjob.common.model.Major;
+import com.openjob.common.model.Specialization;
 import com.openjob.common.response.MessageResponse;
 import com.openjob.web.company.CompanyService;
 import com.openjob.web.dto.JobPaginationDTO;
 import com.openjob.web.dto.JobRequestDTO;
+import com.openjob.web.major.MajorService;
+import com.openjob.web.specialization.SpecializationService;
 import com.openjob.web.util.NullAwareBeanUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,6 +29,8 @@ import java.util.Optional;
 public class JobController {
     private final JobService jobService;
     private final CompanyService companyService;
+    private final MajorService majorService;
+    private final SpecializationService speService;
 
     @GetMapping(path = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<JobPaginationDTO> searchJob(
@@ -55,7 +62,14 @@ public class JobController {
         Job job = new Job();
         beanCopier.copyProperties(job, reqJob);
 
-        job.setCompany(companyService.getById(reqJob.getCompanyId()));
+        Company company = companyService.getById(reqJob.getCompanyId());
+        Optional<Major> major = majorService.getById(reqJob.getMajorId());
+        Optional<Specialization> specialization = speService.getById(reqJob.getSpecializationId());
+        if (Objects.isNull(company) || major.isEmpty() || specialization.isEmpty())
+            throw new IllegalArgumentException("Company/Major/Specialization not found!");
+        job.setCompany(company);
+        job.setMajor(major.get());
+        job.setSpecialization(specialization.get());
 
         Job savedJob = jobService.saveNewJob(job);
         if(Objects.nonNull(savedJob))

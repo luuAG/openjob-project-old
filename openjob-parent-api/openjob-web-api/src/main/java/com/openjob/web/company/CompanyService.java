@@ -10,6 +10,6 @@ public class CompanyService {
     private final CompanyRepository companyRepo;
 
     public Company getById(String id){
-        return companyRepo.getById(id);
+        return companyRepo.findById(id).orElse(null);
     }
 }
