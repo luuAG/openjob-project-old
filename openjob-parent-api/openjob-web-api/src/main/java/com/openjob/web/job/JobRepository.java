@@ -21,4 +21,7 @@ public interface JobRepository extends JpaRepository<Job, String> {
             "where concat(j.title, ' ', j.company.name, ' ', se.skill.name) like %?1% " +
             "and j.company.address like %?2%")
     Page<Job> findByKeywordAndLocation(String keyword, String location, Pageable pageable);
+
+    @Override
+    void deleteById(String s);
 }

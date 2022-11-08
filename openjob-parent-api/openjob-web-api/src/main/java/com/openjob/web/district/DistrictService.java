@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +17,8 @@ public class DistrictService {
     }
 
     public List<District> searchByProvinceAndName(String province, String keyword) {
+        if (Objects.isNull(keyword))
+            keyword = "";
         return districtRepo.searchByProvinceAndName(province, keyword);
     }
 }

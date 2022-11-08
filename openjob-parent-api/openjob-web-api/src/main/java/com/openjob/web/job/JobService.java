@@ -91,4 +91,8 @@ public class JobService {
         }
         return pageJob;
     }
+
+    public void deleteById(String jobId){
+        jobRepo.deleteById(jobId);
+    }
 }

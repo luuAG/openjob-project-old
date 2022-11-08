@@ -78,6 +78,12 @@ public class JobController {
         return ResponseEntity.badRequest().body(new MessageResponse("Creating job failed!"));
     }
 
+    @DeleteMapping(path = "/delete/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MessageResponse> deleteJob(@PathVariable("jobId") String jobId){
+        jobService.deleteById(jobId);
+        return ResponseEntity.ok(new MessageResponse("Job is deleted!"));
+    }
+
 
 
 }

@@ -22,12 +22,12 @@ public class LocationController {
     private final DistrictService districtService;
 
     @GetMapping(path = "/search-province", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Province>> searchProvince(@RequestParam("keyword") String keyword) {
+    public ResponseEntity<List<Province>> searchProvince(@RequestParam(value = "keyword", required = false) String keyword) {
         return ResponseEntity.ok(provinceService.getByName(keyword));
     }
     @GetMapping(path = "/search-district", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<District>> searchDistrict(@RequestParam("province") String province,
-                                                         @RequestParam("keyword") String keyword) {
+                                                         @RequestParam(value = "keyword", required = false) String keyword) {
         return ResponseEntity.ok(districtService.searchByProvinceAndName(province, keyword));
     }
 }
