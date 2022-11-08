@@ -37,7 +37,10 @@ public class User {
     private String lastName;
     @Column
     private String avatarUrl;
-
+    @Column
+    private String dob;
+    @Column
+    private String gender;
     @Column
     private Integer reports;
 
@@ -45,5 +48,7 @@ public class User {
     @JoinColumn
     private Company company;
 
+    @OneToOne
+    private CV cv;
 
 }

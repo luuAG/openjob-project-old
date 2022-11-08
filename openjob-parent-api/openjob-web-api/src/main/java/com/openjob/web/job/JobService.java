@@ -8,6 +8,7 @@ import com.openjob.web.skill.SkillRepository;
 import com.openjob.web.skillexperience.SkillExperienceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,20 +26,7 @@ public class JobService {
     private final SkillExperienceService skillExperienceService;
     private final CompanyRepository companyRepo;
 
-    public Page<Job> searchByKeywordAndLocation(Integer size, Integer page, String keyword, String location) {
-        Pageable pageable = PageRequest.of(page, size);
-        if (Objects.isNull(location) && location.isBlank()){
-            if (Objects.isNull(keyword) && keyword.isBlank())
-                return jobRepo.findAll(pageable);
-            else
-                return jobRepo.findByKeyword(keyword, pageable);
-        } else {
-            if (Objects.isNull(keyword) && keyword.isBlank())
-                return jobRepo.findByLocation(location, pageable);
-            else
-                return jobRepo.findByKeywordAndLocation(keyword, location, pageable);
-        }
-    }
+
 
     public Optional<Job> getById(String id) {
         return jobRepo.findById(id);
@@ -77,5 +65,30 @@ public class JobService {
 
         job.setCreatedAt(new Date());
         return jobRepo.save(job);
+    }
+
+    public Page<Job> searchByKeywordAndLocationAndCompany(Integer size, Integer page, String keyword, String location, String companyId) {
+        Page<Job> pageJob;
+        Pageable pageable = PageRequest.of(page, size);
+        if (Objects.isNull(location) || location.isBlank()){
+            if (Objects.isNull(keyword) || keyword.isBlank())
+                pageJob = jobRepo.findAll(pageable);
+            else
+                pageJob = jobRepo.findByKeyword(keyword, pageable);
+        } else {
+            if (Objects.isNull(keyword) || keyword.isBlank())
+                pageJob = jobRepo.findByLocation(location, pageable);
+            else
+                pageJob = jobRepo.findByKeywordAndLocation(keyword, location, pageable);
+        }
+        if (Objects.nonNull(companyId) && !companyId.isBlank()){
+            List<Job> jobs = new ArrayList<>(pageJob.getContent());
+            for (int i=0; i< jobs.size(); i++)
+                if ( ! jobs.get(i).getCompany().getId().equals(companyId))
+                    jobs.remove(jobs.get(i));
+
+            return new PageImpl<>(jobs);
+        }
+        return pageJob;
     }
 }

@@ -36,9 +36,10 @@ public class JobController {
     public ResponseEntity<JobPaginationDTO> searchJob(
             @RequestParam("page") Integer page,
             @RequestParam("size") Integer size,
-            @RequestParam("keyword") String keyword,
-            @RequestParam("location") String location) {
-        Page<Job> pageJob = jobService.searchByKeywordAndLocation(size, page, keyword, location);
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "location", required = false) String location,
+            @RequestParam(value = "companyId", required = false) String companyId) {
+        Page<Job> pageJob = jobService.searchByKeywordAndLocationAndCompany(size, page, keyword, location, companyId);
 
         return ResponseEntity.ok(new JobPaginationDTO(
                 pageJob.getContent(),
@@ -76,5 +77,7 @@ public class JobController {
             return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("New job is created successfully!"));
         return ResponseEntity.badRequest().body(new MessageResponse("Creating job failed!"));
     }
+
+
 
 }
