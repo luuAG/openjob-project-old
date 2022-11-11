@@ -7,6 +7,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.util.Date;
 
 @Data
 @Entity
@@ -38,7 +39,7 @@ public class User {
     @Column
     private String avatarUrl;
     @Column
-    private String dob;
+    private Date dob;
     @Column
     private String gender;
     @Column
@@ -48,7 +49,7 @@ public class User {
     @JoinColumn
     private Company company;
 
-    @OneToOne
+    @OneToOne(mappedBy = "user")
     private CV cv;
 
 }

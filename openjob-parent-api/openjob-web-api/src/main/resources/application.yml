@@ -22,6 +22,10 @@ spring:
                 dialect: org.hibernate.dialect.MySQL8Dialect
                 format_sql: true
         show-sql: true
+    data:
+      jpa:
+        repositories:
+            bootstrap-mode: default
     servlet:
         multipart:
             max-file-size: 1MB

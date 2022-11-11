@@ -73,8 +73,11 @@ public class JobController {
         job.setSpecialization(specialization.get());
 
         Job savedJob = jobService.saveNewJob(job);
-        if(Objects.nonNull(savedJob))
+        if(Objects.nonNull(savedJob)){
+            jobService.findCVmatchJob(savedJob); // async
             return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("New job is created successfully!"));
+        }
+
         return ResponseEntity.badRequest().body(new MessageResponse("Creating job failed!"));
     }
 

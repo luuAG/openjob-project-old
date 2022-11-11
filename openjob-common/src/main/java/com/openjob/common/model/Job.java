@@ -8,6 +8,7 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Entity
@@ -54,25 +55,20 @@ public class Job {
     @JoinColumn
     private Specialization specialization;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name="job_skill_experience",
-            joinColumns = @JoinColumn( name="job_id"),
-            inverseJoinColumns = @JoinColumn( name="skill_experience_id")
-    )
-    private Collection<SkillExperience> listSkillExperience;
-
     @OneToOne
     @JoinColumn
     private Company company;
 
-    public Job(String id, String title, Date expiredAt, Major major, Specialization specialization, Collection<SkillExperience> listSkillExperience) {
+    @OneToMany(mappedBy = "job")
+    private List<JobSkill> jobSkills;
+
+    public Job(String id, String title, Date expiredAt, Major major, Specialization specialization, List<JobSkill> jobSkills) {
         this.id = id;
         this.title = title;
         this.expiredAt = expiredAt;
         this.major = major;
         this.specialization = specialization;
-        this.listSkillExperience = listSkillExperience;
+        this.jobSkills = jobSkills;
     }
 
     public Job() {

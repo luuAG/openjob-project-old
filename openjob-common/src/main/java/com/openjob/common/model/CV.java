@@ -1,5 +1,6 @@
 package com.openjob.common.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -33,13 +34,23 @@ public class CV {
     private String additionalInfo;
 
     @OneToOne
+    @JoinColumn
+    @JsonIgnore
     private User user;
+
+    @OneToOne
+    @JoinColumn
+    private Major major;
+
+    @OneToOne
+    @JoinColumn
+    private Specialization specialization;
 
     @OneToMany
     @JoinTable(
-        name = "cv_skill_experience",
+        name = "cv_skill",
         joinColumns = @JoinColumn(name = "cv_id"),
-        inverseJoinColumns = @JoinColumn(name = "skill_experience_id")
+        inverseJoinColumns = @JoinColumn(name = "skill_id")
     )
-    private List<SkillExperience> listSkillExperience;
+    private List<Skill> listSkill;
 }

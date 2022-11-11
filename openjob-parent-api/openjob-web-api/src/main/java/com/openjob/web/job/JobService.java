@@ -1,16 +1,16 @@
 package com.openjob.web.job;
 
-import com.openjob.common.model.Job;
-import com.openjob.common.model.Skill;
-import com.openjob.common.model.SkillExperience;
-import com.openjob.web.company.CompanyRepository;
+import com.openjob.common.model.*;
+import com.openjob.web.cv.CvRepository;
+import com.openjob.web.jobcvmatching.JobCVMatchingRepository;
 import com.openjob.web.skill.SkillRepository;
-import com.openjob.web.skillexperience.SkillExperienceService;
+import com.openjob.web.util.JobCVUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,8 +23,8 @@ import java.util.*;
 public class JobService {
     private final JobRepository jobRepo;
     private final SkillRepository skillRepo;
-    private final SkillExperienceService skillExperienceService;
-    private final CompanyRepository companyRepo;
+    private final JobCVMatchingRepository jobCVMatchingRepo;
+    private final CvRepository cvRepo;
 
 
 
@@ -33,35 +33,26 @@ public class JobService {
     }
 
     public Job saveNewJob(Job job) throws SQLException {
-        List<SkillExperience> realListSkillExperience = new ArrayList<>();
+        List<JobSkill> realListJobSkill = new ArrayList<>();
 
-        for (int i = 0; i < job.getListSkillExperience().size(); i++) {
-            SkillExperience SEfromRequest = (SkillExperience) ((List) job.getListSkillExperience()).get(i);
-            SkillExperience SEinDB =
-                    skillExperienceService.getBySkillAndExperience(
-                            SEfromRequest.getSkill().getName(), SEfromRequest.getExperience().getValue());
-            if (Objects.nonNull(SEinDB)){
-                realListSkillExperience.add(SEinDB);
+        // detect new skill
+        for (int i = 0; i < job.getJobSkills().size(); i++) {
+            JobSkill JSfromRequest =  job.getJobSkills().get(i);
+
+            if (Objects.nonNull(JSfromRequest.getSkill().getId())){
+                realListJobSkill.add(JSfromRequest);
             } else {
-                Skill skill = SEfromRequest.getSkill();
-                // New skill
-                if (Objects.isNull(skill.getId())){
-                    skill.setSpecialization(job.getSpecialization());
-                    skill.setIsVerified(false);
-                    Skill savedSkill = skillRepo.save(skill);
-                    SEfromRequest.setSkill(savedSkill);
-                    SkillExperience savedSE = skillExperienceService.saveUpdate(SEfromRequest);
-                    if (Objects.nonNull(savedSE))
-                        realListSkillExperience.add(savedSE);
-                    else
-                        throw new SQLException("Error when save skill "+skill.getName()+" and experience "
-                                + SEfromRequest.getExperience().getValue().name());
-                }
-            }
+                Skill skillFromRequest = JSfromRequest.getSkill();
+                skillFromRequest.setIsVerified(false);
+                skillFromRequest.setSpecialization(job.getSpecialization());
 
+                Skill savedSkill = skillRepo.save(skillFromRequest);
+                JSfromRequest.setSkill(savedSkill);
+                realListJobSkill.add(JSfromRequest);
+            }
         }
 
-        job.setListSkillExperience(realListSkillExperience);
+        job.setJobSkills(realListJobSkill);
 
         job.setCreatedAt(new Date());
         return jobRepo.save(job);
@@ -94,5 +85,22 @@ public class JobService {
 
     public void deleteById(String jobId){
         jobRepo.deleteById(jobId);
+    }
+
+    @Async
+    public void findCVmatchJob(Job savedJob) {
+        List<CV> listCV = cvRepo.findBySpecialization(savedJob.getSpecialization().getId());
+
+        for (CV cv : listCV) {
+            int matchingPoint = JobCVUtils.checkCVmatchJob(savedJob, cv);
+            if (matchingPoint > 0){
+                JobCvMatching jobCvMatching = new JobCvMatching();
+                jobCvMatching.setJob(savedJob);
+                jobCvMatching.setCv(cv);
+                jobCvMatching.setPoint(matchingPoint);
+                jobCVMatchingRepo.save(jobCvMatching);
+            }
+        }
+
     }
 }

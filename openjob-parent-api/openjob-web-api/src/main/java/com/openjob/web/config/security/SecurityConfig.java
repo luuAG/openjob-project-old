@@ -78,6 +78,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.js").permitAll()
                 .antMatchers("/auth/**", "/oauth2/**", "/login", "/signup").permitAll()
                 .antMatchers("/token/refresh",
+                        "/swagger-ui",
                         "/swagger-ui/**",
                         "/swagger-ui.html",
                         "/webjars/**",
