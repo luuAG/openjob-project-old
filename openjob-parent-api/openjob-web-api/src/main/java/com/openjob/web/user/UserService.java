@@ -8,6 +8,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -45,5 +46,9 @@ public class UserService {
         User existingUser = userRepo.getById(userInfo.getId());
         NullAwareBeanUtils.getInstance().copyProperties(existingUser, userInfo);
         return userRepo.save(existingUser);
+    }
+
+    public List<User> getByMatchingJob(String jobId) {
+        return userRepo.findByMatchingJob(jobId);
     }
 }
