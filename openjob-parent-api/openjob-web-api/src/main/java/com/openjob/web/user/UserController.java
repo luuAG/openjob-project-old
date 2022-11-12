@@ -30,7 +30,7 @@ public class UserController {
         if (Objects.isNull(userInfo.getId())){
             throw new IllegalArgumentException("ID is null");
         }
-        if (userService.existById(userInfo.getId())){
+        if (!userService.existById(userInfo.getId())){
             throw new ResourceNotFoundException("User", "id", userInfo.getId());
         }
         User updatedUser = userService.patchUpdate(userInfo);

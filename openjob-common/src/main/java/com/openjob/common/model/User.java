@@ -44,6 +44,8 @@ public class User {
     private String gender;
     @Column
     private Integer reports;
+    @Column
+    private String phone;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn
