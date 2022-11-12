@@ -4,6 +4,7 @@ import com.openjob.common.model.Major;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -13,6 +14,10 @@ public class MajorService {
 
     public Optional<Major> getById(Integer id) {
         return majorRepo.findById(id);
+    }
+
+    public List<Major> getAll() {
+        return majorRepo.findAll();
     }
 }
 
