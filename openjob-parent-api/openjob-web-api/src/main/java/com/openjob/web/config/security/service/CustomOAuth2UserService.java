@@ -49,12 +49,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         User user;
         if(userOptional.isPresent()) {
             user = userOptional.get();
-            if(!user.getAuthProvider().name()
-                    .equalsIgnoreCase(oAuth2UserRequest.getClientRegistration().getRegistrationId())) {
-                throw new OAuth2AuthenticationProcessingException("Looks like you're signed up with " +
-                        user.getAuthProvider().name() + " account. Please use your " + user.getAuthProvider().name() +
-                        " account to login.");
-            }
+//            if(!user.getAuthProvider().name()
+//                    .equalsIgnoreCase(oAuth2UserRequest.getClientRegistration().getRegistrationId())) {
+//                throw new OAuth2AuthenticationProcessingException("Looks like you're signed up with " +
+//                        user.getAuthProvider().name() + " account. Please use your " + user.getAuthProvider().name() +
+//                        " account to login.");
+//            }
             user = updateExistingUser(user, oAuth2UserInfo);
         } else {
             user = registerNewUser(oAuth2UserRequest, oAuth2UserInfo);
@@ -80,6 +80,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         existingUser.setFirstName("");
         existingUser.setLastName(oAuth2UserInfo.getName());
         existingUser.setAvatarUrl(oAuth2UserInfo.getImageUrl());
+        existingUser.setAuthProvider(AuthProvider.GOOGLE);
         return userRepository.save(existingUser);
     }
 }

@@ -11,9 +11,9 @@ import org.springframework.stereotype.Repository;
 public interface JobRepository extends JpaRepository<Job, Integer> {
 
     @Query(value = """
-            select new Job(j.id, j.title, j.expiredAt, j.major, j.specialization, j.listSkillExperience)
+            select new Job(j.id, j.title, j.expiredAt, j.major, j.specialization, j.jobSkills)
             from Job j
-            left join j.listSkillExperience se where se.skill.isVerified=false
+            left join j.jobSkills se where se.skill.isVerified=false
             """)
     Page<Job> findAllwithSkillnotVerified(Pageable pageable);
 }

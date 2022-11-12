@@ -59,6 +59,8 @@ public class AuthController {
         String refreshToken = tokenProvider.createRefreshToken(authentication);
 
         User user = userService.getByEmail(credential.getEmail());
+        user.setAuthProvider(AuthProvider.DATABASE);
+        userService.save(user, false);
 
         Map<String, String> responseDTO = new HashMap<>();
         responseDTO.put("access-token", accessToken);
