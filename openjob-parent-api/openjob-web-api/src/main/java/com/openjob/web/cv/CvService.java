@@ -61,13 +61,8 @@ public class CvService {
             if (skillInDB.isPresent()) {
                 realListSkill.add(skillInDB.get());
             } else {
-                skillInDB = skillRepo.findByName(skillFromRequest.getName());
                 skillFromRequest.setSpecialization(cv.getSpecialization());
-                if (skillInDB.isPresent() && skillInDB.get().getIsVerified()) {
-                    skillFromRequest.setIsVerified(true);
-                } else {
-                    skillFromRequest.setIsVerified(false);
-                }
+                skillFromRequest.setIsVerified(skillRepo.existsByName(skillFromRequest.getName()));
                 Skill savedSkill = skillRepo.save(skillFromRequest);
                 realListSkill.add(savedSkill);
             }

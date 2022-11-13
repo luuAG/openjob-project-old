@@ -73,13 +73,8 @@ public class JobService {
                 jobSkill.setJob(savedJob);
                 realListJobSkill.add(jobSkillRepo.save(jobSkill));
             } else {
-                skillInDB = skillRepo.findByName(skillFromRequest.getName());
                 skillFromRequest.setSpecialization(savedJob.getSpecialization());
-                if (skillInDB.isPresent() && skillInDB.get().getIsVerified()) {
-                    skillFromRequest.setIsVerified(true);
-                } else {
-                    skillFromRequest.setIsVerified(false);
-                }
+                skillFromRequest.setIsVerified(skillRepo.existsByName(skillFromRequest.getName()));
                 Skill savedSkill = skillRepo.save(skillFromRequest);
                 jobSkill.setRequired(JSfromRequest.getIsRequired());
                 jobSkill.setSkill(savedSkill);

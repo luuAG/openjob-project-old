@@ -16,5 +16,6 @@ public interface SkillRepository extends JpaRepository<Skill, Integer> {
     @Query("select s from Skill s where s.specialization.id=?1 group by s.name")
     Collection<Skill> findBySpecialization(Integer speId);
 
-    Optional<Skill> findByName(String name);
+    @Query("select case when count(s)>0 then true else false end from Skill s where s.name=?1")
+    boolean existsByName(String name);
 }
