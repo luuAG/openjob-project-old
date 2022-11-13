@@ -4,6 +4,7 @@ import com.openjob.common.model.*;
 import com.openjob.web.dto.CVRequestDTO;
 import com.openjob.web.job.JobRepository;
 import com.openjob.web.jobcvmatching.JobCVMatchingRepository;
+import com.openjob.web.major.MajorService;
 import com.openjob.web.skill.SkillRepository;
 import com.openjob.web.specialization.SpecializationService;
 import com.openjob.web.user.UserService;
@@ -29,6 +30,7 @@ public class CvService {
     private final UserService userService;
     private final JobRepository jobRepo;
     private final JobCVMatchingRepository jobCVMatchingRepo;
+    private final MajorService majorService;
 
     public Optional<CV> getById(String id) {
         return cvRepo.findById(id);
@@ -45,9 +47,11 @@ public class CvService {
 
         Optional<User> user = userService.get(cvDto.getUserId());
         Optional<Specialization> specialization = speService.getById(cvDto.getSpecializationId());
+        Optional<Major> major = majorService.getById(cvDto.getMajorId());
 
         cv.setUser(user.orElseThrow());
         cv.setSpecialization(specialization.orElseThrow());
+        cv.setMajor(major.orElseThrow());
 
         List<Skill> realListSkill = new ArrayList<>();
 

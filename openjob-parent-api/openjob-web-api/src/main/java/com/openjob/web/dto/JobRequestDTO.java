@@ -14,6 +14,7 @@ public class JobRequestDTO {
     private String salary;
     private WorkPlace workPlace;
     private Integer specializationId;
+    private Integer majorId;
     private List<JobSkillDTO> listJobSkillDTO;
     private String companyId;
 }

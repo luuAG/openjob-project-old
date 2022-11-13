@@ -42,6 +42,10 @@ public class CV {
     @JoinColumn
     private Specialization specialization;
 
+    @OneToOne
+    @JoinColumn
+    private Major major;
+
     @OneToMany
     @JoinTable(
         name = "cv_skill",

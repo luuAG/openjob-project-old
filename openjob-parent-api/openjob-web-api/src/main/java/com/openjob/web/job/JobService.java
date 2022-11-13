@@ -7,6 +7,7 @@ import com.openjob.web.dto.JobRequestDTO;
 import com.openjob.web.dto.JobSkillDTO;
 import com.openjob.web.jobcvmatching.JobCVMatchingRepository;
 import com.openjob.web.jobskill.JobSkillRepository;
+import com.openjob.web.major.MajorService;
 import com.openjob.web.skill.SkillRepository;
 import com.openjob.web.specialization.SpecializationService;
 import com.openjob.web.util.JobCVUtils;
@@ -34,6 +35,7 @@ public class JobService {
     private final CompanyService companyService;
     private final SpecializationService speService;
     private final JobSkillRepository jobSkillRepo;
+    private final MajorService majorService;
 
 
     public Optional<Job> getById(String id) {
@@ -47,9 +49,11 @@ public class JobService {
 
         Company company = companyService.getById(jobDTO.getCompanyId());
         Optional<Specialization> specialization = speService.getById(jobDTO.getSpecializationId());
-        if (Objects.isNull(company) || specialization.isEmpty())
+        Optional<Major> major = majorService.getById(jobDTO.getMajorId());
+        if (Objects.isNull(company) || specialization.isEmpty() || major.isEmpty())
             throw new IllegalArgumentException("Company/Major/Specialization not found!");
         job.setCompany(company);
+        job.setMajor(major.get());
         job.setSpecialization(specialization.get());
 
         Job savedJob = jobRepo.save(job);

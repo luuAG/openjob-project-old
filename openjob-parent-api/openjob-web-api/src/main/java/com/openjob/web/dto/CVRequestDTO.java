@@ -16,6 +16,7 @@ public class CVRequestDTO {
     private String additionalInfo;
     private String userId;
     private Integer specializationId;
+    private Integer majorId;
     private List<Skill> listSkill;
 
 }

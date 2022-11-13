@@ -4,6 +4,9 @@ server:
     servlet:
         context-path: /api/web
 spring:
+    jackson:
+        serialization:
+          fail-on-empty-beans: false
     datasource:
         hikari:
             auto-commit: false

@@ -53,6 +53,10 @@ public class Job {
 
     @OneToOne
     @JoinColumn
+    private Major major;
+
+    @OneToOne
+    @JoinColumn
     private Company company;
 
     @OneToMany(mappedBy = "job")
