@@ -11,6 +11,9 @@ import com.openjob.web.user.UserService;
 import com.openjob.web.util.JobCVUtils;
 import com.openjob.web.util.NullAwareBeanUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,5 +89,10 @@ public class CvService {
                 jobCVMatchingRepo.save(jobCvMatching);
             }
         }
+    }
+
+    public Page<CV> getByJobId(Integer page, Integer size, String jobId) {
+        Pageable pageable = PageRequest.of(page, size);
+        return cvRepo.findByJobId(jobId, pageable);
     }
 }

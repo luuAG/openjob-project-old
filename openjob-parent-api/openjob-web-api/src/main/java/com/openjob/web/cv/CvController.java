@@ -4,10 +4,12 @@ import com.openjob.common.model.CV;
 import com.openjob.common.model.User;
 import com.openjob.common.response.MessageResponse;
 import com.openjob.web.dto.CVRequestDTO;
+import com.openjob.web.dto.CvPaginationDTO;
 import com.openjob.web.job.JobService;
 import com.openjob.web.jobcv.JobCvService;
 import com.openjob.web.user.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -51,6 +53,19 @@ public class CvController {
         }
 
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping(path = "/applied-job/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CvPaginationDTO> getCvAppliedJob (
+            @PathVariable("jobId") String jobId,
+            @RequestParam("page") Integer page,
+            @RequestParam("size") Integer size) {
+        Page<CV> pageCV = cvService.getByJobId(page, size, jobId);
+        return ResponseEntity.ok(new CvPaginationDTO(
+                pageCV.getContent(),
+                pageCV.getTotalPages(),
+                pageCV.getTotalElements()
+        ));
     }
 
     @PostMapping(path = "/{cvId}/apply/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -1,6 +1,8 @@
 package com.openjob.web.cv;
 
 import com.openjob.common.model.CV;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -17,4 +19,6 @@ public interface CvRepository extends JpaRepository<CV, String> {
     @Query("select cv from CV cv where cv.specialization.id=?1")
     List<CV> findBySpecialization(Integer speId);
 
+    @Query("select cv from JobCV jcv join CV cv on jcv.cv.id=cv.id where jcv.job.id=?1")
+    Page<CV> findByJobId(String jobId, Pageable pageable);
 }
