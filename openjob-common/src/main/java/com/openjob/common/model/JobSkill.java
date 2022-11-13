@@ -1,5 +1,6 @@
 package com.openjob.common.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -14,6 +15,7 @@ public class JobSkill {
 
     @ManyToOne
     @JoinColumn
+    @JsonIgnore
     private Job job;
 
     @ManyToOne
