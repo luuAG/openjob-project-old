@@ -15,4 +15,6 @@ public interface SkillRepository extends JpaRepository<Skill, Integer> {
 
     @Query("select s from Skill s where s.specialization.id=?1 group by s.name")
     Collection<Skill> findBySpecialization(Integer speId);
+
+    Optional<Skill> findByName(String name);
 }

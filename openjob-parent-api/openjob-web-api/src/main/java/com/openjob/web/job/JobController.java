@@ -1,16 +1,9 @@
 package com.openjob.web.job;
 
-import com.openjob.common.model.Company;
 import com.openjob.common.model.Job;
-import com.openjob.common.model.Major;
-import com.openjob.common.model.Specialization;
 import com.openjob.common.response.MessageResponse;
-import com.openjob.web.company.CompanyService;
 import com.openjob.web.dto.JobPaginationDTO;
 import com.openjob.web.dto.JobRequestDTO;
-import com.openjob.web.major.MajorService;
-import com.openjob.web.specialization.SpecializationService;
-import com.openjob.web.util.NullAwareBeanUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -19,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
-import java.sql.SQLException;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -28,9 +20,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class JobController {
     private final JobService jobService;
-    private final CompanyService companyService;
-    private final MajorService majorService;
-    private final SpecializationService speService;
 
     @GetMapping(path = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<JobPaginationDTO> searchJob(
@@ -58,21 +47,8 @@ public class JobController {
     }
 
     @PostMapping(path = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<MessageResponse> createNewJob(@RequestBody JobRequestDTO reqJob) throws InvocationTargetException, IllegalAccessException, SQLException {
-        NullAwareBeanUtils beanCopier = NullAwareBeanUtils.getInstance();
-        Job job = new Job();
-        beanCopier.copyProperties(job, reqJob);
-
-        Company company = companyService.getById(reqJob.getCompanyId());
-        Optional<Major> major = majorService.getById(reqJob.getMajorId());
-        Optional<Specialization> specialization = speService.getById(reqJob.getSpecializationId());
-        if (Objects.isNull(company) || major.isEmpty() || specialization.isEmpty())
-            throw new IllegalArgumentException("Company/Major/Specialization not found!");
-        job.setCompany(company);
-        job.setMajor(major.get());
-        job.setSpecialization(specialization.get());
-
-        Job savedJob = jobService.saveNewJob(job);
+    public ResponseEntity<MessageResponse> createNewJob(@RequestBody JobRequestDTO reqJob) throws InvocationTargetException, IllegalAccessException {
+        Job savedJob = jobService.saveNewJob(reqJob);
         if(Objects.nonNull(savedJob)){
             jobService.findCVmatchJob(savedJob); // async
             return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("New job is created successfully!"));

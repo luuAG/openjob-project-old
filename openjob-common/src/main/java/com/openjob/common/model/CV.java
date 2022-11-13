@@ -40,10 +40,6 @@ public class CV {
 
     @OneToOne
     @JoinColumn
-    private Major major;
-
-    @OneToOne
-    @JoinColumn
     private Specialization specialization;
 
     @OneToMany

@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -41,7 +40,7 @@ public class CvController {
     }
 
     @PostMapping(path = "/create-update", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CV> updateCV(@RequestBody CVRequestDTO requestCV) throws SQLException, InvocationTargetException, IllegalAccessException {
+    public ResponseEntity<CV> updateCV(@RequestBody CVRequestDTO requestCV) throws InvocationTargetException, IllegalAccessException {
         CV savedCV = cvService.saveUpdate(requestCV);
         if (Objects.nonNull(savedCV)){
             cvService.findJobMatchCV(savedCV); // async

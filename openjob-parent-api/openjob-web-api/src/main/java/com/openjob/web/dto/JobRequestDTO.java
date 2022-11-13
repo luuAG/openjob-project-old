@@ -1,7 +1,6 @@
 package com.openjob.web.dto;
 
 import com.openjob.common.enums.WorkPlace;
-import com.openjob.common.model.JobSkill;
 import lombok.Getter;
 
 import java.util.List;
@@ -14,9 +13,7 @@ public class JobRequestDTO {
     private Integer quantity;
     private String salary;
     private WorkPlace workPlace;
-
-    private Integer majorId;
     private Integer specializationId;
-    private List<JobSkill> listJobSkill;
+    private List<JobSkillDTO> listJobSkillDTO;
     private String companyId;
 }

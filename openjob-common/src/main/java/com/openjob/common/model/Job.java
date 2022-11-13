@@ -49,10 +49,6 @@ public class Job {
 
     @OneToOne
     @JoinColumn
-    private Major major;
-
-    @OneToOne
-    @JoinColumn
     private Specialization specialization;
 
     @OneToOne
@@ -62,11 +58,10 @@ public class Job {
     @OneToMany(mappedBy = "job")
     private List<JobSkill> jobSkills;
 
-    public Job(String id, String title, Date expiredAt, Major major, Specialization specialization, Collection<JobSkill> jobSkills) {
+    public Job(String id, String title, Date expiredAt,  Specialization specialization, Collection<JobSkill> jobSkills) {
         this.id = id;
         this.title = title;
         this.expiredAt = expiredAt;
-        this.major = major;
         this.specialization = specialization;
         this.jobSkills = (List<JobSkill>) jobSkills;
     }
