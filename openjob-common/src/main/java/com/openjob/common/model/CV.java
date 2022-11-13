@@ -46,7 +46,7 @@ public class CV {
     @JoinColumn
     private Major major;
 
-    @OneToMany
+    @OneToMany(orphanRemoval = true)
     @JoinTable(
         name = "cv_skill",
         joinColumns = @JoinColumn(name = "cv_id"),

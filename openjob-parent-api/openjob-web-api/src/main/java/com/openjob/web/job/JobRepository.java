@@ -29,4 +29,7 @@ public interface JobRepository extends JpaRepository<Job, String> {
 
     @Query("select j from Job j where j.specialization.id=?1")
     List<Job> findBySpecialization(Integer id);
+
+    @Query("select j from Job j where j.company.id=?1")
+    List<Job> findByCompanyId(String cId);
 }

@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -46,6 +47,11 @@ public class JobController {
 
     }
 
+    @GetMapping(path = "/by-company/{companyId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Job>> getJobByCompany(@PathVariable("companyId") String cId) {
+        return ResponseEntity.ok(jobService.getByCompanyId(cId));
+    }
+
     @PostMapping(path = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MessageResponse> createNewJob(@RequestBody JobRequestDTO reqJob) throws InvocationTargetException, IllegalAccessException {
         Job savedJob = jobService.saveNewJob(reqJob);
@@ -62,6 +68,7 @@ public class JobController {
         jobService.deleteById(jobId);
         return ResponseEntity.ok(new MessageResponse("Job is deleted!"));
     }
+
 
 
 

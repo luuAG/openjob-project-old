@@ -140,4 +140,8 @@ public class JobService {
         }
 
     }
+
+    public List<Job> getByCompanyId(String cId) {
+        return jobRepo.findByCompanyId(cId);
+    }
 }
