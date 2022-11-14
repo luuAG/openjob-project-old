@@ -62,6 +62,13 @@ public class Job {
     @OneToMany(mappedBy = "job", orphanRemoval = true)
     private List<JobSkill> jobSkills;
 
+    public Job(String id, String title, Date expiredAt,  Specialization specialization, List<JobSkill> jobSkills) {
+        this.id = id;
+        this.title = title;
+        this.expiredAt = expiredAt;
+        this.specialization = specialization;
+        this.jobSkills =  jobSkills;
+    }
     public Job(String id, String title, Date expiredAt,  Specialization specialization, Collection<JobSkill> jobSkills) {
         this.id = id;
         this.title = title;
@@ -69,6 +76,7 @@ public class Job {
         this.specialization = specialization;
         this.jobSkills = (List<JobSkill>) jobSkills;
     }
+
 
     public Job() {
 

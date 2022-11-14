@@ -8,10 +8,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface JobRepository extends JpaRepository<Job, Integer> {
+public interface JobRepository extends JpaRepository<Job, String> {
 
     @Query(value = """
-            select new Job(j.id, j.title, j.expiredAt, j.major, j.specialization, j.jobSkills)
+            select j
             from Job j
             left join j.jobSkills se where se.skill.isVerified=false
             """)
