@@ -4,10 +4,12 @@ import com.openjob.common.model.CV;
 import com.openjob.common.model.User;
 import com.openjob.common.response.MessageResponse;
 import com.openjob.web.dto.CVRequestDTO;
+import com.openjob.web.dto.CvDTO;
 import com.openjob.web.dto.CvPaginationDTO;
 import com.openjob.web.job.JobService;
 import com.openjob.web.jobcv.JobCvService;
 import com.openjob.web.user.UserService;
+import com.openjob.web.util.NullAwareBeanUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
@@ -15,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -60,9 +63,21 @@ public class CvController {
             @PathVariable("jobId") String jobId,
             @RequestParam("page") Integer page,
             @RequestParam("size") Integer size) {
+        NullAwareBeanUtils copier = NullAwareBeanUtils.getInstance();
         Page<CV> pageCV = cvService.getByJobId(page, size, jobId);
+        List<CvDTO> listCV = new ArrayList<>();
+        pageCV.getContent().forEach(cv -> {
+            CvDTO cvDTO = new CvDTO();
+            try {
+                copier.copyProperties(cvDTO, cv);
+                cvDTO.setUserId(cv.getUser().getId());
+                listCV.add(cvDTO);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+        });
         return ResponseEntity.ok(new CvPaginationDTO(
-                pageCV.getContent(),
+                listCV,
                 pageCV.getTotalPages(),
                 pageCV.getTotalElements()
         ));
