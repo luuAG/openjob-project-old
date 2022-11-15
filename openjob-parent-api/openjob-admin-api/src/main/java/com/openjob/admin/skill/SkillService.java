@@ -24,9 +24,7 @@ public class SkillService {
     }
 
     public Skill save(Skill skill){
-        Skill existingSkill = skillRepo.getById(skill.getId());
-        existingSkill.setName(skill.getName());
-        return skillRepo.save(existingSkill);
+        return skillRepo.save(skill);
     }
 
     public void delete(Integer id) {
