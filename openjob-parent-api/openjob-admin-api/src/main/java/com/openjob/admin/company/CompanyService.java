@@ -39,4 +39,8 @@ public class CompanyService  {
     public boolean isExistByName(String name) {
         return companyRepo.findByName(name).isPresent();
     }
+
+    public boolean existsById(String companyId) {
+        return companyRepo.existsById(companyId);
+    }
 }

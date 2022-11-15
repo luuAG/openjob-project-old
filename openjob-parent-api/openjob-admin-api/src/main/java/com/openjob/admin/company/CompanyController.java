@@ -126,8 +126,10 @@ public class CompanyController {
     @PostMapping(path = "/company/{companyId}/hr/update")
     public ResponseEntity<User> updateHrAccountInfo(
             @PathVariable("companyId") String companyId,
-            @RequestParam("updatePassword") Boolean updatePassword) {
-        User hr = hrService.getByCompany(companyId);
+            @RequestParam("updatePassword") Boolean updatePassword,
+            @RequestBody User hr) {
+        if (!companyService.existsById(companyId))
+            throw new IllegalArgumentException("Company not found!");
         User updatedUser = hrService.update(hr, updatePassword);
         if (Objects.nonNull(updatedUser))
             return ResponseEntity.ok(updatedUser);

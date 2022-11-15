@@ -1,10 +1,8 @@
 package com.openjob.admin.skill;
 
-import com.openjob.admin.dto.JobPaginationDTO;
 import com.openjob.admin.dto.NewSkillDTO;
-import com.openjob.admin.job.JobService;
+import com.openjob.admin.dto.SkillDTO;
 import com.openjob.admin.specialization.SpecializationService;
-import com.openjob.common.model.Job;
 import com.openjob.common.model.Skill;
 import com.openjob.common.response.MessageResponse;
 import lombok.RequiredArgsConstructor;
@@ -13,25 +11,34 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collection;
-import java.util.Objects;
+import java.util.*;
 
 @RestController
 @RequiredArgsConstructor
 public class SkillController {
-    private final JobService jobService;
     private final SkillService skillService;
     private final SpecializationService specializationService;
 
     @GetMapping(path = "/skills-to-verify", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<JobPaginationDTO> getAllSkillsNotverified(
+    public ResponseEntity<?> getAllSkillsNotverified(
             @RequestParam("page") Integer page,
             @RequestParam("size") Integer size){
-        Page<Job> pageJob = jobService.getAllwithSkillnotverified(page, size);
-        return ResponseEntity.ok(new JobPaginationDTO(
-                pageJob.getContent(),
-                pageJob.getTotalPages(),
-                pageJob.getTotalElements()));
+        Page<Skill> pageSkill = skillService.getNotVerified(page, size);
+        List<SkillDTO> listSkillDTO = new ArrayList<>();
+        pageSkill.getContent().forEach(skill -> {
+            SkillDTO skillDTO = new SkillDTO();
+            skillDTO.setId(skill.getId());
+            skillDTO.setName(skill.getName());
+            skillDTO.setIsVerified(skill.getIsVerified());
+            skillDTO.setSpecialization(skill.getSpecialization().getName());
+            skillDTO.setMajor(skill.getSpecialization().getMajor().getName());
+            listSkillDTO.add(skillDTO);
+        });
+        Map<String, Object> response = new HashMap<>();
+        response.put("listSkill", listSkillDTO);
+        response.put("totalPages", pageSkill.getTotalPages());
+        response.put("totalElements", pageSkill.getTotalElements());
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping(path = "/verify-skill/{skillId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -55,8 +62,17 @@ public class SkillController {
     }
 
     @GetMapping(path = "/skill/byspecialization/{speId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Collection<Skill>> getBySpecialization(@PathVariable("speId") Integer speId){
-        return ResponseEntity.ok(skillService.getBySpecialization(speId));
+    public ResponseEntity<List<SkillDTO>> getBySpecialization(@PathVariable("speId") Integer speId){
+        List<SkillDTO> result =  new ArrayList<>();
+
+        skillService.getBySpecialization(speId).forEach(skill -> {
+            SkillDTO skillDTO = new SkillDTO();
+            skillDTO.setId(skill.getId());
+            skillDTO.setName(skill.getName());
+            skillDTO.setIsVerified(skill.getIsVerified());
+            result.add(skillDTO);
+        });
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping(path = "/skill/create", produces = MediaType.APPLICATION_JSON_VALUE)

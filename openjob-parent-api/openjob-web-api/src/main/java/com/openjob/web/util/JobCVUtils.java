@@ -12,15 +12,19 @@ public class JobCVUtils {
     public static int checkCVmatchJob(Job job, CV cv){
         int point = 0;
         for (JobSkill jobSkill : job.getJobSkills()){
+            boolean isRequiredSkillMatched = true;
+            if (jobSkill.isRequired())
+                isRequiredSkillMatched  = false;
             for (Skill skillInCV : cv.getListSkill()) {
                 if (checkSkillMatched(jobSkill.getSkill(), skillInCV)){
                     point++;
-                }
-                else {
                     if (jobSkill.isRequired())
-                        return 0;
+                        isRequiredSkillMatched = true;
+                    break;
                 }
             }
+            if ( ! isRequiredSkillMatched)
+                return 0;
 
         }
 

@@ -2,6 +2,9 @@ package com.openjob.admin.skill;
 
 import com.openjob.common.model.Skill;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -40,5 +43,10 @@ public class SkillService {
 
     public boolean checkExist(Integer id) {
         return skillRepo.existsById(id);
+    }
+
+    public Page<Skill> getNotVerified(Integer page, Integer size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return skillRepo.findUnverifiedSkill(pageable);
     }
 }
