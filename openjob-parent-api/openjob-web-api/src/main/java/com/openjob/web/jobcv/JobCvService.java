@@ -54,4 +54,18 @@ public class JobCvService {
         }
 
     }
+
+    public void rejectCV(String jobId, String cvId) {
+        Optional<Job> job = jobRepo.findById(jobId);
+        Optional<CV> cv = cvRepo.findById(cvId);
+        if (job.isPresent() && cv.isPresent()){
+            Optional<JobCV>  existingJobCv = jobCvRepo.findByJobIdAndCvId(jobId, cvId);
+            if (existingJobCv.isPresent()){
+                existingJobCv.get().setStatus(CvStatus.REJECTED);
+                jobCvRepo.save(existingJobCv.get());
+            } else
+                throw new ResourceNotFoundException("JobCV", "jobId, cvId", jobId + ", " + cvId);
+
+        }
+    }
 }

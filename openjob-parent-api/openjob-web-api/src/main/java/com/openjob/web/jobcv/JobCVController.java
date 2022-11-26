@@ -22,4 +22,12 @@ public class JobCVController {
         jobCvService.acceptCV(jobId, cvId);
         return ResponseEntity.ok(new MessageResponse("CV has been accepted!"));
     }
+
+    @PostMapping(path = "/reject/{jobId}/{cvId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MessageResponse> rejectCV(
+            @PathVariable("jobId") String jobId,
+            @PathVariable("cvId") String cvId) {
+        jobCvService.rejectCV(jobId, cvId);
+        return ResponseEntity.ok(new MessageResponse("CV has been rejected!"));
+    }
 }
