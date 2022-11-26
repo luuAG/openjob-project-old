@@ -5,7 +5,6 @@ import com.openjob.admin.adminuser.AdminUserService;
 import com.openjob.admin.config.ConfigProperty;
 import com.openjob.admin.config.filter.CustomAuthenticationFilter;
 import com.openjob.admin.config.filter.CustomAuthorizationFilter;
-import com.openjob.common.enums.Role;
 import com.openjob.common.response.ErrorResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -54,20 +53,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
         http.cors();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.authorizeRequests().antMatchers("/login",
-                "/token/refresh",
-                "/swagger-ui/**",
-                "/swagger-ui.html",
-                "/webjars/**",
-                "/v2/**",
-                "/swagger-resources/**").permitAll();
-        http.authorizeRequests()
-                .antMatchers("/adminuser/create/**", "/adminuser/update/**","/adminuser/activate/**", "/adminuser/deactivate/**")
-                .hasAuthority(Role.SUPER_ADMIN.name());
-        http.authorizeRequests()
-                .antMatchers("/**")
-                .hasAnyAuthority(Role.SUPER_ADMIN.name(), Role.ADMIN.name());
-        http.authorizeRequests().anyRequest().authenticated();
+//        http.authorizeRequests().antMatchers("/login",
+//                "/token/refresh",
+//                "/swagger-ui/**",
+//                "/swagger-ui.html",
+//                "/webjars/**",
+//                "/v2/**",
+//                "/swagger-resources/**").permitAll();
+//        http.authorizeRequests()
+//                .antMatchers("/adminuser/create/**", "/adminuser/update/**","/adminuser/activate/**", "/adminuser/deactivate/**")
+//                .hasAuthority(Role.SUPER_ADMIN.name());
+//        http.authorizeRequests()
+//                .antMatchers("/**")
+//                .hasAnyAuthority(Role.SUPER_ADMIN.name(), Role.ADMIN.name());
+//        http.authorizeRequests().anyRequest().authenticated();
+        http.authorizeRequests().anyRequest().permitAll();
+
         http.addFilter(new CustomAuthenticationFilter(authenticationManagerBean(), configProperties, adminUserService));
         http.addFilterBefore(new CustomAuthorizationFilter(configProperties), CustomAuthenticationFilter.class);
         http.exceptionHandling().accessDeniedHandler(accessDeniedHandler());

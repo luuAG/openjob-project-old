@@ -1,5 +1,6 @@
 package com.openjob.common.model;
 
+import com.openjob.common.enums.CvStatus;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -20,6 +21,10 @@ public class JobCV {
     @ManyToOne
     @JoinColumn
     private CV cv;
+
+    @Enumerated(value = EnumType.STRING)
+    @Column(columnDefinition = "varchar(10) default 'NEW'")
+    private CvStatus status;
 
     private Date applyDate;
 }
