@@ -30,6 +30,8 @@ public class JobCvService {
             jobCV.setJob(job.get());
             jobCV.setCv(cv.get());
             jobCV.setApplyDate(new Date());
+            jobCV.setIsApplied(true);
+            jobCV.setStatus(CvStatus.NEW);
             jobCvRepo.save(jobCV);
         } else
             throw new IllegalArgumentException("CV or Job not found!");
