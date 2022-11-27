@@ -38,7 +38,15 @@ public class JobCvService {
     }
 
     public void deleteApplication(String cvId, String jobId) {
-        jobCvRepo.deleteByCvIdAndJobId(cvId, jobId);
+        Optional<JobCV> jobCV = jobCvRepo.findByJobIdAndCvId(cvId, jobId);
+        if (jobCV.isPresent()) {
+            if (jobCV.get().getIsMatching()){
+                jobCV.get().setIsApplied(false);
+                jobCvRepo.save(jobCV.get());
+            } else {
+                jobCvRepo.deleteByCvIdAndJobId(cvId, jobId);
+            }
+        }
     }
 
 
