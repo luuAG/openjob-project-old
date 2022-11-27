@@ -1,9 +1,10 @@
 package com.openjob.web.cv;
 
+import com.openjob.common.enums.CvStatus;
 import com.openjob.common.model.*;
 import com.openjob.web.dto.CVRequestDTO;
 import com.openjob.web.job.JobRepository;
-import com.openjob.web.jobcvmatching.JobCVMatchingRepository;
+import com.openjob.web.jobcv.JobCvService;
 import com.openjob.web.major.MajorService;
 import com.openjob.web.skill.SkillRepository;
 import com.openjob.web.specialization.SpecializationService;
@@ -32,7 +33,7 @@ public class CvService {
     private final SpecializationService speService;
     private final UserService userService;
     private final JobRepository jobRepo;
-    private final JobCVMatchingRepository jobCVMatchingRepo;
+    private final JobCvService jobCvService;
     private final MajorService majorService;
 
     public Optional<CV> getById(String id) {
@@ -82,11 +83,23 @@ public class CvService {
         for (Job job : listJob) {
             int matchingPoint = JobCVUtils.checkCVmatchJob(job, savedCV);
             if (matchingPoint > 0) {
-                JobCvMatching jobCvMatching = new JobCvMatching();
-                jobCvMatching.setJob(job);
-                jobCvMatching.setCv(savedCV);
-                jobCvMatching.setPoint(matchingPoint);
-                jobCVMatchingRepo.save(jobCvMatching);
+                Optional<JobCV> existingJobCv =  jobCvService.getByJobIdAndCvId(job.getId(), savedCV.getId());
+                if (existingJobCv.isPresent()){
+                    existingJobCv.get().setIsMatching(true);
+                    existingJobCv.get().setPoint(matchingPoint);
+                    jobCvService.save(existingJobCv.get());
+                }
+                else {
+                    JobCV newJobCv = new JobCV();
+                    newJobCv.setJob(job);
+                    newJobCv.setStatus(CvStatus.NEW);
+                    newJobCv.setIsMatching(true);
+                    newJobCv.setPoint(matchingPoint);
+                    newJobCv.setCv(savedCV);
+                    newJobCv.setApplyDate(null);
+                    newJobCv.setIsApplied(false);
+                    jobCvService.save(newJobCv);
+                }
             }
         }
     }
@@ -94,5 +107,10 @@ public class CvService {
     public Page<CV> getByJobId(Integer page, Integer size, String jobId) {
         Pageable pageable = PageRequest.of(page, size);
         return cvRepo.findByJobId(jobId, pageable);
+    }
+
+    public Page<CV> getCvAppliedByJobId(Integer page, Integer size, String jobId) {
+        Pageable pageable = PageRequest.of(page, size);
+        return cvRepo.findCvAppliedByJobId(jobId, pageable);
     }
 }

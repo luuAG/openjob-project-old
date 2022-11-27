@@ -27,4 +27,11 @@ public class JobCV {
     private CvStatus status;
 
     private Date applyDate;
+
+    @Column(columnDefinition = "bit(1) default false")
+    private Boolean isMatching;
+
+    private Boolean isApplied;
+
+    private Integer point;
 }

@@ -21,4 +21,7 @@ public interface CvRepository extends JpaRepository<CV, String> {
 
     @Query("select cv from JobCV jcv join CV cv on jcv.cv.id=cv.id where jcv.job.id=?1")
     Page<CV> findByJobId(String jobId, Pageable pageable);
+
+    @Query("select cv from JobCV jcv join CV cv on jcv.cv.id=cv.id where jcv.job.id=?1 and jcv.isApplied=true")
+    Page<CV> findCvAppliedByJobId(String jobId, Pageable pageable);
 }

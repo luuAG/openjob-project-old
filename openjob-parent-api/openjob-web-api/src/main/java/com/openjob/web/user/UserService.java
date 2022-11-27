@@ -2,6 +2,7 @@ package com.openjob.web.user;
 
 
 import com.openjob.common.model.User;
+import com.openjob.web.dto.UserCvDto;
 import com.openjob.web.util.NullAwareBeanUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -48,7 +49,7 @@ public class UserService {
         return userRepo.save(existingUser);
     }
 
-    public List<User> getByMatchingJob(String jobId) {
+    public List<UserCvDto> getByMatchingJob(String jobId) {
         return userRepo.findByMatchingJob(jobId);
     }
 }

@@ -73,4 +73,12 @@ public class JobCvService {
         Optional<JobCV> jobCV = jobCvRepo.findByJobIdAndCvId(jobId, cvId);
         return jobCV.orElseThrow().getStatus();
     }
+
+    public Optional<JobCV> getByJobIdAndCvId(String jobId, String cvId) {
+        return jobCvRepo.findByJobIdAndCvId(jobId, cvId);
+    }
+
+    public JobCV save(JobCV existingJobCv) {
+        return jobCvRepo.save(existingJobCv);
+    }
 }

@@ -1,11 +1,12 @@
 package com.openjob.web.job;
 
+import com.openjob.common.enums.CvStatus;
 import com.openjob.common.model.*;
 import com.openjob.web.company.CompanyService;
 import com.openjob.web.cv.CvRepository;
 import com.openjob.web.dto.JobRequestDTO;
 import com.openjob.web.dto.JobSkillDTO;
-import com.openjob.web.jobcvmatching.JobCVMatchingRepository;
+import com.openjob.web.jobcv.JobCvService;
 import com.openjob.web.jobskill.JobSkillRepository;
 import com.openjob.web.major.MajorService;
 import com.openjob.web.skill.SkillRepository;
@@ -30,7 +31,7 @@ import java.util.*;
 public class JobService {
     private final JobRepository jobRepo;
     private final SkillRepository skillRepo;
-    private final JobCVMatchingRepository jobCVMatchingRepo;
+    private final JobCvService jobCvService;
     private final CvRepository cvRepo;
     private final CompanyService companyService;
     private final SpecializationService speService;
@@ -126,11 +127,23 @@ public class JobService {
         for (CV cv : listCV) {
             int matchingPoint = JobCVUtils.checkCVmatchJob(savedJob, cv);
             if (matchingPoint > 0) {
-                JobCvMatching jobCvMatching = new JobCvMatching();
-                jobCvMatching.setJob(savedJob);
-                jobCvMatching.setCv(cv);
-                jobCvMatching.setPoint(matchingPoint);
-                jobCVMatchingRepo.save(jobCvMatching);
+                Optional<JobCV> existingJobCv =  jobCvService.getByJobIdAndCvId(savedJob.getId(), cv.getId());
+                if (existingJobCv.isPresent()){
+                    existingJobCv.get().setIsMatching(true);
+                    existingJobCv.get().setPoint(matchingPoint);
+                    jobCvService.save(existingJobCv.get());
+                }
+                else {
+                    JobCV newJobCv = new JobCV();
+                    newJobCv.setJob(savedJob);
+                    newJobCv.setStatus(CvStatus.NEW);
+                    newJobCv.setIsMatching(true);
+                    newJobCv.setPoint(matchingPoint);
+                    newJobCv.setCv(cv);
+                    newJobCv.setApplyDate(null);
+                    newJobCv.setIsApplied(false);
+                    jobCvService.save(newJobCv);
+                }
             }
         }
 
