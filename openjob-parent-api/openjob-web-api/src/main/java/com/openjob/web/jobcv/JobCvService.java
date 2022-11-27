@@ -38,7 +38,7 @@ public class JobCvService {
     }
 
     public void deleteApplication(String cvId, String jobId) {
-        Optional<JobCV> jobCV = jobCvRepo.findByJobIdAndCvId(cvId, jobId);
+        Optional<JobCV> jobCV = jobCvRepo.findByJobIdAndCvId(jobId, cvId);
         if (jobCV.isPresent()) {
             if (jobCV.get().getIsMatching()){
                 jobCV.get().setIsApplied(false);
