@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
 import java.util.Optional;
@@ -26,7 +27,7 @@ public class UserController {
     }
 
     @PatchMapping(path = "/userprofile/update", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> updateUserInfo(@RequestBody User userInfo) throws InvocationTargetException, IllegalAccessException {
+    public ResponseEntity<User> updateUserInfo(@RequestBody User userInfo) throws InvocationTargetException, IllegalAccessException, IOException {
         if (Objects.isNull(userInfo.getId())){
             throw new IllegalArgumentException("ID is null");
         }

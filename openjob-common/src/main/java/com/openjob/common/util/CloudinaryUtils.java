@@ -34,6 +34,18 @@ public class CloudinaryUtils {
             throw new IOException(NestedExceptionUtils.getMostSpecificCause(ex).getMessage());
         }
     }
+    public static String upload(byte[] bytes, String objectId) throws IOException {
+        if (Objects.isNull(cloudinary))
+            throw new IOException("Cloudinary instance is null");
+        try {
+            Map uploadResults = cloudinary.uploader().upload(
+                    bytes, ObjectUtils.asMap("public_id", objectId)
+            );
+            return uploadResults.get("url").toString();
+        } catch (Exception ex) {
+            throw new IOException(NestedExceptionUtils.getMostSpecificCause(ex).getMessage());
+        }
+    }
 
     public static void delete(String objectId) throws IOException {
         if (Objects.isNull(cloudinary))
