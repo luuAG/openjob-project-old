@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -40,7 +41,7 @@ public class JobCvService {
     public void deleteApplication(String cvId, String jobId) {
         Optional<JobCV> jobCV = jobCvRepo.findByJobIdAndCvId(jobId, cvId);
         if (jobCV.isPresent()) {
-            if (jobCV.get().getIsMatching()){
+            if (Objects.nonNull(jobCV.get().getIsMatching())  && jobCV.get().getIsMatching()){
                 jobCV.get().setIsApplied(false);
                 jobCvRepo.save(jobCV.get());
             } else {
