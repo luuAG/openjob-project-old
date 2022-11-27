@@ -89,8 +89,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/location/**",
                         "/cv/**",
                         "/company/**",
-                        "/companies").permitAll()
-                .anyRequest().authenticated();
+                        "/companies").permitAll();
+//                .anyRequest().authenticated();
         http.oauth2Login()
                 .authorizationEndpoint()
                     .baseUri("/oauth2/authorize")
