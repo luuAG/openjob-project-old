@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface JobCvRepository extends JpaRepository<JobCV, Integer> {
 
     @Modifying
-    @Query("delete from JobCV jc where jc.cv.id=?1 and jc.job.id=?2")
+    @Query("delete from JobCV jc where jc.cv.id=?1 and jc.job.id=?2 and jc.isMatching=false")
     void deleteByCvIdAndJobId(String cvId, String jobId);
 
     @Query("select jc from JobCV jc where jc.job.id=?1 and jc.cv.id=?2")
