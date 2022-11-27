@@ -87,7 +87,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                .antMatchers("/job/create").hasAuthority(Role.HR.name())
                 .antMatchers("/job/**",
                         "/location/**",
-                        "/cv/**").permitAll()
+                        "/cv/**",
+                        "/company/**",
+                        "/companies").permitAll()
                 .anyRequest().authenticated();
         http.oauth2Login()
                 .authorizationEndpoint()
