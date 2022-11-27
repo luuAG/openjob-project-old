@@ -1,6 +1,7 @@
 package com.openjob.web.cv;
 
 import com.openjob.common.model.CV;
+import com.openjob.common.model.JobCV;
 import com.openjob.common.response.MessageResponse;
 import com.openjob.web.dto.CVRequestDTO;
 import com.openjob.web.dto.CvDTO;
@@ -101,7 +102,8 @@ public class CvController {
     @PostMapping(path = "/{cvId}/apply/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MessageResponse> applyCvForJob(@PathVariable("cvId") String cvId,
                                                          @PathVariable("jobId") String jobId) {
-        if (jobCvService.getByJobIdAndCvId(jobId, cvId).isPresent())
+        Optional<JobCV> jobCV = jobCvService.getByJobIdAndCvId(jobId, cvId);
+        if (jobCV.isPresent() && !jobCV.get().getIsMatching())
             throw new IllegalArgumentException("You have applied this job!");
         jobCvService.saveNewApplication(cvId, jobId);
         return ResponseEntity.ok(new MessageResponse("Apply job successfully!"));
