@@ -71,6 +71,7 @@ public class CvController {
             try {
                 copier.copyProperties(cvDTO, cv);
                 cvDTO.setUserId(cv.getUser().getId());
+                cvDTO.setStatus(jobCvService.getStatus(jobId, cv.getId()));
                 listCV.add(cvDTO);
             } catch (IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);

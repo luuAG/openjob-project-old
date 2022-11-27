@@ -1,5 +1,6 @@
 package com.openjob.web.dto;
 
+import com.openjob.common.enums.CvStatus;
 import com.openjob.common.model.Major;
 import com.openjob.common.model.Skill;
 import com.openjob.common.model.Specialization;
@@ -23,6 +24,8 @@ public class CvDTO {
     private String additionalInfo;
 
     private String userId;
+
+    private CvStatus status;
 
     private Specialization specialization;
 

@@ -68,4 +68,9 @@ public class JobCvService {
 
         }
     }
+
+    public CvStatus getStatus(String jobId, String cvId){
+        Optional<JobCV> jobCV = jobCvRepo.findByJobIdAndCvId(jobId, cvId);
+        return jobCV.orElseThrow().getStatus();
+    }
 }

@@ -53,4 +53,5 @@ public class CV {
         inverseJoinColumns = @JoinColumn(name = "skill_id")
     )
     private List<Skill> listSkill;
+
 }
