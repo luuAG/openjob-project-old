@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Objects;
 
 @Service
 public class SpecializationService {
@@ -20,9 +21,13 @@ public class SpecializationService {
     }
 
     public Specialization save(Specialization specialization){
-        Specialization existingSpe = specializationRepo.getById(specialization.getId());
-        existingSpe.setName(specialization.getName());
-        return specializationRepo.save(existingSpe);
+        if (Objects.nonNull(specialization.getId())){
+            Specialization existingSpe = specializationRepo.getById(specialization.getId());
+            existingSpe.setName(specialization.getName());
+            return specializationRepo.save(existingSpe);
+        }
+        return specializationRepo.save(specialization);
+
     }
 
     public boolean checkExist(Integer id) {

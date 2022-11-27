@@ -3,6 +3,7 @@ package com.openjob.admin.company;
 import com.openjob.admin.dto.CompanyCreateRequestDTO;
 import com.openjob.admin.dto.CompanyHeadhunterResponseDTO;
 import com.openjob.admin.dto.CompanyPaginationDTO;
+import com.openjob.admin.setting.SettingService;
 import com.openjob.common.enums.AuthProvider;
 import com.openjob.common.enums.Role;
 import com.openjob.common.model.Company;
@@ -27,6 +28,7 @@ import java.util.Objects;
 public class CompanyController {
     private final HrService hrService;
     private final CompanyService companyService;
+    private final SettingService settingService;
     private final JavaMailSender mailSender;
 
     @GetMapping(path = "/company/{id}/hr", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -80,11 +82,11 @@ public class CompanyController {
                 message1.setFrom("duongvannam2001@gmail.com");
                 message1.setTo(savedHr.getEmail());
                 message1.setSubject("Tài khoản OpenJob đã được tạo");
-                message1.setText("Kính gửi Phòng tuyển dụng công ty "+company.getName()+", \n" +
-                        "Tài khoản cho Quản lý bộ phận tuyển dụng ở OpenJob: \n" +
-                        "Username: "+ savedHr.getEmail() + "\n" +
-                        "Password: 12345678\n" +
-                        "Vui lòng đổi mật khẩu sau khi đăng nhập lần đầu!", true);
+                String text = settingService.getByName("MAIL_NEW_HR_ACCOUNT").orElseThrow().getValue();
+                text = text.replace("[[company]]", company.getName())
+                        .replace("[[email]]", savedHr.getEmail())
+                        .replace("[[password]]", "12345678");
+                message1.setText(text, true);
             };
             try {
                 mailSender.send(message);

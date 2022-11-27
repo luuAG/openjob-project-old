@@ -49,4 +49,8 @@ public class SkillService {
         Pageable pageable = PageRequest.of(page, size);
         return skillRepo.findUnverifiedSkill(pageable);
     }
+
+    public void deleteByName(String name) {
+        skillRepo.deleteByName(name);
+    }
 }

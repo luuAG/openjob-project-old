@@ -47,9 +47,9 @@ public class SkillController {
         return ResponseEntity.ok(new MessageResponse("Skill is verified"));
     }
 
-    @DeleteMapping(path = "/skill/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<MessageResponse> deleteSkill(@PathVariable("id") Integer id){
-        skillService.delete(id);
+    @DeleteMapping(path = "/skill/delete/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MessageResponse> deleteSkill(@PathVariable("name") String name){
+        skillService.deleteByName(name);
         return ResponseEntity.ok(new MessageResponse("Skill is deleted"));
     }
 
@@ -86,13 +86,13 @@ public class SkillController {
         }
         return ResponseEntity.badRequest().body(null);
     }
-    @PutMapping(path = "/skill/update", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Skill> updateSkill(@RequestBody Skill skill) {
-        if (!skillService.checkExist(skill.getId()))
-            throw new IllegalArgumentException("Skill does not exist");
-        Skill savedSkill = skillService.save(skill);
-        if (Objects.nonNull(savedSkill))
-            return ResponseEntity.ok(savedSkill);
-        return ResponseEntity.badRequest().body(null);
-    }
+//    @PutMapping(path = "/skill/update", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<Skill> updateSkill(@RequestBody Skill skill) {
+//        if (!skillService.checkExist(skill.getId()))
+//            throw new IllegalArgumentException("Skill does not exist");
+//        skillService.save(skill);
+//        if (Objects.nonNull(savedSkill))
+//            return ResponseEntity.ok(savedSkill);
+//        return ResponseEntity.badRequest().body(null);
+//    }
 }

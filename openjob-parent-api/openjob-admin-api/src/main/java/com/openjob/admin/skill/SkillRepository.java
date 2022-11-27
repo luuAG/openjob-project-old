@@ -25,4 +25,8 @@ public interface SkillRepository extends JpaRepository<Skill, Integer> {
 
     @Query("select s from Skill s where s.isVerified=false group by s.name")
     Page<Skill> findUnverifiedSkill(Pageable pageable);
+
+    @Query("delete from Skill s where s.name = ?1")
+    @Modifying
+    void deleteByName(String name);
 }
