@@ -54,6 +54,7 @@ public class CvController {
                     throw new RuntimeException(e);
                 }
                 userCvDto.setCvStatus(jobCvService.getStatus(jobId, user.getCv().getId()));
+                userCvDto.setUserId(user.getId());
                 result.add(userCvDto);
             });
             return ResponseEntity.ok(result);
