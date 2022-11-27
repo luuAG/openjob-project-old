@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 public class UserCvDto {
     private String userId;
+    private String cvId;
     private String firstName;
     private String lastName;
     private String phone;
@@ -16,9 +17,10 @@ public class UserCvDto {
     private CvStatus cvStatus;
     private Integer point;
 
-    public UserCvDto(String id, String firstName, String lastName, String email,
+    public UserCvDto(String userid, String cvId, String firstName, String lastName, String email,
                      String phone, String gender, Integer point, CvStatus status) {
-        this.userId = id;
+        this.userId = userid;
+        this.cvId = cvId;
         this.firstName =firstName;
         this.lastName = lastName;
         this.email = email;
