@@ -6,6 +6,7 @@ import com.openjob.common.response.MessageResponse;
 import com.openjob.web.dto.CVRequestDTO;
 import com.openjob.web.dto.CvDTO;
 import com.openjob.web.dto.CvPaginationDTO;
+import com.openjob.web.dto.UserCvDto;
 import com.openjob.web.job.JobService;
 import com.openjob.web.jobcv.JobCvService;
 import com.openjob.web.user.UserService;
@@ -40,9 +41,22 @@ public class CvController {
     }
 
     @GetMapping(path = "/match-with-job/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<User>> getUserHasCVmatchJob(@PathVariable("jobId") String jobId) {
+    public ResponseEntity<List<UserCvDto>> getUserHasCVmatchJob(@PathVariable("jobId") String jobId) {
         if (jobService.getById(jobId).isPresent()){
-            return ResponseEntity.ok(userService.getByMatchingJob(jobId));
+            List<User> users = userService.getByMatchingJob(jobId);
+            List<UserCvDto> result = new ArrayList<>();
+            users.forEach(user -> {
+                NullAwareBeanUtils copier = NullAwareBeanUtils.getInstance();
+                UserCvDto userCvDto = new UserCvDto();
+                try {
+                    copier.copyProperties(userCvDto, user);
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    throw new RuntimeException(e);
+                }
+                userCvDto.setCvStatus(jobCvService.getStatus(jobId, user.getCv().getId()));
+                result.add(userCvDto);
+            });
+            return ResponseEntity.ok(result);
         }
         throw new IllegalArgumentException("Job not found for ID: "+jobId);
     }
