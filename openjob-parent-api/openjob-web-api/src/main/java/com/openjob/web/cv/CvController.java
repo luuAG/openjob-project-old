@@ -101,6 +101,8 @@ public class CvController {
     @PostMapping(path = "/{cvId}/apply/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MessageResponse> applyCvForJob(@PathVariable("cvId") String cvId,
                                                          @PathVariable("jobId") String jobId) {
+        if (jobCvService.getByJobIdAndCvId(jobId, cvId).isPresent())
+            throw new IllegalArgumentException("You have applied this job!");
         jobCvService.saveNewApplication(cvId, jobId);
         return ResponseEntity.ok(new MessageResponse("Apply job successfully!"));
     }
