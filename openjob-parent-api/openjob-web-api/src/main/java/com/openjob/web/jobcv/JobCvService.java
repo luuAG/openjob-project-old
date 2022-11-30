@@ -24,18 +24,27 @@ public class JobCvService {
     private final JobRepository jobRepo;
 
     public void saveNewApplication(String cvId, String jobId) {
-        Optional<Job> job = jobRepo.findById(jobId);
-        Optional<CV> cv = cvRepo.findById(cvId);
-        if (job.isPresent() && cv.isPresent()){
-            JobCV jobCV = new JobCV();
-            jobCV.setJob(job.get());
-            jobCV.setCv(cv.get());
-            jobCV.setApplyDate(new Date());
-            jobCV.setIsApplied(true);
-            jobCV.setStatus(CvStatus.NEW);
-            jobCvRepo.save(jobCV);
-        } else
-            throw new IllegalArgumentException("CV or Job not found!");
+        Optional<JobCV> jobCV = jobCvRepo.findByJobIdAndCvId(jobId, cvId);
+        if (jobCV.isPresent()) {
+            jobCV.get().setApplyDate(new Date());
+            jobCV.get().setIsApplied(true);
+            jobCV.get().setStatus(CvStatus.NEW);
+            jobCvRepo.save(jobCV.get());
+        } else {
+            Optional<Job> job = jobRepo.findById(jobId);
+            Optional<CV> cv = cvRepo.findById(cvId);
+            if (job.isPresent() && cv.isPresent()){
+                JobCV newJobCv = new JobCV();
+                newJobCv.setJob(job.get());
+                newJobCv.setCv(cv.get());
+                newJobCv.setApplyDate(new Date());
+                newJobCv.setIsApplied(true);
+                newJobCv.setStatus(CvStatus.NEW);
+                jobCvRepo.save(newJobCv);
+            } else
+                throw new IllegalArgumentException("CV or Job not found!");
+        }
+
     }
 
     public void deleteApplication(String cvId, String jobId) {

@@ -103,7 +103,7 @@ public class CvController {
     public ResponseEntity<MessageResponse> applyCvForJob(@PathVariable("cvId") String cvId,
                                                          @PathVariable("jobId") String jobId) {
         Optional<JobCV> jobCV = jobCvService.getByJobIdAndCvId(jobId, cvId);
-        if (jobCV.isPresent() && !jobCV.get().getIsMatching())
+        if (jobCV.isPresent() && jobCV.get().getIsApplied())
             throw new IllegalArgumentException("You have applied this job!");
         jobCvService.saveNewApplication(cvId, jobId);
         return ResponseEntity.ok(new MessageResponse("Apply job successfully!"));
