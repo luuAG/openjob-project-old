@@ -19,7 +19,7 @@ public class Province {
     @Column(name = "_code", length = 20)
     private String code;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "_province_id", referencedColumnName = "id")
     private Collection<District> districts;
 

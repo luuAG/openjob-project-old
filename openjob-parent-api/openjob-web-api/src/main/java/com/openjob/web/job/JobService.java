@@ -6,6 +6,7 @@ import com.openjob.web.company.CompanyService;
 import com.openjob.web.cv.CvRepository;
 import com.openjob.web.dto.JobRequestDTO;
 import com.openjob.web.dto.JobSkillDTO;
+import com.openjob.web.jobcv.JobCvRepository;
 import com.openjob.web.jobcv.JobCvService;
 import com.openjob.web.jobskill.JobSkillRepository;
 import com.openjob.web.major.MajorService;
@@ -32,6 +33,7 @@ public class JobService {
     private final JobRepository jobRepo;
     private final SkillRepository skillRepo;
     private final JobCvService jobCvService;
+    private final JobCvRepository jobCvRepo;
     private final CvRepository cvRepo;
     private final CompanyService companyService;
     private final SpecializationService speService;
@@ -151,5 +153,13 @@ public class JobService {
 
     public List<Job> getByCompanyId(String cId) {
         return jobRepo.findByCompanyId(cId);
+    }
+
+    public Page<Job> getJobAppliedByUser(Integer page, Integer size, String userId) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<JobCV> jobCVPage = jobCvRepo.findByUserId(userId, pageable);
+        List<Job> jobs = new ArrayList<>();
+        jobCVPage.getContent().forEach(jobCV -> jobs.add(jobCV.getJob()));
+        return new PageImpl<>(jobs);
     }
 }

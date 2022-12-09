@@ -69,7 +69,18 @@ public class JobController {
         return ResponseEntity.ok(new MessageResponse("Job is deleted!"));
     }
 
+    @GetMapping(path = "/applied-by-user/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<JobPaginationDTO> getJobAppliedByUser(@PathVariable("userId")String userId,
+                                                                @RequestParam("page") Integer page,
+                                                                @RequestParam("size") Integer size){
+        Page<Job> pageJob = jobService.getJobAppliedByUser(page, size, userId);
 
+        return ResponseEntity.ok(new JobPaginationDTO(
+                pageJob.getContent(),
+                pageJob.getTotalPages(),
+                pageJob.getTotalElements()
+        ));
+    }
 
 
 }

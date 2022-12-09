@@ -1,6 +1,8 @@
 package com.openjob.web.jobcv;
 
 import com.openjob.common.model.JobCV;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,4 +19,7 @@ public interface JobCvRepository extends JpaRepository<JobCV, Integer> {
 
     @Query("select jc from JobCV jc where jc.job.id=?1 and jc.cv.id=?2")
     Optional<JobCV> findByJobIdAndCvId(String jobId, String cvId);
+
+    @Query("select jc from JobCV jc where jc.cv.user.id=?1")
+    Page<JobCV> findByUserId(String userId, Pageable pageable);
 }

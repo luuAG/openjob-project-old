@@ -16,4 +16,13 @@ public interface JobRepository extends JpaRepository<Job, String> {
             left join j.jobSkills se where se.skill.isVerified=false
             """)
     Page<Job> findAllwithSkillnotVerified(Pageable pageable);
+
+    @Query("select j from Job j where j.company.name like %?1% or j.title like %?1%")
+    Page<Job> findAllWithKeyword(String keyword, Pageable pageable);
+
+    @Query("select j from Job j where j.company.id=?1")
+    Page<Job> findAllByCompanyId(String companyId, Pageable pageable);
+
+    @Query("select j from Job j where j.company.id=?1 and (j.company.name like %?2% or j.title like %?2%)")
+    Page<Job> findAllByCompanyIdWithKeyword(String companyId, String keyword, Pageable pageable);
 }
