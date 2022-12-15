@@ -14,6 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -57,7 +58,51 @@ public class UserService {
             String returnedUrl = CloudinaryUtils.upload(imageBytes, userInfo.getCompany().getId());
             existingUser.getCompany().setLogoUrl(returnedUrl);
         }
+        if (Objects.nonNull(userInfo.getCompany()) && userInfo.getCompany().getDescription().contains("<img")){
+            byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(
+                                                                    getImgBase64FromText(
+                                                                            userInfo.getCompany().getDescription()));
+
+            CloudinaryUtils.getInstance();
+            String returnedUrl = CloudinaryUtils.upload(imageBytes, UUID.randomUUID().toString());
+            userInfo.getCompany().setDescription(replaceImgTag(userInfo.getCompany().getDescription(), returnedUrl));
+        }
         return userRepo.save(existingUser);
+    }
+
+    private String getImgBase64FromText(String text){
+        int startIndex = text.indexOf("base64,") + 7;
+        StringBuilder base64 = new StringBuilder();
+        for (int i=startIndex; i<text.length(); i++){
+            if (text.charAt(i) == '"')
+                break;
+            base64.append(text.charAt(i));
+        }
+        return base64.toString();
+    }
+    private String replaceImgTag(String text, String imageUrl) {
+        int imgTagIndex = text.indexOf("<img");
+        while (text.charAt(imgTagIndex) != '>'){
+            text = text.replace(String.valueOf(text.charAt(imgTagIndex)), "");
+        }
+        text = text.replace(String.valueOf(text.charAt(imgTagIndex)), "");
+        return insertString(text, "<img src='"+imageUrl+"'/>", imgTagIndex);
+    }
+    private String insertString(
+            String originalString,
+            String stringToBeInserted,
+            int index)
+    {
+        StringBuilder newString = new StringBuilder();
+
+        for (int i = 0; i < originalString.length(); i++) {
+            newString.append(originalString.charAt(i));
+
+            if (i == index) {
+                newString.append(stringToBeInserted);
+            }
+        }
+        return newString.toString();
     }
 
     public List<UserCvDto> getByMatchingJob(String jobId) {

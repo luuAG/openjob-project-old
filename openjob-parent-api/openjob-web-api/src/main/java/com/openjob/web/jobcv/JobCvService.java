@@ -101,4 +101,11 @@ public class JobCvService {
     public JobCV save(JobCV existingJobCv) {
         return jobCvRepo.save(existingJobCv);
     }
+
+    public Boolean checkUserAppliedJob(String userId, String jobId) {
+        Optional<JobCV> jobCV = jobCvRepo.findByUserIdAndJobId(userId, jobId);
+        if (jobCV.isPresent())
+            return jobCV.get().getIsApplied();
+        return false;
+    }
 }

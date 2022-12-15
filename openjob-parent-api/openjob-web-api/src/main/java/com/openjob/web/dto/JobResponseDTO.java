@@ -6,11 +6,13 @@ import com.openjob.common.model.Major;
 import com.openjob.common.model.Skill;
 import com.openjob.common.model.Specialization;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
 import java.util.List;
 
 @Getter
+@Setter
 public class JobResponseDTO {
     private String id;
     private String title;
@@ -25,5 +27,5 @@ public class JobResponseDTO {
     private Major major;
     private Company company;
     private List<Skill> skills;
-
+    private Boolean isApplied;
 }

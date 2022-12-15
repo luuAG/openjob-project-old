@@ -31,6 +31,6 @@ public interface JobRepository extends JpaRepository<Job, String> {
     List<Job> findBySpecialization(Integer id);
 
     @Query("select j from Job j where j.company.id=?1")
-    List<Job> findByCompanyId(String cId);
+    Page<Job> findByCompanyId(String cId, Pageable pageable);
 
 }

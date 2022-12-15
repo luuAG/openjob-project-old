@@ -151,8 +151,9 @@ public class JobService {
 
     }
 
-    public List<Job> getByCompanyId(String cId) {
-        return jobRepo.findByCompanyId(cId);
+    public Page<Job> getByCompanyId(Integer page, Integer size, String cId) {
+        Pageable pageable = PageRequest.of(page, size);
+        return jobRepo.findByCompanyId(cId, pageable);
     }
 
     public Page<Job> getJobAppliedByUser(Integer page, Integer size, String userId) {

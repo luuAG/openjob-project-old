@@ -40,8 +40,8 @@ public class Main {
     @Bean
     public JavaMailSender getJavaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost(settingService.getValue("MAIL_HOST"));
-        mailSender.setPort(Integer.parseInt(settingService.getValue("MAIL_PORT")));
+        mailSender.setHost("smtp.gmail.com");
+        mailSender.setPort(587);
 
         mailSender.setUsername(settingService.getValue("MAIL_USERNAME"));
         mailSender.setPassword(settingService.getValue("MAIL_PASSWORD"));

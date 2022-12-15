@@ -22,4 +22,7 @@ public interface JobCvRepository extends JpaRepository<JobCV, Integer> {
 
     @Query("select jc from JobCV jc where jc.cv.user.id=?1")
     Page<JobCV> findByUserId(String userId, Pageable pageable);
+
+    @Query("select jc from JobCV jc where jc.cv.user.id=?1 and jc.job.id=?2")
+    Optional<JobCV> findByUserIdAndJobId(String userId, String jobId);
 }
