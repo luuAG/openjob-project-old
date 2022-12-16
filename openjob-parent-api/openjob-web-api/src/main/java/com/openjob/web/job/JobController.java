@@ -53,9 +53,6 @@ public class JobController {
             loggedInUser = userService.getByEmail(email);
         }
 
-
-
-
         List<JobResponseDTO> results = new ArrayList<>();
 
         Page<Job> pageJob = jobService.searchByKeywordAndLocationAndCompany(size, page, keyword, location, companyId);
@@ -81,10 +78,33 @@ public class JobController {
     }
 
     @GetMapping(path = "/details/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Job> getJobDetails(@PathVariable("id") String id){
+    public ResponseEntity<JobResponseDTO> getJobDetails(@PathVariable("id") String id, HttpServletRequest request) throws IOException {
+        String email = null;
+        String accessToken = request.getHeader("authorization");
+        User loggedInUser=null;
+        if (Objects.nonNull(accessToken)){
+            String payloadJWT = accessToken.split("\\.")[1];
+            Base64 base64 = new Base64(true);
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, String> info = mapper.readValue(base64.decode(payloadJWT), Map.class);
+            email = info.get("sub");
+            loggedInUser = userService.getByEmail(email);
+        }
         Optional<Job> job = jobService.getById(id);
-        if (job.isPresent())
-            return ResponseEntity.ok(job.get());
+        User finalLoggedInUser = loggedInUser;
+        if (job.isPresent()) {
+            JobResponseDTO tempDto = new JobResponseDTO();
+            NullAwareBeanUtils copier = NullAwareBeanUtils.getInstance();
+            try {
+                copier.copyProperties(tempDto, job);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+            if (Objects.nonNull(finalLoggedInUser))
+                tempDto.setIsApplied(jobCvService.checkUserAppliedJob(finalLoggedInUser.getId(),job.get().getId()));
+            return ResponseEntity.ok(tempDto);
+        }
+
         return ResponseEntity.notFound().build();
 
     }
