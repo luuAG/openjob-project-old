@@ -96,7 +96,7 @@ public class JobController {
             JobResponseDTO tempDto = new JobResponseDTO();
             NullAwareBeanUtils copier = NullAwareBeanUtils.getInstance();
             try {
-                copier.copyProperties(tempDto, job);
+                copier.copyProperties(tempDto, job.get());
             } catch (IllegalAccessException | InvocationTargetException e) {
                 throw new RuntimeException(e);
             }
