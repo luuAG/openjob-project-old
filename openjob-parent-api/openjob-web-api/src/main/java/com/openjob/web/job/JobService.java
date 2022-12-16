@@ -158,7 +158,7 @@ public class JobService {
 
     public Page<Job> getJobAppliedByUser(Integer page, Integer size, String userId) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<JobCV> jobCVPage = jobCvRepo.findByUserId(userId, pageable);
+        Page<JobCV> jobCVPage = jobCvRepo.findJobAppliedByUserId(userId, pageable);
         List<Job> jobs = new ArrayList<>();
         jobCVPage.getContent().forEach(jobCV -> jobs.add(jobCV.getJob()));
         return new PageImpl<>(jobs);
