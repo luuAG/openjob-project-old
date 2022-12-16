@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.print.attribute.standard.Media;
+import java.util.Optional;
+
 @RestController
 @RequiredArgsConstructor
 public class JobController {
@@ -37,5 +40,14 @@ public class JobController {
                 jobPage.getContent(),
                 jobPage.getTotalPages(),
                 jobPage.getTotalElements()));
+    }
+
+    @GetMapping(path = "/job/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Job> getById(@PathVariable("jobId") String jobId) {
+        Optional<Job> job = jobService.getById(jobId);
+        if (job.isPresent()){
+            return ResponseEntity.ok(job.get());
+        }else
+            return ResponseEntity.notFound().build();
     }
 }

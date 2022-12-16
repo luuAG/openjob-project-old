@@ -12,9 +12,12 @@ spring:
             auto-commit: false
             maximum-pool-size: 1
             minimum-idle: 1
-        password: DeoaolGAcfXkG4dsXGn5
-        url: jdbc:mysql://be7rthtqxjtp0hj0gdjh-mysql.services.clever-cloud.com:3306/be7rthtqxjtp0hj0gdjh
-        username: u1wnjbbsiay1iy1h
+        url: jdbc:mysql://localhost:3306/openjobdb?createDatabaseIfNotExist=true
+        password: 123456
+        username: root
+#        password: DeoaolGAcfXkG4dsXGn5
+#        url: jdbc:mysql://be7rthtqxjtp0hj0gdjh-mysql.services.clever-cloud.com:3306/be7rthtqxjtp0hj0gdjh
+#        username: u1wnjbbsiay1iy1h
     jpa:
         hibernate:
             ddl-auto: update

@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +31,10 @@ public class JobService {
             return jobRepo.findAllByCompanyId(companyId, pageable);
         }
         return jobRepo.findAllByCompanyIdWithKeyword(companyId, keyword, pageable);
+    }
+
+    public Optional<Job> getById(String jobId) {
+        return jobRepo.findById(jobId);
     }
 
 //    public Page<Job> getAllwithSkillnotverified(Integer page, Integer size) {
