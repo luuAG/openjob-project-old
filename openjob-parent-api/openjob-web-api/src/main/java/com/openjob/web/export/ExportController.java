@@ -1,18 +1,21 @@
 package com.openjob.web.export;
 
 import com.openjob.common.model.Job;
-import com.openjob.common.response.MessageResponse;
 import com.openjob.web.dto.ExportCvDTO;
 import com.openjob.web.dto.ExportDTO;
 import com.openjob.web.job.JobService;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.ServletContext;
 import javax.validation.Valid;
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -26,9 +29,10 @@ import java.util.Optional;
 @RequestMapping("/export")
 public class ExportController {
     private final JobService jobService;
+    private final ServletContext servletContext;
 
     @PostMapping("/accepted-cv")
-    public ResponseEntity<MessageResponse> exportAcceptedCv(@Valid @RequestBody ExportDTO body) throws IOException {
+    public ResponseEntity<InputStreamResource> exportAcceptedCv(@Valid @RequestBody ExportDTO body) throws IOException {
         Optional<Job> jobOptional = jobService.getById(body.getJobId());
         if (jobOptional.isEmpty())
             throw new IllegalArgumentException("Job not found for ID: " + body.getJobId());
@@ -47,6 +51,7 @@ public class ExportController {
             listCvDto = body.getMatchedCVs();
         }
         // Write to file
+        String filename = "";
         try (InputStream is = new FileInputStream(new File("").getAbsolutePath() + "/openjob-web-api/src/main/resources/template/export_cv_template.xlsx")){
             Workbook wb = WorkbookFactory.create(is);
             Sheet sheet = wb.getSheetAt(0);
@@ -84,18 +89,24 @@ public class ExportController {
             for (int i=0; i<6; i++){
                 sheet.autoSizeColumn(i);
             }
-            // Save the Workbook
-            String filename = "/exported-cv/Accepted_CV_" + new SimpleDateFormat("dd-mm-yyyy").format(new Date()) + ".xlsx" ;
-            OutputStream os = new FileOutputStream(new File("..").getAbsolutePath() +filename);
+            // Save the Workbookfi
+            filename = new File("..").getAbsolutePath() +"/exported-cv/Accepted_CV_" + new SimpleDateFormat("dd-MM-yyyy").format(new Date()) + ".xlsx" ;
+            OutputStream os = new FileOutputStream(filename);
             wb.write(os);
             os.close();
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            return ResponseEntity.internalServerError().body(new MessageResponse("Error occured when exporting data"));
+            throw new RuntimeException(e.getMessage());
         }
 
 
+        File file = new File(filename);
+        InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
 
-        return ResponseEntity.ok(new MessageResponse("Data exported"));
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + file.getName())
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .contentLength(file.length())
+                .body(resource);
     }
 }
