@@ -16,9 +16,9 @@ public interface CompanyRepository extends JpaRepository<Company, String> {
     @Query("select c from Company c where c.address like %?1%")
     Page<Company> findByLocation(String location, Pageable pageable);
 
-    @Query("select c from Company c where concat(c.name, ' ', c.description) like %?1%")
+    @Query("select c from Company c where c.name like %?1% or c.description like %?1%")
     Page<Company> findByKeyword(String keyword, Pageable pageable);
 
-    @Query("select c from Company c where concat(c.name, ' ', c.description) like %?1% and c.address like %?2%")
+    @Query("select c from Company c where (c.name like %?1% or c.description like %?1%) and c.address like %?2%")
     Page<Company> findByKeywordAndLocation(String keyword, String location, Pageable pageable);
 }

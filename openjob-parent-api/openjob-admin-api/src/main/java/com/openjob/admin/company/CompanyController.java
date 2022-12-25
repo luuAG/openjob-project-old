@@ -4,6 +4,7 @@ import com.openjob.admin.dto.CompanyCreateRequestDTO;
 import com.openjob.admin.dto.CompanyHeadhunterResponseDTO;
 import com.openjob.admin.dto.CompanyPaginationDTO;
 import com.openjob.admin.setting.SettingService;
+import com.openjob.admin.util.CustomJavaMailSender;
 import com.openjob.common.enums.AuthProvider;
 import com.openjob.common.enums.Role;
 import com.openjob.common.model.Company;
@@ -14,7 +15,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +29,7 @@ public class CompanyController {
     private final HrService hrService;
     private final CompanyService companyService;
     private final SettingService settingService;
-    private final JavaMailSender mailSender;
+    private final CustomJavaMailSender mailSender;
 
     @GetMapping(path = "/company/{id}/hr", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> getHr(@PathVariable("id") String id) {
@@ -89,7 +89,8 @@ public class CompanyController {
                 message1.setText(text, true);
             };
             try {
-                mailSender.send(message);
+                mailSender.reloadProperties();
+                mailSender.getMailSender().send(message);
             } catch (Exception ex) {
                 hrService.delete(savedHr);
                 throw ex;

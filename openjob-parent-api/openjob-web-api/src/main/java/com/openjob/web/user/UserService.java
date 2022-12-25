@@ -50,7 +50,7 @@ public class UserService {
     public User patchUpdate(User userInfo) throws InvocationTargetException, IllegalAccessException, IOException {
         User existingUser = userRepo.getById(userInfo.getId());
         NullAwareBeanUtils.getInstance().copyProperties(existingUser, userInfo);
-        if (Objects.nonNull(userInfo.getCompany().getLogoUrl()) && userInfo.getCompany().getLogoUrl().startsWith("data:")){
+        if (Objects.nonNull(userInfo.getCompany()) && Objects.nonNull(userInfo.getCompany().getLogoUrl()) && userInfo.getCompany().getLogoUrl().startsWith("data:")){
             String base64Image = userInfo.getCompany().getLogoUrl().split(",")[1];
             byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(base64Image);
 

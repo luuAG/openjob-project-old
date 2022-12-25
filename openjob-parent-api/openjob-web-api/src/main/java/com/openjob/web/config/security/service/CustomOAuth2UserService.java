@@ -64,21 +64,24 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private User registerNewUser(OAuth2UserRequest oAuth2UserRequest, OAuth2UserInfo oAuth2UserInfo) {
+        String[] name = oAuth2UserInfo.getName().split(" ");
+
         User user = new User();
         user.setRole(Role.USER);
         user.setIsActive(true);
         user.setPassword("");
         user.setAuthProvider(AuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId().toUpperCase()));
-        user.setFirstName("");
-        user.setLastName(oAuth2UserInfo.getName());
+        user.setFirstName(name[0]);
+        user.setLastName(oAuth2UserInfo.getName().replace(name[0], "").trim());
         user.setEmail(oAuth2UserInfo.getEmail());
         user.setAvatarUrl(oAuth2UserInfo.getImageUrl());
         return userRepository.save(user);
     }
 
     private User updateExistingUser(User existingUser, OAuth2UserInfo oAuth2UserInfo) {
-        existingUser.setFirstName("");
-        existingUser.setLastName(oAuth2UserInfo.getName());
+        String[] name = oAuth2UserInfo.getName().split(" ");
+        existingUser.setFirstName(name[0]);
+        existingUser.setLastName(oAuth2UserInfo.getName().replace(name[0], "").trim());
         existingUser.setAvatarUrl(oAuth2UserInfo.getImageUrl());
         existingUser.setAuthProvider(AuthProvider.GOOGLE);
         return userRepository.save(existingUser);
