@@ -15,10 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -98,12 +95,7 @@ public class ExportController {
             throw new RuntimeException(e.getMessage());
         }
 
-        return ResponseEntity.ok(filename);
-
-
-//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//        new ObjectOutputStream( baos ).writeObject( wb );
-//        return ResponseEntity.ok(Base64.getEncoder().encode(baos.toByteArray()));
+        return ResponseEntity.ok((new HashMap<>()).put("pathName", filename));
     }
 
     @GetMapping(path = "/download")
