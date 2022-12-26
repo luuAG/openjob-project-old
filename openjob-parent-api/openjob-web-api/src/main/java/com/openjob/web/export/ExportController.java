@@ -10,10 +10,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.*;
@@ -101,7 +98,16 @@ public class ExportController {
             throw new RuntimeException(e.getMessage());
         }
 
+        return ResponseEntity.ok(filename);
 
+
+//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//        new ObjectOutputStream( baos ).writeObject( wb );
+//        return ResponseEntity.ok(Base64.getEncoder().encode(baos.toByteArray()));
+    }
+
+    @GetMapping(path = "/download")
+    public ResponseEntity<?> downloadFile(@RequestParam("filename")String filename) throws FileNotFoundException {
         File file = new File(filename);
         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
 
@@ -110,8 +116,5 @@ public class ExportController {
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .contentLength(file.length())
                 .body(resource);
-//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//        new ObjectOutputStream( baos ).writeObject( wb );
-//        return ResponseEntity.ok(Base64.getEncoder().encode(baos.toByteArray()));
     }
 }
