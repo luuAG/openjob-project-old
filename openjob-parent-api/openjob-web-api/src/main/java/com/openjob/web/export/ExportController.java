@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.ServletContext;
 import javax.validation.Valid;
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -29,10 +28,9 @@ import java.util.Optional;
 @RequestMapping("/export")
 public class ExportController {
     private final JobService jobService;
-    private final ServletContext servletContext;
 
     @PostMapping("/accepted-cv")
-    public ResponseEntity<InputStreamResource> exportAcceptedCv(@Valid @RequestBody ExportDTO body) throws IOException {
+    public ResponseEntity<?> exportAcceptedCv(@Valid @RequestBody ExportDTO body) throws IOException {
         Optional<Job> jobOptional = jobService.getById(body.getJobId());
         if (jobOptional.isEmpty())
             throw new IllegalArgumentException("Job not found for ID: " + body.getJobId());
@@ -52,8 +50,9 @@ public class ExportController {
         }
         // Write to file
         String filename = "";
+        Workbook wb;
         try (InputStream is = new FileInputStream(new File("").getAbsolutePath() + "/openjob-web-api/src/main/resources/template/export_cv_template.xlsx")){
-            Workbook wb = WorkbookFactory.create(is);
+            wb = WorkbookFactory.create(is);
             Sheet sheet = wb.getSheetAt(0);
             //Write job info
             Row row = sheet.getRow(0);
@@ -89,8 +88,11 @@ public class ExportController {
             for (int i=0; i<6; i++){
                 sheet.autoSizeColumn(i);
             }
-            // Save the Workbookfi
-            filename = new File("..").getAbsolutePath() +"/exported-cv/Accepted_CV_" + new SimpleDateFormat("dd-MM-yyyy").format(new Date()) + ".xlsx" ;
+//             Save the Workbook
+            File saveFolder = new File(new File("..").getAbsolutePath() +"\\exported-cv");
+            if (!saveFolder.exists())
+                saveFolder.mkdirs();
+            filename = new File("..").getAbsolutePath() +"\\exported-cv\\Accepted_CV_" + new SimpleDateFormat("dd-MM-yyyy").format(new Date()) + ".xlsx" ;
             OutputStream os = new FileOutputStream(filename);
             wb.write(os);
             os.close();
@@ -108,5 +110,8 @@ public class ExportController {
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .contentLength(file.length())
                 .body(resource);
+//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//        new ObjectOutputStream( baos ).writeObject( wb );
+//        return ResponseEntity.ok(Base64.getEncoder().encode(baos.toByteArray()));
     }
 }
