@@ -108,4 +108,8 @@ public class UserService {
     public List<UserCvDto> getByMatchingJob(String jobId) {
         return userRepo.findByMatchingJob(jobId);
     }
+
+    public List<UserCvDto> getByJobApplied(String jobId) {
+        return userRepo.findAppliedJob(jobId);
+    }
 }
