@@ -94,8 +94,9 @@ public class ExportController {
             System.out.println(e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
-
-        return ResponseEntity.ok((new HashMap<>()).put("pathName", filename));
+        Map<String, String> res = new HashMap<>();
+        res.put("pathName", filename);
+        return ResponseEntity.ok(res);
     }
 
     @GetMapping(path = "/download")
