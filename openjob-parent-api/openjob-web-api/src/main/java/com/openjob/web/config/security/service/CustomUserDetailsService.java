@@ -32,6 +32,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                     optionalUser.get().getId(),
                     optionalUser.get().getEmail(),
                     optionalUser.get().getPassword(),
+                    optionalUser.get().getIsActive(),
                     authorities
             );
         }

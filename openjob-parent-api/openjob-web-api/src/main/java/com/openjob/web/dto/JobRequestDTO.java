@@ -3,6 +3,7 @@ package com.openjob.web.dto;
 import com.openjob.common.enums.WorkPlace;
 import lombok.Getter;
 
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -17,4 +18,5 @@ public class JobRequestDTO {
     private Integer majorId;
     private List<JobSkillDTO> listJobSkillDTO;
     private String companyId;
+    private Date expiredAt;
 }

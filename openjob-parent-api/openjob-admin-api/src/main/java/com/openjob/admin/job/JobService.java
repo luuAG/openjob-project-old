@@ -1,32 +1,45 @@
 package com.openjob.admin.job;
 
-import com.openjob.admin.company.CompanyService;
 import com.openjob.common.model.Job;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class JobService {
     private final JobRepository jobRepo;
-    private final CompanyService companyRepo;
+    private final Sort sort = Sort.by(Sort.Direction.DESC,"createdAt");
 
-    public Page<Job> getAll(Integer page, Integer size, String keyword) {
-        Pageable pageable = PageRequest.of(page, size);
+    public Page<Job> getAll(Integer page, Integer size, String keyword, Integer majorId, Integer specializationId) {
+        Pageable pageable = PageRequest.of(page, size, sort);
+        List<Job> results;
         if (Objects.isNull(keyword) || keyword.isBlank()) {
-            return jobRepo.findAll(pageable);
+            results = jobRepo.findAll(pageable).getContent();
+        } else {
+            results = jobRepo.findAllWithKeyword(keyword, pageable).getContent();
         }
-        return jobRepo.findAllWithKeyword(keyword, pageable);
+
+        if (Objects.nonNull(majorId)) {
+            results = results.stream()
+                    .filter(job -> Objects.equals(job.getSpecialization().getMajor().getId(), majorId))
+                    .collect(Collectors.toList());
+        }
+        if (Objects.nonNull(specializationId)) {
+            results = results.stream()
+                    .filter(job -> Objects.equals(job.getSpecialization().getId(), specializationId))
+                    .collect(Collectors.toList());
+        }
+        return new PageImpl<>(results);
     }
 
     public Page<Job> getAllByCompanyId(Integer page, Integer size, String keyword, String companyId) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, sort);
         if (Objects.isNull(keyword) || keyword.isBlank()) {
             return jobRepo.findAllByCompanyId(companyId, pageable);
         }

@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.print.attribute.standard.Media;
 import java.util.Optional;
 
 @RestController
@@ -22,13 +21,27 @@ public class JobController {
     @GetMapping(path = "/jobs", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<JobPaginationDTO> getAll(@RequestParam("page")Integer page,
                                                    @RequestParam("size")Integer size,
-                                                   @RequestParam(value = "keyword", required = false)String keyword) {
-        Page<Job> jobPage = jobService.getAll(page, size, keyword);
+                                                   @RequestParam(value = "keyword", required = false)String keyword,
+                                                   @RequestParam(value = "majorId", required = false)Integer majorId,
+                                                   @RequestParam(value = "specializationId", required = false)Integer specializationId) {
+        Page<Job> jobPage = jobService.getAll(page, size, keyword, majorId, specializationId);
         return ResponseEntity.ok(new JobPaginationDTO(
                 jobPage.getContent(),
                 jobPage.getTotalPages(),
                 jobPage.getTotalElements()));
     }
+
+
+//    @GetMapping(path = "/jobs", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<JobPaginationDTO> getAll(@RequestParam("page")Integer page,
+//                                                   @RequestParam("size")Integer size,
+//                                                   @RequestParam(value = "keyword", required = false)String keyword) {
+//        Page<Job> jobPage = jobService.getAll(page, size, keyword);
+//        return ResponseEntity.ok(new JobPaginationDTO(
+//                jobPage.getContent(),
+//                jobPage.getTotalPages(),
+//                jobPage.getTotalElements()));
+//    }
 
     @GetMapping(path = "/job/by-company/{companyId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<JobPaginationDTO> getAll(@PathVariable("companyId") String companyId,
