@@ -15,17 +15,19 @@ import com.openjob.web.specialization.SpecializationService;
 import com.openjob.web.util.JobCVUtils;
 import com.openjob.web.util.NullAwareBeanUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
+@EnableAsync
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -39,6 +41,7 @@ public class JobService {
     private final SpecializationService speService;
     private final JobSkillRepository jobSkillRepo;
     private final MajorService majorService;
+    private final Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
 
 
     public Optional<Job> getById(String id) {
@@ -95,7 +98,7 @@ public class JobService {
 
     public Page<Job> searchByKeywordAndLocationAndCompany(Integer size, Integer page, String keyword, String location, String companyId) {
         Page<Job> pageJob;
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, sort);
         if (Objects.isNull(location) || location.isBlank()) {
             if (Objects.isNull(keyword) || keyword.isBlank())
                 pageJob = jobRepo.findAll(pageable);
@@ -152,15 +155,40 @@ public class JobService {
     }
 
     public Page<Job> getByCompanyId(Integer page, Integer size, String cId) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, sort);
         return jobRepo.findByCompanyId(cId, pageable);
     }
 
-    public Page<Job> getJobAppliedByUser(Integer page, Integer size, String userId) {
+    public Page<JobCV> getJobAppliedByUser(Integer page, Integer size, String userId) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<JobCV> jobCVPage = jobCvRepo.findJobAppliedByUserId(userId, pageable);
-        List<Job> jobs = new ArrayList<>();
-        jobCVPage.getContent().forEach(jobCV -> jobs.add(jobCV.getJob()));
-        return new PageImpl<>(jobs);
+        return jobCvRepo.findJobAppliedByUserId(userId, pageable);
+    }
+
+    @Scheduled(cron = "0 0 0 * * *")
+    @Async
+    public void delete7daysExpiredJob() {
+        Date today = new Date();
+        List<Job> expiredJob = getExpiredJob().stream()
+                .filter(job -> TimeUnit.DAYS.convert(
+                        today.getTime() - job.getExpiredAt().getTime(), TimeUnit.MILLISECONDS) >= 7)
+                .collect(Collectors.toList());
+        // delete from db
+        expiredJob.forEach(job -> {
+            jobCvService.deleteByJobId(job.getId());
+            jobRepo.deleteById(job.getId());
+        });
+    }
+
+    public List<Job> getExpiredJob() {
+        return jobRepo.findExpiredJob();
+    }
+
+    public void setExpiredDate(String jobId, Date expiredDate) {
+        Optional<Job> job = jobRepo.findById(jobId);
+        if (job.isPresent()){
+            job.get().setExpiredAt(expiredDate);
+            jobRepo.save(job.get());
+        } else
+            throw new IllegalArgumentException("Job not found with id: " + jobId);
     }
 }

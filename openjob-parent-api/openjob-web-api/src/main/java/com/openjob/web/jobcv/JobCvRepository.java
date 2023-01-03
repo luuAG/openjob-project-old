@@ -20,9 +20,13 @@ public interface JobCvRepository extends JpaRepository<JobCV, Integer> {
     @Query("select jc from JobCV jc where jc.job.id=?1 and jc.cv.id=?2")
     Optional<JobCV> findByJobIdAndCvId(String jobId, String cvId);
 
-    @Query("select jc from JobCV jc where jc.cv.user.id=?1 and jc.isApplied=true")
+    @Query("select jc from JobCV jc where jc.cv.user.id=?1 and jc.isApplied=true order by jc.applyDate desc ")
     Page<JobCV> findJobAppliedByUserId(String userId, Pageable pageable);
 
     @Query("select jc from JobCV jc where jc.cv.user.id=?1 and jc.job.id=?2")
     Optional<JobCV> findByUserIdAndJobId(String userId, String jobId);
+
+    @Query("delete from JobCV jcv where jcv.job.id=?1")
+    @Modifying
+    void deleteByJobId(String jobId);
 }

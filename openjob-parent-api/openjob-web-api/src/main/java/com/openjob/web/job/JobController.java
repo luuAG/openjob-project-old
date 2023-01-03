@@ -2,12 +2,10 @@ package com.openjob.web.job;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openjob.common.model.Job;
+import com.openjob.common.model.JobCV;
 import com.openjob.common.model.User;
 import com.openjob.common.response.MessageResponse;
-import com.openjob.web.dto.JobPaginationDTO;
-import com.openjob.web.dto.JobRequestDTO;
-import com.openjob.web.dto.JobResponseDTO;
-import com.openjob.web.dto.JobResponsePaginationDTO;
+import com.openjob.web.dto.*;
 import com.openjob.web.jobcv.JobCvService;
 import com.openjob.web.user.UserService;
 import com.openjob.web.util.NullAwareBeanUtils;
@@ -139,17 +137,27 @@ public class JobController {
     }
 
     @GetMapping(path = "/applied-by-user/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<JobPaginationDTO> getJobAppliedByUser(@PathVariable("userId")String userId,
-                                                                @RequestParam("page") Integer page,
-                                                                @RequestParam("size") Integer size){
-        Page<Job> pageJob = jobService.getJobAppliedByUser(page, size, userId);
+    public ResponseEntity<JobCvPaginationDTO> getJobAppliedByUser(@PathVariable("userId")String userId,
+                                                                  @RequestParam("page") Integer page,
+                                                                  @RequestParam("size") Integer size){
+        Page<JobCV> pageJobCv = jobService.getJobAppliedByUser(page, size, userId);
 
-        return ResponseEntity.ok(new JobPaginationDTO(
-                pageJob.getContent(),
-                pageJob.getTotalPages(),
-                pageJob.getTotalElements()
+        return ResponseEntity.ok(new JobCvPaginationDTO(
+                pageJobCv.getContent(),
+                pageJobCv.getTotalPages(),
+                pageJobCv.getTotalElements()
         ));
     }
+    @PostMapping("/{jobId}/reset-expired-date")
+    public ResponseEntity<MessageResponse> resetExpiredDate(@PathVariable("jobId")String jobId,
+                                                            @RequestParam("expiredDate") Date expiredDate) {
+        jobService.setExpiredDate(jobId, expiredDate);
+        return ResponseEntity.ok(new MessageResponse("Reset expired date successfully!"));
+    }
 
+    @GetMapping("/expired")
+    public ResponseEntity<?> testGetExpiredJob(){
+        return ResponseEntity.ok(jobService.getExpiredJob());
+    }
 
 }

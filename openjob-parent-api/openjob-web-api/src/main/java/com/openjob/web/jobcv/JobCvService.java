@@ -108,4 +108,8 @@ public class JobCvService {
             return jobCV.get().getIsApplied();
         return false;
     }
+
+    public void deleteByJobId(String jobId) {
+        jobCvRepo.deleteByJobId(jobId);
+    }
 }

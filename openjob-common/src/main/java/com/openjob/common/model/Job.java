@@ -59,7 +59,7 @@ public class Job {
     @JoinColumn
     private Company company;
 
-    @OneToMany(mappedBy = "job", orphanRemoval = true)
+    @OneToMany(mappedBy = "job", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<JobSkill> jobSkills;
 
     public Job(String id, String title, Date expiredAt,  Specialization specialization, List<JobSkill> jobSkills) {
