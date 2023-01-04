@@ -18,7 +18,7 @@ public class Company {
     private String id;
     @Column(nullable = false, unique = true)
     private String name;
-    @Column
+    @Column(columnDefinition = "text")
     private String description;
     @Column
     private String phone;
