@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.sql.Timestamp;
 import java.util.*;
 
 @RestController
@@ -150,8 +151,9 @@ public class JobController {
     }
     @PostMapping("/{jobId}/reset-expired-date")
     public ResponseEntity<MessageResponse> resetExpiredDate(@PathVariable("jobId")String jobId,
-                                                            @RequestParam("expiredDate") Date expiredDate) {
-        jobService.setExpiredDate(jobId, expiredDate);
+                                                            @RequestParam("expiredDate") Long expiredTimestamp) {
+        Timestamp timestamp = new Timestamp(expiredTimestamp);
+        jobService.setExpiredDate(jobId, new Date(timestamp.getTime()));
         return ResponseEntity.ok(new MessageResponse("Reset expired date successfully!"));
     }
 
