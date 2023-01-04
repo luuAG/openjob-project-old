@@ -199,6 +199,13 @@ public class AdminUserController {
         return ResponseEntity.ok(new MessageResponse("Accepted"));
     }
 
+    @DeleteMapping(path = "/adminuser/delete/{userId}")
+    public ResponseEntity<MessageResponse> deleteAdminUser(@PathVariable("userId") String userId) {
+        adminUserService.delete(userId);
+
+        return ResponseEntity.ok(new MessageResponse("Admin user has been deleted!"));
+    }
+
 
 
 }

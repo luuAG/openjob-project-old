@@ -88,6 +88,8 @@ public class AdminUserService extends AbstractBaseService<Admin> implements User
 
     @Override
     public void delete(String id) {
+        Optional<Admin> admin = adminUserRepo.findById(id);
+        admin.ifPresent(adminUserRepo::delete);
     }
 
     public void activate(String id) throws UserNotFoundException, SQLException {
