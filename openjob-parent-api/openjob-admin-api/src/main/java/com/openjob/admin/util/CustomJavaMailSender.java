@@ -2,6 +2,7 @@ package com.openjob.admin.util;
 
 import com.openjob.admin.setting.SettingService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +13,11 @@ public class CustomJavaMailSender extends JavaMailSenderImpl {
     @Autowired
     private SettingService settingService;
 
+    @Value("${spring.mail.username}")
+    private String mailUsername;
+    @Value("${spring.mail.password}")
+    private String mailPassword;
+
     private JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 
     public void getInstance(){
@@ -19,8 +25,8 @@ public class CustomJavaMailSender extends JavaMailSenderImpl {
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
 
-        mailSender.setUsername(settingService.getValue("MAIL_USERNAME"));
-        mailSender.setPassword(settingService.getValue("MAIL_PASSWORD"));
+        mailSender.setUsername(mailUsername);
+        mailSender.setPassword(mailPassword);
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");

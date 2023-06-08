@@ -45,7 +45,7 @@ public class ExportController {
         // Write to file
         String filename = "";
         Workbook wb;
-        try (InputStream is = new FileInputStream(new File("").getAbsolutePath() + "/openjob-web-api/src/main/resources/template/export_cv_template.xlsx")){
+        try (InputStream is = new FileInputStream(new File("").getAbsolutePath() + "/openjob-parent-api/openjob-web-api/src/main/resources/template/export_cv_template.xlsx")){
             wb = WorkbookFactory.create(is);
             Sheet sheet = wb.getSheetAt(0);
             //Write job info
