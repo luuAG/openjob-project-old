@@ -38,7 +38,7 @@ public class Company extends BaseAuditEntity{
     private Integer totalEmployee;
     @Column
     private String logoUrl;
-    @Column
+    @Column(length = 500)
     private String imageUrlsString;
     @Column
     @Temporal(TemporalType.TIMESTAMP)
