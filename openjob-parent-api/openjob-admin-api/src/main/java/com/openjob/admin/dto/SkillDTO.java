@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class SkillDTO {
+public class SkillDTO extends BaseAuditDTO {
     private Integer id;
     private Boolean isVerified;
     private String name;

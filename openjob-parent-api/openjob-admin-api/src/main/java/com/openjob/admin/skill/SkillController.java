@@ -41,10 +41,10 @@ public class SkillController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping(path = "/verify-skill/{skillId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<MessageResponse> verifySkill(@PathVariable("skillId") Integer skillId) {
-        skillService.verifySkill(skillId);
-        return ResponseEntity.ok(new MessageResponse("Skill is verified"));
+    @PostMapping(path = "/verify-skills", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MessageResponse> verifySkill(@RequestBody List<Integer> skillIds) {
+        skillService.verifyManySkills(skillIds);
+        return ResponseEntity.ok(new MessageResponse("Skills are verified"));
     }
 
     @DeleteMapping(path = "/skill/delete/{name}", produces = MediaType.APPLICATION_JSON_VALUE)

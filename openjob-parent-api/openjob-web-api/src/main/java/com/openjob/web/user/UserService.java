@@ -11,10 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -66,6 +63,18 @@ public class UserService {
             CloudinaryUtils.getInstance();
             String returnedUrl = CloudinaryUtils.upload(imageBytes, UUID.randomUUID().toString());
             userInfo.getCompany().setDescription(replaceImgTag(userInfo.getCompany().getDescription(), returnedUrl));
+        }
+        if (Objects.nonNull(userInfo.getCompany()) && Objects.nonNull(userInfo.getCompany().getBase64Images())) {
+            List<String> urls = new ArrayList<>();
+            for (String rawBase64Image : userInfo.getCompany().getBase64Images()){
+                String base64Image = rawBase64Image.split(",")[1];
+                byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(base64Image);
+
+                CloudinaryUtils.getInstance();
+                String returnedUrl = CloudinaryUtils.upload(imageBytes, "companyImages/"+ UUID.randomUUID());
+                urls.add(returnedUrl);
+            }
+            existingUser.getCompany().setImageUrls(urls);
         }
         return userRepo.save(existingUser);
     }

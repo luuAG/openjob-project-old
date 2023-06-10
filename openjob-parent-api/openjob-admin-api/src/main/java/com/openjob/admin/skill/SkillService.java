@@ -5,10 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 @Service
 @Transactional
@@ -26,6 +30,14 @@ public class SkillService {
     }
 
     public Skill save(Skill skill){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        skill.setUpdatedAt(new Date());
+        skill.setUpdatedBy(username);
+        if (skill.getId() == null) {
+            skill.setCreatedAt(new Date());
+            skill.setCreatedBy(username);
+        }
         return skillRepo.save(skill);
     }
 
@@ -52,5 +64,9 @@ public class SkillService {
 
     public void deleteByName(String name) {
         skillRepo.deleteByName(name);
+    }
+
+    public void verifyManySkills(List<Integer> skillIds) {
+        skillRepo.verifyManySkills(skillIds);
     }
 }

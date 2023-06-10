@@ -8,10 +8,17 @@ import com.openjob.admin.util.CustomJavaMailSender;
 import com.openjob.common.enums.AuthProvider;
 import com.openjob.common.enums.Role;
 import com.openjob.common.model.Company;
+import com.openjob.common.model.PagingModel;
 import com.openjob.common.model.User;
 import com.openjob.common.response.MessageResponse;
 import lombok.RequiredArgsConstructor;
+import net.kaczmarzyk.spring.data.jpa.domain.DateBetween;
+import net.kaczmarzyk.spring.data.jpa.domain.Equal;
+import net.kaczmarzyk.spring.data.jpa.domain.Like;
+import net.kaczmarzyk.spring.data.jpa.web.annotation.And;
+import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +27,7 @@ import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.Objects;
 
 
@@ -101,12 +109,31 @@ public class CompanyController {
         );
     }
 
+//    @GetMapping(path = "/companies", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<CompanyPaginationDTO> getCompanies(
+//            @RequestParam Integer page,
+//            @RequestParam Integer size,
+//            @RequestParam(required = false) String keyword) {
+//        Page<Company> pageCompany = companyService.search(page, size, keyword);
+//        return ResponseEntity.ok(new CompanyPaginationDTO(
+//                pageCompany.getContent(),
+//                pageCompany.getTotalPages(),
+//                pageCompany.getTotalElements())
+//        );
+//    }
+
     @GetMapping(path = "/companies", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CompanyPaginationDTO> getCompanies(
-            @RequestParam Integer page,
-            @RequestParam Integer size,
-            @RequestParam(required = false) String keyword) {
-        Page<Company> pageCompany = companyService.search(page, size, keyword);
+            @And({
+                    @Spec(path = "createdAt", params = {"startDate", "endDate"}, spec = DateBetween.class),
+                    @Spec(path = "memberType", spec = Equal.class),
+                    @Spec(path = "address", spec = Like.class),
+                    @Spec(path = "companyType", spec = Equal.class),
+                    @Spec(path = "isActive", spec = Equal.class),
+                    @Spec(path = "name", spec = Like.class),
+            }) Specification<Company> companySpec,
+            PagingModel pagingModel) {
+        Page<Company> pageCompany = companyService.search(companySpec, pagingModel.getPageable());
         return ResponseEntity.ok(new CompanyPaginationDTO(
                 pageCompany.getContent(),
                 pageCompany.getTotalPages(),

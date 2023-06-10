@@ -46,6 +46,8 @@ public class User {
     private Integer reports;
     @Column
     private String phone;
+    @Column
+    private String position;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn

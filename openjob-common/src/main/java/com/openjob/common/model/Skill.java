@@ -3,14 +3,17 @@ package com.openjob.common.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.openjob.common.enums.ExperienceValue;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
 @Table
-@Data
-public class Skill {
+@Getter
+@Setter
+public class Skill extends BaseAuditEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

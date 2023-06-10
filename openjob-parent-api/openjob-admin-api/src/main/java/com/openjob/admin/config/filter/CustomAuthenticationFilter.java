@@ -63,6 +63,11 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        Optional<Admin> admin = adminUserService.findByUsername(userDetails.getUsername());
+        if (admin.isPresent() && !admin.get().getIsActive())
+            throw new IllegalArgumentException("Tài khoản của bạn đã bị vô hiệu hoá, liên hệ quản trị viên để mở lại!");
+
         Algorithm algorithm = Algorithm.HMAC256(configProperties.getConfigValue("secret-key").getBytes());
         String accessToken = JWT.create()
                 .withSubject(userDetails.getUsername())
@@ -78,7 +83,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
                 .withIssuer(request.getRequestURL().toString())
                 .sign(algorithm);
 
-        Optional<Admin> admin = adminUserService.findByUsername(userDetails.getUsername());
+
         Map<String, String> responseDTO = new HashMap<>();
         responseDTO.put("access-token", accessToken);
         responseDTO.put("refresh-token", refreshToken);

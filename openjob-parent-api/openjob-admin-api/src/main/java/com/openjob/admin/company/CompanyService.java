@@ -5,8 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -20,6 +24,14 @@ public class CompanyService  {
     }
 
     public Company save(Company object)  {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        object.setUpdatedAt(new Date());
+        object.setUpdatedBy(username);
+        if (object.getId() == null) {
+            object.setCreatedAt(new Date());
+            object.setCreatedBy(username);
+        }
         return companyRepo.save(object);
     }
 
@@ -42,5 +54,9 @@ public class CompanyService  {
 
     public boolean existsById(String companyId) {
         return companyRepo.existsById(companyId);
+    }
+
+    public Page<Company> search(Specification<Company> companySpec, Pageable pageable) {
+        return companyRepo.findAll(companySpec, pageable);
     }
 }

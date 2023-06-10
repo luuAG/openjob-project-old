@@ -4,13 +4,14 @@ import com.openjob.common.model.Company;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface CompanyRepository extends JpaRepository<Company, String> {
+public interface CompanyRepository extends JpaRepository<Company, String>, JpaSpecificationExecutor<Company> {
 
     @Query("select c from Company c where c.name like %?1%")
     Page<Company> findByKeyword(String keyword, Pageable pageable);
