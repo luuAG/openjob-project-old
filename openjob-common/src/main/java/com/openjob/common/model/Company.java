@@ -6,6 +6,7 @@ import com.openjob.common.enums.MemberType;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.context.annotation.Primary;
 
@@ -71,7 +72,8 @@ public class Company extends BaseAuditEntity{
 
 
     public void setImageUrlsStringCustom(List<String> urls) {
-        this.imageUrlsString = "";
+        if (StringUtils.isEmpty(this.imageUrlsString))
+            this.imageUrlsString = "";
         urls.forEach(url -> this.imageUrlsString += url + ", ");
     }
     public void initializeImageUrls(){

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.openjob.common.enums.JobLevel;
 import com.openjob.common.enums.JobType;
 import com.openjob.common.enums.WorkPlace;
+import com.openjob.common.model.converter.SalaryConverter;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -34,8 +35,8 @@ public class Job {
     @Column
     private Integer quantity;
 
-    @Column
-    private String salary;
+//    @Column
+//    private String salary;
 
     @Column
     @Temporal(value = TemporalType.TIMESTAMP)
@@ -56,6 +57,9 @@ public class Job {
     @Column
     @Enumerated(value = EnumType.STRING)
     private JobType jobType;
+
+    @Convert(converter = SalaryConverter.class)
+    private SalaryModel salaryInfo;
 
     @OneToOne
     @JoinColumn
