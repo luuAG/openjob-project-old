@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.context.annotation.Primary;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ public class Company extends BaseAuditEntity{
     @Column
     private String logoUrl;
     @Column
-    private String imageUrls;
+    private String imageUrlsString;
     @Column
     @Temporal(TemporalType.TIMESTAMP)
     private Date contractEndDate;
@@ -54,6 +55,9 @@ public class Company extends BaseAuditEntity{
     @Enumerated(EnumType.STRING)
     private CompanyType companyType;
 
+    @Column
+    private Integer scope;
+
     @OneToOne
     @JoinColumn
     @JsonIgnore
@@ -61,14 +65,20 @@ public class Company extends BaseAuditEntity{
 
     @Transient
     private String[] base64Images;
+    @Transient
+    private List<String> imageUrls;
 
-    public List<String> getImageUrls(){
-        String[] urls = this.imageUrls.split(", ");
-        return Arrays.stream(urls).collect(Collectors.toList());
-    }
-    public void setImageUrls(List<String> urls) {
-        this.imageUrls = "";
-        urls.forEach(url -> this.imageUrls += url + ", ");
+//    @Primary
+//    public List<String> getImageUrls(){
+//        String[] urls = this.imageUrlsString.split(", ");
+//        return Arrays.stream(urls).collect(Collectors.toList());
+//    }
+
+    @Primary
+    public void setImageUrlsString(List<String> urls) {
+        this.imageUrlsString = "";
+        urls.forEach(url -> this.imageUrlsString += url + ", ");
+        imageUrls = urls;
     }
 
 }

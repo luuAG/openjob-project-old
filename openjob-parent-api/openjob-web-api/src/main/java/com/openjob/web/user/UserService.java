@@ -74,7 +74,7 @@ public class UserService {
                 String returnedUrl = CloudinaryUtils.upload(imageBytes, "companyImages/"+ UUID.randomUUID());
                 urls.add(returnedUrl);
             }
-            existingUser.getCompany().setImageUrls(urls);
+            existingUser.getCompany().setImageUrlsString(urls);
         }
         return userRepo.save(existingUser);
     }
