@@ -12,7 +12,11 @@ import org.springframework.stereotype.Service;
 public class CompanyRegistrationService {
     private final CompanyRegistrationRepository companyRegistrationRepo;
 
-    public Page<CompanyRegistration> findAll(Specification<CompanyRegistration> specification, Pageable pageable){
-        return companyRegistrationRepo.findAll(specification, pageable);
+    public Page<CompanyRegistration> search(Specification<CompanyRegistration> companySpec, Pageable pageable) {
+        return companyRegistrationRepo.findAll(companySpec, pageable);
+    }
+
+    public void deleteById(String id) {
+        companyRegistrationRepo.deleteById(id);
     }
 }

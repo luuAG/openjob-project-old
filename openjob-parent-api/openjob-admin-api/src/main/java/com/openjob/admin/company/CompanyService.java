@@ -1,6 +1,9 @@
 package com.openjob.admin.company;
 
+import com.openjob.common.enums.Role;
 import com.openjob.common.model.Company;
+import com.openjob.common.model.CompanyRegistration;
+import com.openjob.common.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -11,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -18,6 +22,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CompanyService  {
     private final CompanyRepository companyRepo;
+    private final HrService hrService;
+    private final CompanyRegistrationService companyRegistrationService;
 
     public Optional<Company> get(String id)  {
         return companyRepo.findById(id);
@@ -58,5 +64,27 @@ public class CompanyService  {
 
     public Page<Company> search(Specification<Company> companySpec, Pageable pageable) {
         return companyRepo.findAll(companySpec, pageable);
+    }
+
+    public void approve(List<CompanyRegistration> companyRegistrationList) {
+        companyRegistrationList.forEach(companyRegistration -> {
+            Company company = new Company();
+            company.setName(companyRegistration.getCompanyName());
+
+            Company savedCompany = save(company);
+
+            User hr = new User();
+            hr.setRole(Role.HR);
+            hr.setIsActive(true);
+            hr.setFirstName(companyRegistration.getHeadHunterName());
+            hr.setEmail(companyRegistration.getEmail());
+            hr.setPhone(companyRegistration.getPhone());
+            hr.setPosition(companyRegistration.getPosition());
+            hr.setCompany(savedCompany);
+
+            hrService.create(hr);
+
+            companyRegistrationService.deleteById(companyRegistration.getId());
+        });
     }
 }

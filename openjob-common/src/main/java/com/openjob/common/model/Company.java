@@ -74,8 +74,8 @@ public class Company extends BaseAuditEntity{
 //        return Arrays.stream(urls).collect(Collectors.toList());
 //    }
 
-    @Primary
-    public void setImageUrlsString(List<String> urls) {
+
+    public void setImageUrlsStringCustom(List<String> urls) {
         this.imageUrlsString = "";
         urls.forEach(url -> this.imageUrlsString += url + ", ");
         imageUrls = urls;

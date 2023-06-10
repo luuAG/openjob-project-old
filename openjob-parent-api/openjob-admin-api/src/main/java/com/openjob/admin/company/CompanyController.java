@@ -3,15 +3,18 @@ package com.openjob.admin.company;
 import com.openjob.admin.dto.CompanyCreateRequestDTO;
 import com.openjob.admin.dto.CompanyHeadhunterResponseDTO;
 import com.openjob.admin.dto.CompanyPaginationDTO;
+import com.openjob.admin.dto.CompanyRegistrationPaginationDTO;
 import com.openjob.admin.setting.SettingService;
 import com.openjob.admin.util.CustomJavaMailSender;
 import com.openjob.common.enums.AuthProvider;
 import com.openjob.common.enums.Role;
 import com.openjob.common.model.Company;
+import com.openjob.common.model.CompanyRegistration;
 import com.openjob.common.model.PagingModel;
 import com.openjob.common.model.User;
 import com.openjob.common.response.MessageResponse;
 import lombok.RequiredArgsConstructor;
+import net.kaczmarzyk.spring.data.jpa.domain.Between;
 import net.kaczmarzyk.spring.data.jpa.domain.DateBetween;
 import net.kaczmarzyk.spring.data.jpa.domain.Equal;
 import net.kaczmarzyk.spring.data.jpa.domain.Like;
@@ -26,8 +29,10 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -38,6 +43,7 @@ public class CompanyController {
     private final CompanyService companyService;
     private final SettingService settingService;
     private final CustomJavaMailSender mailSender;
+    private final CompanyRegistrationService companyRegistrationService;
 
     @GetMapping(path = "/company/{id}/hr", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> getHr(@PathVariable("id") String id) {
@@ -126,7 +132,7 @@ public class CompanyController {
     @GetMapping(path = "/companies", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CompanyPaginationDTO> getCompanies(
             @And({
-                    @Spec(path = "createdAt", params = {"startDate", "endDate"}, spec = DateBetween.class),
+                    @Spec(path = "createdAt", params = {"startDate", "endDate"}, spec = Between.class),
                     @Spec(path = "memberType", spec = Equal.class),
                     @Spec(path = "address", spec = Like.class),
                     @Spec(path = "companyType", spec = Equal.class),
@@ -157,13 +163,33 @@ public class CompanyController {
     @PostMapping(path = "/company/{companyId}/hr/update")
     public ResponseEntity<User> updateHrAccountInfo(
             @PathVariable("companyId") String companyId,
-            @RequestParam("updatePassword") Boolean updatePassword,
-            @RequestBody User hr) {
+            @RequestBody User hr) throws IOException {
         if (!companyService.existsById(companyId))
             throw new IllegalArgumentException("Company not found!");
-        User updatedUser = hrService.update(hr, updatePassword);
+        User updatedUser = hrService.update(hr);
         if (Objects.nonNull(updatedUser))
             return ResponseEntity.ok(updatedUser);
         return ResponseEntity.badRequest().body(null);
+    }
+
+    @GetMapping(path = "/company/unapproved")
+    public ResponseEntity<CompanyRegistrationPaginationDTO> getUnapprovedCompanies(
+            @And({
+                    @Spec(path = "createdAt", params = {"startDate", "endDate"}, spec = Between.class),
+                    @Spec(path = "name", spec = Like.class),
+            }) Specification<CompanyRegistration> companySpec,
+            PagingModel pagingModel) {
+        Page<CompanyRegistration> pageCompany = companyRegistrationService.search(companySpec, pagingModel.getPageable());
+        return ResponseEntity.ok(new CompanyRegistrationPaginationDTO(
+                pageCompany.getContent(),
+                pageCompany.getTotalPages(),
+                pageCompany.getTotalElements())
+        );
+    }
+
+    @PostMapping(path = "/company/approve")
+    public ResponseEntity<MessageResponse> approveManyCompanies(@RequestBody List<CompanyRegistration> companyRegistrationList){
+        companyService.approve(companyRegistrationList);
+        return ResponseEntity.ok(new MessageResponse("Chấp thuận các công ty thành công!"));
     }
 }
