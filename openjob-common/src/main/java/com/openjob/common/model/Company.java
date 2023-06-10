@@ -68,17 +68,15 @@ public class Company extends BaseAuditEntity{
     @Transient
     private List<String> imageUrls;
 
-//    @Primary
-//    public List<String> getImageUrls(){
-//        String[] urls = this.imageUrlsString.split(", ");
-//        return Arrays.stream(urls).collect(Collectors.toList());
-//    }
 
 
     public void setImageUrlsStringCustom(List<String> urls) {
         this.imageUrlsString = "";
         urls.forEach(url -> this.imageUrlsString += url + ", ");
-        imageUrls = urls;
+    }
+    public void initializeImageUrls(){
+        String[] urls = this.imageUrlsString.split(", ");
+        imageUrls = Arrays.stream(urls).collect(Collectors.toList());
     }
 
 }

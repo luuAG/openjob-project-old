@@ -15,7 +15,6 @@ import java.util.*;
 @RequiredArgsConstructor
 public class HrService {
     private final HrRepository hrRepo;
-    private final BCryptPasswordEncoder passwordEncoder;
 
     public void activate(String companyId){
         hrRepo.activate(companyId);
@@ -27,8 +26,11 @@ public class HrService {
 
     public User getByCompany(String companyId) {
         Optional<User> optionalUser = hrRepo.findByCompany(companyId);
-        if (optionalUser.isPresent())
-            return optionalUser.get();
+        if (optionalUser.isPresent()){
+            User hr = optionalUser.get();
+            hr.getCompany().initializeImageUrls();
+            return hr;
+        }
         else
             throw new IllegalArgumentException("HR not found for company ID: " + companyId);
     }

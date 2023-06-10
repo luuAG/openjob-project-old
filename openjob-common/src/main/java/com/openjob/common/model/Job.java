@@ -1,6 +1,8 @@
 package com.openjob.common.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.openjob.common.enums.JobLevel;
+import com.openjob.common.enums.JobType;
 import com.openjob.common.enums.WorkPlace;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
@@ -46,6 +48,14 @@ public class Job {
     @Column
     @Enumerated(value = EnumType.STRING)
     private WorkPlace workPlace;
+
+    @Column
+    @Enumerated(value = EnumType.STRING)
+    private JobLevel jobLevel;
+
+    @Column
+    @Enumerated(value = EnumType.STRING)
+    private JobType jobType;
 
     @OneToOne
     @JoinColumn
