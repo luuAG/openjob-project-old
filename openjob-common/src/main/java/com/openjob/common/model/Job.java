@@ -6,6 +6,8 @@ import com.openjob.common.enums.JobType;
 import com.openjob.common.enums.WorkPlace;
 import com.openjob.common.model.converter.SalaryConverter;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -13,10 +15,11 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table
-public class Job {
+public class Job extends BaseAuditEntity {
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
     @Column(columnDefinition = "CHAR(32)")
@@ -38,9 +41,9 @@ public class Job {
 //    @Column
 //    private String salary;
 
-    @Column
-    @Temporal(value = TemporalType.TIMESTAMP)
-    private Date createdAt;
+//    @Column
+//    @Temporal(value = TemporalType.TIMESTAMP)
+//    private Date createdAt;
 
     @Column
     @Temporal(value = TemporalType.TIMESTAMP)

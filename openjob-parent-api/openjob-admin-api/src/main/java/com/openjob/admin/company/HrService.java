@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -59,7 +60,9 @@ public class HrService {
                     hr.getCompany().setLogoUrl(returnedUrl);
                 }
                 if (Objects.nonNull(hr.getCompany().getBase64Images())) {
-                    List<String> urls = new ArrayList<>();
+                    List<String> urls = Arrays.stream(hr.getCompany().getImageUrlsString().split(", ")).collect(Collectors.toList());
+                    urls.remove(null);
+                    urls.remove("");
                     for (String rawBase64Image : hr.getCompany().getBase64Images()){
                         String base64Image = rawBase64Image.split(",")[1];
                         byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(base64Image);

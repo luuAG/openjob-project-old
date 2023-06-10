@@ -9,20 +9,24 @@ import javax.persistence.Converter;
 
 @Converter
 public class SalaryConverter implements AttributeConverter<SalaryModel, String> {
+    private final ObjectMapper objectMapper = new ObjectMapper();
     @Override
     public String convertToDatabaseColumn(SalaryModel attribute) {
-        ObjectMapper objectMapper = new ObjectMapper();
-
         try {
             return objectMapper.writeValueAsString(attribute);
         } catch (JsonProcessingException e) {
-            System.out.println("Fail to convert salaryModel!!!!!!!");
+            System.out.println("Fail to convert SalaryModel to String!!!!!!!");
             throw new RuntimeException(e);
         }
     }
 
     @Override
     public SalaryModel convertToEntityAttribute(String dbData) {
-        return null;
+        try {
+            return objectMapper.readValue(dbData, SalaryModel.class);
+        } catch (JsonProcessingException e) {
+            System.out.println("Fail to convert String to SalaryModel!!!!!!!");
+            throw new RuntimeException(e);
+        }
     }
 }

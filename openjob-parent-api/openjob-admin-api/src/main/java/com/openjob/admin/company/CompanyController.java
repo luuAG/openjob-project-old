@@ -83,7 +83,7 @@ public class CompanyController {
         }
         Company savedCompany = companyService.save(company);
 
-        savedCompany.setHeadHunter(hr);
+
 
         hr.setCompany(savedCompany);
         hr.setRole(Role.HR);
