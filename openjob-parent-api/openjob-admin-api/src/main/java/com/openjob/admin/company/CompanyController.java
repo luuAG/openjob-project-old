@@ -75,10 +75,11 @@ public class CompanyController {
         if (Objects.isNull(company.getName()) || company.getName().isBlank()){
             throw new IllegalArgumentException("Company name is null or blank");
         }
+        Company savedCompany = companyService.save(company);
 
-        company.setHeadHunter(hr);
+        savedCompany.setHeadHunter(hr);
 
-        hr.setCompany(company);
+        hr.setCompany(savedCompany);
         hr.setRole(Role.HR);
         hr.setPassword("12345678");
         hr.setAuthProvider(AuthProvider.DATABASE);

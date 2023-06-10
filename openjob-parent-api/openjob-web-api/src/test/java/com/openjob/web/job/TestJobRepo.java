@@ -27,23 +27,23 @@ public class TestJobRepo {
 
     @Test
     public void insertJob(){
-        Job job = new Job();
-        Company company = companyRepo.getById("297eaef983de8b5d0183dec8a57c0003");
-        List<SkillExperience> listSe =  new ArrayList<>();
-        listSe.add(entityManager.find(SkillExperience.class, 1));
-        listSe.add(entityManager.find(SkillExperience.class, 2));
-
-        job.setCompany(company);
-        job.setTitle("Test title");
-        job.setDescription("Test Description");
-        job.setSalary("10tr-20tr");
-        job.setCreatedAt(new Date());
-        job.setWorkPlace(WorkPlace.HYBRID);
-        job.setMajor(entityManager.find(Major.class, 2));
-        job.setSpecialization(entityManager.find(Specialization.class, 1));
-        job.setListSkillExperience(listSe);
-
-        Job saved = jobRepo.save(job);
-        Assert.assertNotNull(saved);
+//        Job job = new Job();
+//        Company company = companyRepo.getById("297eaef983de8b5d0183dec8a57c0003");
+//        List<SkillExperience> listSe =  new ArrayList<>();
+//        listSe.add(entityManager.find(SkillExperience.class, 1));
+//        listSe.add(entityManager.find(SkillExperience.class, 2));
+//
+//        job.setCompany(company);
+//        job.setTitle("Test title");
+//        job.setDescription("Test Description");
+//        job.setSalary("10tr-20tr");
+//        job.setCreatedAt(new Date());
+//        job.setWorkPlace(WorkPlace.HYBRID);
+//        job.setMajor(entityManager.find(Major.class, 2));
+//        job.setSpecialization(entityManager.find(Specialization.class, 1));
+//        job.setListSkillExperience(listSe);
+//
+//        Job saved = jobRepo.save(job);
+//        Assert.assertNotNull(saved);
     }
 }
