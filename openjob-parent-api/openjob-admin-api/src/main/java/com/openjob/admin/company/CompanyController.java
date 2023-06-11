@@ -13,12 +13,14 @@ import com.openjob.common.model.CompanyRegistration;
 import com.openjob.common.model.PagingModel;
 import com.openjob.common.model.User;
 import com.openjob.common.response.MessageResponse;
+import com.openjob.common.util.MilisecondToDateConverter;
 import lombok.RequiredArgsConstructor;
 import net.kaczmarzyk.spring.data.jpa.domain.Between;
 import net.kaczmarzyk.spring.data.jpa.domain.DateBetween;
 import net.kaczmarzyk.spring.data.jpa.domain.Equal;
 import net.kaczmarzyk.spring.data.jpa.domain.Like;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.And;
+import net.kaczmarzyk.spring.data.jpa.web.annotation.OnTypeMismatch;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
@@ -128,7 +130,7 @@ public class CompanyController {
     @GetMapping(path = "/companies", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CompanyPaginationDTO> getCompanies(
             @And({
-                    @Spec(path = "createdAt", params = {"startDate", "endDate"}, spec = Between.class),
+                    @Spec(path = "createdAt", params = {"startDate", "endDate"}, spec = Between.class, onTypeMismatch = OnTypeMismatch.DEFAULT),
                     @Spec(path = "memberType", spec = Equal.class),
                     @Spec(path = "address", spec = Like.class),
                     @Spec(path = "companyType", spec = Equal.class),
