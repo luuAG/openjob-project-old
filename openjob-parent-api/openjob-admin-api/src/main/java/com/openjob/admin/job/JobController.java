@@ -1,13 +1,12 @@
 package com.openjob.admin.job;
 
-import com.openjob.admin.dto.CompanyPaginationDTO;
 import com.openjob.admin.dto.JobPaginationDTO;
-import com.openjob.common.model.Company;
 import com.openjob.common.model.Job;
 import com.openjob.common.model.PagingModel;
 import lombok.RequiredArgsConstructor;
 import net.kaczmarzyk.spring.data.jpa.domain.*;
-import net.kaczmarzyk.spring.data.jpa.web.annotation.And;
+import net.kaczmarzyk.spring.data.jpa.web.annotation.Conjunction;
+import net.kaczmarzyk.spring.data.jpa.web.annotation.Or;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
@@ -15,7 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
@@ -27,22 +25,26 @@ public class JobController {
 
     @GetMapping(path = "/jobs")
     public ResponseEntity<JobPaginationDTO> getAll(
-            @And({
-                @Spec(path = "createdAt", params = {"startDate", "endDate"}, spec = Between.class),
-                @Spec(path = "isActive", spec = Equal.class),
-                @Spec(path = "company.address", params = "address", spec = Like.class),
-                @Spec(path = "jobLevel", spec = Equal.class),
-                @Spec(path = "jobType", spec = Equal.class),
-                @Spec(path = "workplace", spec = Equal.class),
-                @Spec(path = "salaryInfo.min", params = "minSalary", spec = GreaterThanOrEqual.class),
-                @Spec(path = "salaryInfo.max", params = "maxSalary", spec = LessThanOrEqual.class),
-                @Spec(path = "salaryInfo.isNegotiable", params = "isSalaryNegotiable", spec = Equal.class),
-                @Spec(path = "salaryInfo.salaryType", params = "salaryType", spec = Equal.class),
-                @Spec(path = "company.name", params = "keyword", spec = Like.class),
-                @Spec(path = "title", params = "keyword", spec = Like.class),
-                @Spec(path = "major.id", params = "majorId", spec = Equal.class),
-                @Spec(path = "specialization.id", params = "speId", spec = Equal.class),
-            }) Specification<Job> jobSpec, PagingModel pagingModel) {
+            @Conjunction(
+                    value = @Or({
+                            @Spec(path = "title", params = "keyword", spec = Like.class),
+                            @Spec(path = "company.name", params = "keyword", spec = Like.class)}),
+                    and = {
+                            @Spec(path = "createdAt", params = {"startDate", "endDate"}, spec = Between.class),
+                            @Spec(path = "isActive", spec = Equal.class),
+                            @Spec(path = "company.address", params = "address", spec = Like.class),
+                            @Spec(path = "jobLevel", spec = Equal.class),
+                            @Spec(path = "jobType", spec = Equal.class),
+                            @Spec(path = "workplace", spec = Equal.class),
+                            @Spec(path = "salaryInfo.min", params = "minSalary", spec = GreaterThanOrEqual.class),
+                            @Spec(path = "salaryInfo.max", params = "maxSalary", spec = LessThanOrEqual.class),
+                            @Spec(path = "salaryInfo.isNegotiable", params = "isSalaryNegotiable", spec = Equal.class),
+                            @Spec(path = "salaryInfo.salaryType", params = "salaryType", spec = Equal.class),
+                            @Spec(path = "major.id", params = "majorId", spec = Equal.class),
+                            @Spec(path = "specialization.id", params = "speId", spec = Equal.class)
+                    })
+            Specification<Job> jobSpec,
+            PagingModel pagingModel) {
         Page<Job> pageJob = jobService.search(jobSpec, pagingModel.getPageable());
         return ResponseEntity.ok(new JobPaginationDTO(
                 pageJob.getContent(),

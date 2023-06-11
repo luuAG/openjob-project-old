@@ -12,6 +12,8 @@ public class SalaryConverter implements AttributeConverter<SalaryModel, String> 
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Override
     public String convertToDatabaseColumn(SalaryModel attribute) {
+        if (attribute == null)
+            return null;
         try {
             return objectMapper.writeValueAsString(attribute);
         } catch (JsonProcessingException e) {
@@ -22,6 +24,8 @@ public class SalaryConverter implements AttributeConverter<SalaryModel, String> 
 
     @Override
     public SalaryModel convertToEntityAttribute(String dbData) {
+        if (dbData == null)
+            return null;
         try {
             return objectMapper.readValue(dbData, SalaryModel.class);
         } catch (JsonProcessingException e) {
