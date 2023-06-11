@@ -69,8 +69,7 @@ public class CompanyController {
     @PostMapping(path = "/company/create", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CompanyHeadhunterResponseDTO> createHeadHunter(@RequestBody CompanyCreateRequestDTO body) throws SQLException {
         User hr = body.getHeadHunter();
-        Company company = new Company();
-        company.setName(body.getCompanyName());
+        Company company = body.getHeadHunter().getCompany();
 
         if (Objects.isNull(hr)){
             throw new IllegalArgumentException("Head hunter is null");
@@ -83,11 +82,8 @@ public class CompanyController {
         }
         Company savedCompany = companyService.save(company);
 
-
-
         hr.setCompany(savedCompany);
         hr.setRole(Role.HR);
-        hr.setPassword("12345678");
         hr.setAuthProvider(AuthProvider.DATABASE);
         User savedHr = hrService.create(hr);
 
