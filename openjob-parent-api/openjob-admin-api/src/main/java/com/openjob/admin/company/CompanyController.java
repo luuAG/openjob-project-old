@@ -89,26 +89,26 @@ public class CompanyController {
         hr.setAuthProvider(AuthProvider.DATABASE);
         User savedHr = hrService.create(hr);
 
-        if (Objects.nonNull(savedHr)){
-            MimeMessagePreparator message = mimeMessage -> {
-                MimeMessageHelper message1 = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-                message1.setFrom("duongvannam2001@gmail.com");
-                message1.setTo(savedHr.getEmail());
-                message1.setSubject("Tài khoản OpenJob đã được tạo");
-                String text = settingService.getByName("MAIL_NEW_HR_ACCOUNT").orElseThrow().getValue();
-                text = text.replace("[[company]]", company.getName())
-                        .replace("[[email]]", savedHr.getEmail())
-                        .replace("[[password]]", "12345678");
-                message1.setText(text, true);
-            };
-            try {
-                mailSender.reloadProperties();
-                mailSender.getMailSender().send(message);
-            } catch (Exception ex) {
-                hrService.delete(savedHr);
-                throw ex;
-            }
-        }
+//        if (Objects.nonNull(savedHr)){
+//            MimeMessagePreparator message = mimeMessage -> {
+//                MimeMessageHelper message1 = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+//                message1.setFrom("duongvannam2001@gmail.com");
+//                message1.setTo(savedHr.getEmail());
+//                message1.setSubject("Tài khoản OpenJob đã được tạo");
+//                String text = settingService.getByName("MAIL_NEW_HR_ACCOUNT").orElseThrow().getValue();
+//                text = text.replace("[[company]]", company.getName())
+//                        .replace("[[email]]", savedHr.getEmail())
+//                        .replace("[[password]]", "12345678");
+//                message1.setText(text, true);
+//            };
+//            try {
+//                mailSender.reloadProperties();
+//                mailSender.getMailSender().send(message);
+//            } catch (Exception ex) {
+//                hrService.delete(savedHr);
+//                throw ex;
+//            }
+//        }
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 new CompanyHeadhunterResponseDTO(savedHr.getCompany().getId(), savedHr.getId())
         );
