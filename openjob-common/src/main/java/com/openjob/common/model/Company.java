@@ -59,6 +59,9 @@ public class Company extends BaseAuditEntity{
     @Column
     private Integer scope;
 
+    @Column
+    private String email;
+
     @OneToOne
     @JoinColumn
     @JsonIgnore
