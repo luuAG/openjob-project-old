@@ -95,6 +95,16 @@ public class SkillController {
         }
         return ResponseEntity.badRequest().body(null);
     }
+    @PostMapping(path = "/skill/update/{id}/{name}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Skill> createSkill(@PathVariable Integer id, @PathVariable String name){
+        Skill existingSKill = skillService.getById(id);
+        existingSKill.setName(name);
+        Skill savedSkill = skillService.save(existingSKill);
+        if (Objects.nonNull(savedSkill)){
+            return ResponseEntity.ok(savedSkill);
+        }
+        return ResponseEntity.badRequest().body(null);
+    }
 //    @PutMapping(path = "/skill/update", produces = MediaType.APPLICATION_JSON_VALUE)
 //    public ResponseEntity<Skill> updateSkill(@RequestBody Skill skill) {
 //        if (!skillService.checkExist(skill.getId()))

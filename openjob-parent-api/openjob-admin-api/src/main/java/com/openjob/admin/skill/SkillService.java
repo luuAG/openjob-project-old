@@ -74,4 +74,8 @@ public class SkillService {
     public Page<Skill> search(Specification<Skill> skillSpec, Pageable pageable) {
         return skillRepo.findAll(skillSpec, pageable);
     }
+
+    public Skill getById(Integer id) {
+        return skillRepo.findById(id).orElseThrow();
+    }
 }
