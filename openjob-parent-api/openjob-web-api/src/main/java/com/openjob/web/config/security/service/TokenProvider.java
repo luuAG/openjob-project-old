@@ -5,7 +5,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.openjob.web.config.properties.AppProperties;
+import com.openjob.web.config.AppProperties;
 import com.openjob.web.config.security.info.UserPrincipal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

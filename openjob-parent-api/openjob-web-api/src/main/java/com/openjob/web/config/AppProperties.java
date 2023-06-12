@@ -1,4 +1,4 @@
-package com.openjob.web.config.properties;
+package com.openjob.web.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

@@ -18,4 +18,6 @@ public interface SkillRepository extends JpaRepository<Skill, Integer> {
 
     @Query("select case when count(s)>0 then true else false end from Skill s where s.name=?1")
     boolean existsByName(String name);
+
+    Optional<Skill> findByName(String name);
 }

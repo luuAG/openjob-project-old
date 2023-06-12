@@ -1,15 +1,14 @@
 package com.openjob.web.company;
 
 import com.openjob.common.model.Company;
+import com.openjob.common.model.CompanyRegistration;
+import com.openjob.common.response.MessageResponse;
 import com.openjob.web.dto.CompanyPaginationDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
 
@@ -17,6 +16,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class CompanyController {
     private final CompanyService companyService;
+    private final CompanyRegistrationService companyRegistrationService;
 
     @GetMapping(path = "/companies", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CompanyPaginationDTO> getAndSearchCompany(
@@ -38,5 +38,11 @@ public class CompanyController {
         return Objects.nonNull(company) ?
                 ResponseEntity.ok(company) :
                 ResponseEntity.notFound().build();
+    }
+
+    @PostMapping(path = "/company/register")
+    public ResponseEntity<MessageResponse> companyRegister(@RequestBody CompanyRegistration registration){
+        companyRegistrationService.save(registration);
+        return ResponseEntity.ok(new MessageResponse("Đăng ký thành công! Chúng tôi sẽ liên hệ bạn sớm!"));
     }
 }

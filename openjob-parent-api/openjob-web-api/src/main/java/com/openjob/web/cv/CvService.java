@@ -3,6 +3,7 @@ package com.openjob.web.cv;
 import com.openjob.common.enums.CvStatus;
 import com.openjob.common.model.*;
 import com.openjob.web.dto.CVRequestDTO;
+import com.openjob.web.dto.CvDTO;
 import com.openjob.web.job.JobRepository;
 import com.openjob.web.jobcv.JobCvService;
 import com.openjob.web.major.MajorService;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,7 +63,7 @@ public class CvService {
 
         for (int i = 0; i < cvDto.getListSkill().size(); i++) {
             Skill skillFromRequest = cv.getListSkill().get(i);
-            Optional<Skill> skillInDB = skillRepo.findByNameAndExperience(skillFromRequest.getName(), skillFromRequest.getExperience());
+            Optional<Skill> skillInDB = skillRepo.findByName(skillFromRequest.getName());
             if (skillInDB.isPresent()) {
                 realListSkill.add(skillInDB.get());
             } else {
@@ -112,5 +114,24 @@ public class CvService {
     public Page<CV> getCvAppliedByJobId(Integer page, Integer size, String jobId) {
         Pageable pageable = PageRequest.of(page, size);
         return cvRepo.findCvAppliedByJobId(jobId, pageable);
+    }
+
+    public Page<CV> search(Specification<CV> cvSpec, Pageable pageable) {
+        return cvRepo.findAll(cvSpec, pageable);
+    }
+
+    public List<CvDTO> mapToCvDto(List<CV> listCv) {
+        List<CvDTO> toReturn = new ArrayList<>();
+        listCv.forEach(cv -> {
+            CvDTO cvDTO = new CvDTO();
+            try {
+                NullAwareBeanUtils.getInstance().copyProperties(cvDTO, cv);
+                cvDTO.setUserId(cv.getUser().getId());
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                System.out.println("Error while copying CV to CvDTO in CvService");
+                throw new RuntimeException("Lỗi hệ thống");
+            }
+        });
+        return toReturn;
     }
 }

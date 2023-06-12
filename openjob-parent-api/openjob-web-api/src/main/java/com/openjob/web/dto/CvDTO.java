@@ -25,7 +25,7 @@ public class CvDTO {
 
     private String userId;
 
-    private CvStatus status;
+//    private CvStatus status;
 
     private Specialization specialization;
 

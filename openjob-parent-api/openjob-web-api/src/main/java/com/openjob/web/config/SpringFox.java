@@ -1,4 +1,4 @@
-package com.openjob.web.config.springfox;
+package com.openjob.web.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

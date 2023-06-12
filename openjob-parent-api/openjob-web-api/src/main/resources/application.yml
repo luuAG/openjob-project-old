@@ -63,3 +63,14 @@ app:
         # We're not using cookies because they won't work well in mobile clients.
         authorizedRedirectUris:
             - http://localhost:5173/oauth2/redirect
+
+
+# client-side
+client:
+    base_url: http://localhost:5173
+
+# paypal
+paypal:
+    mode: sandbox
+    client_id: AVBqsyz16FK5wSCuvW8sbZwC1Y8RoALBzEtK0lwK5E-6kMfGUZ1WtRDWBK9GZxGPPWHGPAJlTfE0Ytpj
+    secret_key: EHxTScKIts2smmfOxj1SaRGGwYW9MuvrB_yNVGcstCc-2zZvTPVWB9q5jNZXpsGZvhsvNv3NOBBp2e8S

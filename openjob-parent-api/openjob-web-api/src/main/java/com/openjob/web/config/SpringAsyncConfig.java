@@ -1,4 +1,4 @@
-package com.openjob.web.config.async;
+package com.openjob.web.config;
 
 import com.openjob.web.exception.CustomAsyncExceptionHandler;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;

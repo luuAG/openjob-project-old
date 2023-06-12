@@ -2,11 +2,20 @@ package com.openjob.admin.skill;
 
 import com.openjob.admin.dto.NewSkillDTO;
 import com.openjob.admin.dto.SkillDTO;
+import com.openjob.admin.dto.SkillPaginationDTO;
 import com.openjob.admin.specialization.SpecializationService;
+import com.openjob.common.model.CV;
+import com.openjob.common.model.PagingModel;
 import com.openjob.common.model.Skill;
+import com.openjob.common.model.Specialization;
 import com.openjob.common.response.MessageResponse;
 import lombok.RequiredArgsConstructor;
+import net.kaczmarzyk.spring.data.jpa.domain.Equal;
+import net.kaczmarzyk.spring.data.jpa.domain.Like;
+import net.kaczmarzyk.spring.data.jpa.web.annotation.And;
+import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -95,4 +104,18 @@ public class SkillController {
 //            return ResponseEntity.ok(savedSkill);
 //        return ResponseEntity.badRequest().body(null);
 //    }
+
+    @GetMapping("/skills")
+    public ResponseEntity<SkillPaginationDTO> getAllSkill(
+            @And({
+                    @Spec(path = "name", spec = Like.class),
+                    @Spec(path = "specialization.id", params = "speId", spec = Equal.class)
+            }) Specification<Skill> skillSpec, PagingModel pagingModel) {
+        Page<Skill> pageCv = skillService.search(skillSpec, pagingModel.getPageable());
+        return ResponseEntity.ok(new SkillPaginationDTO(
+                pageCv.getContent(),
+                pageCv.getTotalPages(),
+                pageCv.getTotalElements())
+        );
+    }
 }

@@ -24,18 +24,18 @@ public class Skill extends BaseAuditEntity {
     @Column(columnDefinition = "bit(1) default true")
     private Boolean isVerified;
 
-    @Column(columnDefinition = "varchar(50) default 'ANY'")
-    @Enumerated(value = EnumType.STRING)
-    private ExperienceValue experience;
+//    @Column(columnDefinition = "varchar(50) default 'ANY'")
+//    @Enumerated(value = EnumType.STRING)
+//    private ExperienceValue experience;
 
     @JsonIgnore
     @ManyToOne
     @JoinColumn
     private Specialization specialization;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "skill")
-    private List<JobSkill> jobSkills;
+//    @JsonIgnore
+//    @OneToMany(mappedBy = "skill")
+//    private List<JobSkill> jobSkills;
 
 
 }

@@ -1,9 +1,6 @@
 package com.openjob.admin.company;
 
-import com.openjob.admin.dto.CompanyCreateRequestDTO;
-import com.openjob.admin.dto.CompanyHeadhunterResponseDTO;
-import com.openjob.admin.dto.CompanyPaginationDTO;
-import com.openjob.admin.dto.CompanyRegistrationPaginationDTO;
+import com.openjob.admin.dto.*;
 import com.openjob.admin.setting.SettingService;
 import com.openjob.admin.util.CustomJavaMailSender;
 import com.openjob.common.enums.AuthProvider;
@@ -179,9 +176,13 @@ public class CompanyController {
         );
     }
 
-    @PostMapping(path = "/company/approve")
-    public ResponseEntity<MessageResponse> approveManyCompanies(@RequestBody List<CompanyRegistration> companyRegistrationList){
-        companyService.approve(companyRegistrationList);
+    @PostMapping(path = "/company/review-registration")
+    public ResponseEntity<MessageResponse> reviewManyCompanies(@RequestBody ReviewRegistrationDTO dto){
+        if (dto.isApproved())
+            companyService.approve(dto.getCompanyRegistrationList());
+        else
+            companyService.reject(dto.getCompanyRegistrationList());
         return ResponseEntity.ok(new MessageResponse("Chấp thuận các công ty thành công!"));
     }
+
 }

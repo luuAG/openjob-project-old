@@ -1,7 +1,7 @@
 package com.openjob.web.config.security.handler;
 
 import com.openjob.common.model.User;
-import com.openjob.web.config.properties.AppProperties;
+import com.openjob.web.config.AppProperties;
 import com.openjob.web.config.security.repository.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.openjob.web.config.security.service.TokenProvider;
 import com.openjob.web.exception.BadRequestException;

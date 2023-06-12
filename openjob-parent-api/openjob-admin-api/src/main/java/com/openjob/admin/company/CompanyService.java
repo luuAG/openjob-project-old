@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -70,6 +71,7 @@ public class CompanyService  {
         companyRegistrationList.forEach(companyRegistration -> {
             Company company = new Company();
             company.setName(companyRegistration.getCompanyName());
+            company.setEmail(companyRegistration.getEmail());
 
             Company savedCompany = save(company);
 
@@ -86,5 +88,10 @@ public class CompanyService  {
 
             companyRegistrationService.deleteById(companyRegistration.getId());
         });
+    }
+
+    public void reject(List<CompanyRegistration> companyRegistrationList) {
+        List<String> ids = companyRegistrationList.stream().map(CompanyRegistration::getId).collect(Collectors.toList());
+        companyRepo.rejectManyCompaniesByIds(ids);
     }
 }
