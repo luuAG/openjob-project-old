@@ -51,8 +51,8 @@ public class SkillController {
     }
 
     @PostMapping(path = "/verify-skills", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<MessageResponse> verifySkill(@RequestBody List<Integer> skillIds) {
-        skillService.verifyManySkills(skillIds);
+    public ResponseEntity<MessageResponse> verifySkill(@RequestBody Map<String, List<Integer>> map) {
+        skillService.verifyManySkills(map.get("skillIds"));
         return ResponseEntity.ok(new MessageResponse("Skills are verified"));
     }
 
