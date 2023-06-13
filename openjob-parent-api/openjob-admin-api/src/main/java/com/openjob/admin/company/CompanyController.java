@@ -165,7 +165,7 @@ public class CompanyController {
     public ResponseEntity<CompanyRegistrationPaginationDTO> getUnapprovedCompanies(
             @And({
                     @Spec(path = "createdAt", params = {"startDate", "endDate"}, spec = Between.class),
-                    @Spec(path = "name", spec = Like.class),
+                    @Spec(path = "companyName", spec = Like.class),
             }) Specification<CompanyRegistration> companySpec,
             PagingModel pagingModel) {
         Page<CompanyRegistration> pageCompany = companyRegistrationService.search(companySpec, pagingModel.getPageable());

@@ -6,7 +6,8 @@ server:
 spring:
     thymeleaf:
         enabled: true
-        prefix:
+        prefix: classpath:/templates/
+        suffix: .html
     task:
         scheduling:
             pool:
