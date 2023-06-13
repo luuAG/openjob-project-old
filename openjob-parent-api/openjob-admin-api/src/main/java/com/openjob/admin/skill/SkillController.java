@@ -119,7 +119,8 @@ public class SkillController {
     public ResponseEntity<SkillPaginationDTO> getAllSkill(
             @And({
                     @Spec(path = "name", spec = Like.class),
-                    @Spec(path = "specialization.id", params = "speId", spec = Equal.class)
+                    @Spec(path = "specialization.id", params = "speId", spec = Equal.class),
+                    @Spec(path = "isVerified", constVal = "true", spec = Equal.class)
             }) Specification<Skill> skillSpec, PagingModel pagingModel) {
         Page<Skill> pageCv = skillService.search(skillSpec, pagingModel.getPageable());
         return ResponseEntity.ok(new SkillPaginationDTO(
