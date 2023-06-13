@@ -6,7 +6,7 @@ server:
 spring:
     thymeleaf:
         enabled: true
-        prefix: classpath:/templates/
+        prefix: classpath:/template/
         suffix: .html
     task:
         scheduling:
