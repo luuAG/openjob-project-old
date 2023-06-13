@@ -32,11 +32,7 @@ public class JobCVUtils {
     }
 
     private static boolean checkSkillMatched(Skill skillInJob, Skill skillInCV) {
-        if (Objects.equals(skillInJob.getName(), skillInCV.getName())){
-            if (skillInJob.getExperience().name().equals(ExperienceValue.ANY.name()) ||
-                skillInJob.getExperience().equals(skillInCV.getExperience()))
-                return true;
-        }
+       // TODO:
 
         return false;
     }

@@ -4,6 +4,9 @@ server:
     servlet:
         context-path: /api/web
 spring:
+    thymeleaf:
+        enabled: true
+        prefix:
     task:
         scheduling:
             pool:

@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface SkillRepository extends JpaRepository<Skill, Integer> {
-    Optional<Skill> findByNameAndExperience(String name, ExperienceValue experience);
+//    Optional<Skill> findByNameAndExperience(String name, ExperienceValue experience);
 
     @Query("select s from Skill s where s.specialization.id=?1 group by s.name")
     Collection<Skill> findBySpecialization(Integer speId);

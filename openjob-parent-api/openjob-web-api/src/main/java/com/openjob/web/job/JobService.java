@@ -72,7 +72,7 @@ public class JobService {
             JobSkill jobSkill = new JobSkill();
 
             Skill skillFromRequest = JSfromRequest.getSkill();
-            Optional<Skill> skillInDB = skillRepo.findByNameAndExperience(skillFromRequest.getName(), skillFromRequest.getExperience());
+            Optional<Skill> skillInDB = skillRepo.findByName(skillFromRequest.getName());
             if (skillInDB.isPresent()){
                 jobSkill.setRequired(JSfromRequest.getIsRequired());
                 jobSkill.setSkill(skillInDB.get());
