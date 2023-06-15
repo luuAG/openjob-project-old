@@ -66,14 +66,17 @@ public class Job extends BaseAuditEntity {
 
     @OneToOne
     @JoinColumn
+    @JsonIgnore
     private Specialization specialization;
 
-    @OneToOne
-    @JoinColumn
-    private Major major;
+//    @OneToOne
+//    @JoinColumn
+//    @JsonIgnore
+//    private Major major;
 
     @OneToOne
     @JoinColumn
+    @JsonIgnore
     private Company company;
 
     @OneToMany(mappedBy = "job", orphanRemoval = true, cascade = CascadeType.ALL)

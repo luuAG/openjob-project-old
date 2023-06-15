@@ -64,11 +64,9 @@ public class JobService {
 
         Company company = companyService.getById(jobDTO.getCompanyId());
         Optional<Specialization> specialization = speService.getById(jobDTO.getSpecializationId());
-        Optional<Major> major = majorService.getById(jobDTO.getMajorId());
-        if (Objects.isNull(company) || specialization.isEmpty() || major.isEmpty())
-            throw new IllegalArgumentException("Company/Major/Specialization not found!");
+        if (Objects.isNull(company) || specialization.isEmpty())
+            throw new IllegalArgumentException("Company/Specialization not found!");
         job.setCompany(company);
-        job.setMajor(major.get());
         job.setSpecialization(specialization.get());
 
         Job savedJob = jobRepo.save(job);
@@ -82,21 +80,19 @@ public class JobService {
 
             Skill skillFromRequest = JSfromRequest.getSkill();
             Optional<Skill> skillInDB = skillRepo.findByName(skillFromRequest.getName());
-            if (skillInDB.isPresent()){
-                jobSkill.setRequired(JSfromRequest.getIsRequired());
-                jobSkill.setSkill(skillInDB.get());
-                jobSkill.setJob(savedJob);
-                realListJobSkill.add(jobSkillRepo.save(jobSkill));
-            } else {
+            // if new skill -> save new skill and set to jobSkill
+            if (skillInDB.isEmpty()){
                 skillFromRequest.setSpecialization(savedJob.getSpecialization());
-                skillFromRequest.setIsVerified(skillRepo.existsByName(skillFromRequest.getName()));
+//                skillFromRequest.setIsVerified(skillRepo.existsByName(skillFromRequest.getName()));
+                skillFromRequest.setIsVerified(false);
                 Skill savedSkill = skillRepo.save(skillFromRequest);
-                jobSkill.setRequired(JSfromRequest.getIsRequired());
                 jobSkill.setSkill(savedSkill);
-                jobSkill.setJob(savedJob);
-                realListJobSkill.add(jobSkillRepo.save(jobSkill));
+            } else { // if existing skill -> set to jobSkill
+                jobSkill.setSkill(skillInDB.get());
             }
-
+            jobSkill.setRequired(JSfromRequest.getIsRequired());
+            jobSkill.setJob(savedJob);
+            realListJobSkill.add(jobSkillRepo.save(jobSkill));
         }
 
 
@@ -136,30 +132,30 @@ public class JobService {
 
     @Async
     public void findCVmatchJob(Job savedJob) {
-        List<CV> listCV = cvRepo.findBySpecialization(savedJob.getSpecialization().getId());
-
-        for (CV cv : listCV) {
-            int matchingPoint = JobCVUtils.checkCVmatchJob(savedJob, cv);
-            if (matchingPoint > 0) {
-                Optional<JobCV> existingJobCv =  jobCvService.getByJobIdAndCvId(savedJob.getId(), cv.getId());
-                if (existingJobCv.isPresent()){
-                    existingJobCv.get().setIsMatching(true);
-                    existingJobCv.get().setPoint(matchingPoint);
-                    jobCvService.save(existingJobCv.get());
-                }
-                else {
-                    JobCV newJobCv = new JobCV();
-                    newJobCv.setJob(savedJob);
-                    newJobCv.setStatus(CvStatus.NEW);
-                    newJobCv.setIsMatching(true);
-                    newJobCv.setPoint(matchingPoint);
-                    newJobCv.setCv(cv);
-                    newJobCv.setApplyDate(null);
-                    newJobCv.setIsApplied(false);
-                    jobCvService.save(newJobCv);
-                }
-            }
-        }
+//        List<CV> listCV = cvRepo.findBySpecialization(savedJob.getSpecialization().getId());
+//
+//        for (CV cv : listCV) {
+//            int matchingPoint = JobCVUtils.checkCVmatchJob(savedJob, cv);
+//            if (matchingPoint > 0) {
+//                Optional<JobCV> existingJobCv =  jobCvService.getByJobIdAndCvId(savedJob.getId(), cv.getId());
+//                if (existingJobCv.isPresent()){
+//                    existingJobCv.get().setIsMatching(true);
+//                    existingJobCv.get().setPoint(matchingPoint);
+//                    jobCvService.save(existingJobCv.get());
+//                }
+//                else {
+//                    JobCV newJobCv = new JobCV();
+//                    newJobCv.setJob(savedJob);
+//                    newJobCv.setStatus(CvStatus.NEW);
+//                    newJobCv.setIsMatching(true);
+//                    newJobCv.setPoint(matchingPoint);
+//                    newJobCv.setCv(cv);
+//                    newJobCv.setApplyDate(null);
+//                    newJobCv.setIsApplied(false);
+//                    jobCvService.save(newJobCv);
+//                }
+//            }
+//        }
 
     }
 

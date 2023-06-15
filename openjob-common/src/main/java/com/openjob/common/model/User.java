@@ -26,7 +26,7 @@ public class User {
     @Column(nullable = false)
     private Role role;
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "varchar(10) default 'DATABASE'")
+    @Column(columnDefinition = "varchar(10) default 'DATABASE'")
     private AuthProvider authProvider;
     @Column(columnDefinition = "bit(1) default true")
     private Boolean isActive;

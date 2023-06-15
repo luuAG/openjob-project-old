@@ -34,6 +34,7 @@ public class OpenjobBusinessService {
 
         data.setPremiumFreeViewCv(openjobBusiness.getPremiumFreeViewCv());
         data.setPremiumFreeJob(openjobBusiness.getPremiumFreeJob());
+        data.setPremiumPrice(openjobBusiness.getPremiumPrice());
 
         return repository.save(data);
     }

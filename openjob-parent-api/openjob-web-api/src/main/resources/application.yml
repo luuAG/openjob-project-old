@@ -6,7 +6,7 @@ server:
 spring:
     thymeleaf:
         enabled: true
-        prefix: classpath:/template/
+        prefix: classpath:/templates/
         suffix: .html
     task:
         scheduling:
@@ -21,12 +21,12 @@ spring:
             maximum-pool-size: 1
             minimum-idle: 1
             max-lifetime: 300000
-        url: jdbc:mysql://localhost:3306/openjobdb2?createDatabaseIfNotExist=true
-        password: 123456
-        username: root
-#        password: DeoaolGAcfXkG4dsXGn5
-#        url: jdbc:mysql://be7rthtqxjtp0hj0gdjh-mysql.services.clever-cloud.com:3306/be7rthtqxjtp0hj0gdjh
-#        username: u1wnjbbsiay1iy1h
+#        url: jdbc:mysql://localhost:3306/openjobdb2?createDatabaseIfNotExist=true
+#        password: 123456
+#        username: root
+        password: DeoaolGAcfXkG4dsXGn5
+        url: jdbc:mysql://be7rthtqxjtp0hj0gdjh-mysql.services.clever-cloud.com:3306/be7rthtqxjtp0hj0gdjh
+        username: u1wnjbbsiay1iy1h
     jpa:
         hibernate:
             ddl-auto: update
