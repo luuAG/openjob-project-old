@@ -1,10 +1,12 @@
 package com.openjob.web.job;
 
 import com.openjob.common.enums.CvStatus;
+import com.openjob.common.enums.Role;
 import com.openjob.common.model.*;
 import com.openjob.web.company.CompanyService;
 import com.openjob.web.cv.CvRepository;
 import com.openjob.web.dto.JobRequestDTO;
+import com.openjob.web.dto.JobResponseDTO;
 import com.openjob.web.dto.JobSkillDTO;
 import com.openjob.web.jobcv.JobCvRepository;
 import com.openjob.web.jobcv.JobCvService;
@@ -12,16 +14,22 @@ import com.openjob.web.jobskill.JobSkillRepository;
 import com.openjob.web.major.MajorService;
 import com.openjob.web.skill.SkillRepository;
 import com.openjob.web.specialization.SpecializationService;
+import com.openjob.web.user.UserService;
 import com.openjob.web.util.JobCVUtils;
 import com.openjob.web.util.NullAwareBeanUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -32,6 +40,7 @@ import java.util.stream.Collectors;
 @Transactional
 @RequiredArgsConstructor
 public class JobService {
+    private final UserService userService;
     private final JobRepository jobRepo;
     private final SkillRepository skillRepo;
     private final JobCvService jobCvService;
@@ -190,5 +199,42 @@ public class JobService {
             jobRepo.save(job.get());
         } else
             throw new IllegalArgumentException("Job not found with id: " + jobId);
+    }
+
+    public List<Job> getRelevantJobs(Job job) {
+        Specialization specialization = job.getSpecialization();
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "created_at"));
+        return jobRepo.findBySpecialization(specialization.getId(), pageable);
+    }
+
+
+    public JobResponseDTO mapJobToJobResponseDTO(Job job, User loggedInUser){
+        JobResponseDTO toReturn = new JobResponseDTO();
+        NullAwareBeanUtils copier = NullAwareBeanUtils.getInstance();
+        try {
+            copier.copyProperties(toReturn, job);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+        if (Objects.nonNull(loggedInUser) &&  !loggedInUser.getRole().equals(Role.HR))
+            toReturn.setIsApplied(jobCvService.checkUserAppliedJob(loggedInUser.getId(),job.getId()));
+        return  toReturn;
+    }
+
+
+
+    public Page<Job> search(Specification<Job> jobSpec, Pageable pageable) {
+        return jobRepo.findAll(jobSpec, pageable);
+    }
+
+    public Page<Job> getSuggestionJobs(Pageable pageable, User loggedInUser) {
+        if (loggedInUser == null) {
+            loggedInUser = userService.getByEmail("duongvannam2001@gmail.com");
+        }
+        Set<Integer> skillIds = loggedInUser.getCv().getListSkill().stream()
+                .map(Skill::getId)
+                .collect(Collectors.toSet());
+
+        return jobRepo.findBySkillIds(skillIds, pageable);
     }
 }

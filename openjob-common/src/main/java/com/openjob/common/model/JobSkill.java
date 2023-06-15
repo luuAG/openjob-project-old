@@ -23,4 +23,5 @@ public class JobSkill {
     private Skill skill;
 
     private boolean isRequired;
+    private double weight;
 }

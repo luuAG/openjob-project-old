@@ -4,13 +4,15 @@ import com.openjob.common.model.Job;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Set;
 
 @Repository
-public interface JobRepository extends JpaRepository<Job, String> {
+public interface JobRepository extends JpaRepository<Job, String>, JpaSpecificationExecutor<Job> {
 
     @Query("select distinct j from Job j join j.jobSkills js " +
             "where concat(j.title, ' ', j.company.name, ' ', js.skill.name) like %?1% ")
@@ -35,4 +37,10 @@ public interface JobRepository extends JpaRepository<Job, String> {
 
     @Query("select j from Job j where current_date() > j.expiredAt")
     List<Job> findExpiredJob();
+
+    @Query("select j from Job j where j.specialization.id=?1")
+    List<Job> findBySpecialization(Integer id, Pageable pageable);
+
+    @Query("select j from Job j join j.jobSkills js where js.skill.id in ?1")
+    Page<Job> findBySkillIds(Set<Integer> skillIds, Pageable pageable);
 }

@@ -3,16 +3,22 @@ package com.openjob.web.job;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openjob.common.model.Job;
 import com.openjob.common.model.JobCV;
+import com.openjob.common.model.PagingModel;
 import com.openjob.common.model.User;
 import com.openjob.common.response.MessageResponse;
 import com.openjob.web.dto.*;
 import com.openjob.web.jobcv.JobCvService;
 import com.openjob.web.user.UserService;
+import com.openjob.web.util.AuthenticationUtils;
 import com.openjob.web.util.NullAwareBeanUtils;
 import lombok.RequiredArgsConstructor;
+import net.kaczmarzyk.spring.data.jpa.domain.Equal;
+import net.kaczmarzyk.spring.data.jpa.domain.Like;
+import net.kaczmarzyk.spring.data.jpa.web.annotation.*;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,54 +29,66 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/job")
 @RequiredArgsConstructor
 public class JobController {
     private final JobService jobService;
-    private final UserService userService;
     private final JobCvService jobCvService;
+    private final AuthenticationUtils authenticationUtils;
 
     @GetMapping(path = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<JobResponsePaginationDTO> searchJob(
-            @RequestParam("page") Integer page,
-            @RequestParam("size") Integer size,
-            @RequestParam(value = "keyword", required = false) String keyword,
-            @RequestParam(value = "location", required = false) String location,
-            @RequestParam(value = "companyId", required = false) String companyId,
+//            @RequestParam("page") Integer page,
+//            @RequestParam("size") Integer size,
+//            @RequestParam(value = "keyword", required = false) String keyword,
+//            @RequestParam(value = "location", required = false) String location,
+//            @RequestParam(value = "companyId", required = false) String companyId,
+            @Join(path = "jobSkills", alias = "jobSkill")
+            @Join(path = "jobSkill.skill", alias = "skill")
+            @Conjunction(
+                value = {
+                    @Or({@Spec(path = "title", params = "keyword", spec = Like.class),
+                        @Spec(path = "company.name", params = "keyword", spec = Like.class),
+                        @Spec(path = "skill.name", params = "keyword", spec = Like.class),}),
+                    },
+                and = {
+                    @Spec(path = "company.id", params = "companyId",spec = Equal.class),
+                    @Spec(path = "company.address", params = "location",spec = Equal.class)
+                }
+            )
+            Specification<Job> jobSpec,
+            PagingModel pagingModel,
             HttpServletRequest request) throws IOException {
-        String email = null;
-        String accessToken = request.getHeader("authorization");
-        User loggedInUser=null;
-        if (Objects.nonNull(accessToken)){
-            String payloadJWT = accessToken.split("\\.")[1];
-            Base64 base64 = new Base64(true);
-            ObjectMapper mapper = new ObjectMapper();
-            Map<String, String> info = mapper.readValue(base64.decode(payloadJWT), Map.class);
-            email = info.get("sub");
-            loggedInUser = userService.getByEmail(email);
+
+
+        User loggedInUser = authenticationUtils.getLoggedInUser(request);
+
+        List<JobResponseDTO> jobResponseDTOs = new ArrayList<>();
+//        Page<Job> pageJob = jobService.searchByKeywordAndLocationAndCompany(size, page, keyword, location, companyId);
+        Page<Job> jobPage = jobService.search(jobSpec, pagingModel.getPageable());
+        // map job to dto
+        jobPage.getContent().forEach(job -> {
+            JobResponseDTO tempDto = jobService.mapJobToJobResponseDTO(job, loggedInUser);
+            jobResponseDTOs.add(tempDto);
+        });
+
+        // get relevant jobs
+        List<JobResponseDTO> relevantJobDtos = null;
+        if (!jobPage.isEmpty()) {
+            List<Job> relevantJobs = jobService.getRelevantJobs(jobPage.getContent().get(0));
+            // map relevant jobs to dto
+            relevantJobDtos = relevantJobs.stream()
+                    .map(job -> jobService.mapJobToJobResponseDTO(job, loggedInUser))
+                    .collect(Collectors.toList());
         }
 
-        List<JobResponseDTO> results = new ArrayList<>();
 
-        Page<Job> pageJob = jobService.searchByKeywordAndLocationAndCompany(size, page, keyword, location, companyId);
-        User finalLoggedInUser = loggedInUser;
-        pageJob.getContent().forEach(job -> {
-            JobResponseDTO tempDto = new JobResponseDTO();
-            NullAwareBeanUtils copier = NullAwareBeanUtils.getInstance();
-            try {
-                copier.copyProperties(tempDto, job);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                throw new RuntimeException(e);
-            }
-            if (Objects.nonNull(finalLoggedInUser))
-                tempDto.setIsApplied(jobCvService.checkUserAppliedJob(finalLoggedInUser.getId(),job.getId()));
-            results.add(tempDto);
-        });
-        PageImpl<JobResponseDTO> jobPage = new PageImpl<>(results);
         return ResponseEntity.ok(new JobResponsePaginationDTO(
-                jobPage.getContent(),
+                jobResponseDTOs,
+                relevantJobDtos,
                 jobPage.getTotalPages(),
                 jobPage.getTotalElements()
         ));
@@ -78,32 +96,12 @@ public class JobController {
 
     @GetMapping(path = "/details/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<JobResponseDTO> getJobDetails(@PathVariable("id") String id, HttpServletRequest request) throws IOException {
-        String email = null;
-        String accessToken = request.getHeader("authorization");
-        User loggedInUser=null;
-        if (Objects.nonNull(accessToken)){
-            String payloadJWT = accessToken.split("\\.")[1];
-            Base64 base64 = new Base64(true);
-            ObjectMapper mapper = new ObjectMapper();
-            Map<String, String> info = mapper.readValue(base64.decode(payloadJWT), Map.class);
-            email = info.get("sub");
-            loggedInUser = userService.getByEmail(email);
-        }
         Optional<Job> job = jobService.getById(id);
-        User finalLoggedInUser = loggedInUser;
+        User finalLoggedInUser = authenticationUtils.getLoggedInUser(request);
         if (job.isPresent()) {
-            JobResponseDTO tempDto = new JobResponseDTO();
-            NullAwareBeanUtils copier = NullAwareBeanUtils.getInstance();
-            try {
-                copier.copyProperties(tempDto, job.get());
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                throw new RuntimeException(e);
-            }
-            if (Objects.nonNull(finalLoggedInUser))
-                tempDto.setIsApplied(jobCvService.checkUserAppliedJob(finalLoggedInUser.getId(),job.get().getId()));
-            return ResponseEntity.ok(tempDto);
+            JobResponseDTO toReturnDTO = jobService.mapJobToJobResponseDTO(job.get(), finalLoggedInUser);
+            return ResponseEntity.ok(toReturnDTO);
         }
-
         return ResponseEntity.notFound().build();
 
     }
@@ -160,6 +158,21 @@ public class JobController {
     @GetMapping("/expired")
     public ResponseEntity<?> testGetExpiredJob(){
         return ResponseEntity.ok(jobService.getExpiredJob());
+    }
+
+    @GetMapping("/suggestion")
+    public ResponseEntity<JobResponsePaginationDTO> getSuggestedJob(PagingModel pagingModel,
+                                                                    HttpServletRequest request) throws IOException {
+        User loggedInUser = authenticationUtils.getLoggedInUser(request);
+        Page<Job> jobPage = jobService.getSuggestionJobs(pagingModel.getPageable(), loggedInUser);
+        List<JobResponseDTO> jobResponseDTOList = jobPage.getContent().stream()
+                .map(job -> jobService.mapJobToJobResponseDTO(job, loggedInUser))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(new JobResponsePaginationDTO(
+                jobResponseDTOList,
+                jobPage.getTotalPages(),
+                jobPage.getTotalElements()
+        ));
     }
 
 }

@@ -7,4 +7,5 @@ import lombok.Getter;
 public class JobSkillDTO {
     private Skill skill;
     private Boolean isRequired;
+    private double weight;
 }
