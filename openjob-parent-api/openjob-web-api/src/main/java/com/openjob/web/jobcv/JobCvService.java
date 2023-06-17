@@ -26,7 +26,6 @@ public class JobCvService {
     public void saveNewApplication(String cvId, String jobId) {
         Optional<JobCV> jobCV = jobCvRepo.findByJobIdAndCvId(jobId, cvId);
         if (jobCV.isPresent()) {
-            jobCV.get().setApplyDate(new Date());
             jobCV.get().setIsApplied(true);
             jobCV.get().setStatus(CvStatus.NEW);
             jobCvRepo.save(jobCV.get());
@@ -37,7 +36,6 @@ public class JobCvService {
                 JobCV newJobCv = new JobCV();
                 newJobCv.setJob(job.get());
                 newJobCv.setCv(cv.get());
-                newJobCv.setApplyDate(new Date());
                 newJobCv.setIsApplied(true);
                 newJobCv.setStatus(CvStatus.NEW);
                 jobCvRepo.save(newJobCv);

@@ -10,6 +10,7 @@ import com.openjob.common.response.MessageResponse;
 import lombok.RequiredArgsConstructor;
 import net.kaczmarzyk.spring.data.jpa.domain.*;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.Conjunction;
+import net.kaczmarzyk.spring.data.jpa.web.annotation.Join;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.Or;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.springframework.data.domain.Page;
@@ -29,6 +30,8 @@ public class JobController {
 
     @GetMapping(path = "/jobs")
     public ResponseEntity<JobPaginationDTO> getAll(
+            @Join(path = "jobSkills", alias = "js")
+            @Join(path = "js.skill", alias = "skill")
             @Conjunction(
                     value = @Or({
                             @Spec(path = "title", params = "keyword", spec = Like.class),
@@ -46,7 +49,8 @@ public class JobController {
                             @Spec(path = "salaryInfo.maxSalary", params = "maxSalary", spec = LessThanOrEqual.class),
                             @Spec(path = "salaryInfo.isSalaryNegotiable", params = "isSalaryNegotiable", spec = Equal.class),
                             @Spec(path = "salaryInfo.salaryType", params = "salaryType", spec = Equal.class),
-                            @Spec(path = "jobStatus", spec = Equal.class)
+                            @Spec(path = "jobStatus", spec = Equal.class),
+                            @Spec(path = "skill.id", params = "skillId", spec = Equal.class)
                     })
             Specification<Job> jobSpec,
             PagingModel pagingModel) {

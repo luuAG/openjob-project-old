@@ -9,6 +9,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Service
 @RequiredArgsConstructor
 public class CompanyRegistrationService {
@@ -26,6 +28,7 @@ public class CompanyRegistrationService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         registration.setCreatedBy(username);
+        registration.setCreatedAt(new Date());
         companyRegistrationRepo.save(registration);
     }
 }

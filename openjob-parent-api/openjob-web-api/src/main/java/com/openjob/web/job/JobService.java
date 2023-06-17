@@ -170,10 +170,10 @@ public class JobService {
         return jobRepo.findByCompanyId(cId, pageable);
     }
 
-    public Page<JobCV> getJobAppliedByUser(Integer page, Integer size, String userId) {
-        Pageable pageable = PageRequest.of(page, size);
-        return jobCvRepo.findJobAppliedByUserId(userId, pageable);
-    }
+//    public Page<JobCV> getJobAppliedByUser(Integer page, Integer size, String userId) {
+//        Pageable pageable = PageRequest.of(page, size);
+//        return jobCvRepo.findJobAppliedByUserId(userId, pageable);
+//    }
 
     @Scheduled(cron = "0 0 0 * * *")
     @Async

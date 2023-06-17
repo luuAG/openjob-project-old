@@ -136,18 +136,19 @@ public class JobController {
         return ResponseEntity.ok(new MessageResponse("Job is deleted!"));
     }
 
-    @GetMapping(path = "/applied-by-user/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<JobCvPaginationDTO> getJobAppliedByUser(@PathVariable("userId")String userId,
-                                                                  @RequestParam("page") Integer page,
-                                                                  @RequestParam("size") Integer size){
-        Page<JobCV> pageJobCv = jobService.getJobAppliedByUser(page, size, userId);
+//    @GetMapping(path = "/applied-by-user/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<JobCvPaginationDTO> getJobAppliedByUser(@PathVariable("userId")String userId,
+//                                                                  @RequestParam("page") Integer page,
+//                                                                  @RequestParam("size") Integer size){
+//        Page<JobCV> pageJobCv = jobService.getJobAppliedByUser(page, size, userId);
+//
+//        return ResponseEntity.ok(new JobCvPaginationDTO(
+//                pageJobCv.getContent(),
+//                pageJobCv.getTotalPages(),
+//                pageJobCv.getTotalElements()
+//        ));
+//    }
 
-        return ResponseEntity.ok(new JobCvPaginationDTO(
-                pageJobCv.getContent(),
-                pageJobCv.getTotalPages(),
-                pageJobCv.getTotalElements()
-        ));
-    }
     @PostMapping("/{jobId}/reset-expired-date")
     public ResponseEntity<MessageResponse> resetExpiredDate(@PathVariable("jobId")String jobId,
                                                             @RequestParam("expiredDate") Long expiredTimestamp) {
@@ -178,6 +179,8 @@ public class JobController {
 
     @GetMapping(path = "/by-company/{companyId}")
     public ResponseEntity<JobPaginationDTO> getAll(
+            @Join(path = "jobSkills", alias = "js")
+            @Join(path = "js.skill", alias = "skill")
             @Conjunction(
                     value = @Or({
                             @Spec(path = "title", params = "keyword", spec = Like.class),
@@ -195,7 +198,8 @@ public class JobController {
                             @Spec(path = "salaryInfo.maxSalary", params = "maxSalary", spec = LessThanOrEqual.class),
                             @Spec(path = "salaryInfo.isSalaryNegotiable", params = "isSalaryNegotiable", spec = Equal.class),
                             @Spec(path = "salaryInfo.salaryType", params = "salaryType", spec = Equal.class),
-                            @Spec(path = "jobStatus", spec = Equal.class)
+                            @Spec(path = "jobStatus", spec = Equal.class),
+                            @Spec(path = "skill.id", params = "skillId", spec = Equal.class)
                     })
             Specification<Job> jobSpec,
             PagingModel pagingModel,

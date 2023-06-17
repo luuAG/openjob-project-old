@@ -74,6 +74,7 @@ public class CompanyService  {
             Company company = new Company();
             company.setName(companyRegistration.getCompanyName());
             company.setEmail(companyRegistration.getEmail());
+            company.setIsActive(true);
 
             Company savedCompany = save(company);
 

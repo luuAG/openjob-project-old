@@ -71,12 +71,12 @@ public class Job extends BaseAuditEntity {
 
     @OneToOne
     @JoinColumn
-    @JsonIgnore
+//    @JsonIgnore
     private Specialization specialization;
 
     @OneToOne
     @JoinColumn
-    @JsonIgnore
+//    @JsonIgnore
     private Major major;
 
     @OneToOne

@@ -81,29 +81,28 @@ public class CvService {
 
     @Async
     public void findJobMatchCV(CV savedCV) {
-        List<Job> listJob = jobRepo.findBySpecialization(savedCV.getSpecialization().getId());
-        for (Job job : listJob) {
-            int matchingPoint = JobCVUtils.checkCVmatchJob(job, savedCV);
-            if (matchingPoint > 0) {
-                Optional<JobCV> existingJobCv =  jobCvService.getByJobIdAndCvId(job.getId(), savedCV.getId());
-                if (existingJobCv.isPresent()){
-                    existingJobCv.get().setIsMatching(true);
-                    existingJobCv.get().setPoint(matchingPoint);
-                    jobCvService.save(existingJobCv.get());
-                }
-                else {
-                    JobCV newJobCv = new JobCV();
-                    newJobCv.setJob(job);
-                    newJobCv.setStatus(CvStatus.NEW);
-                    newJobCv.setIsMatching(true);
-                    newJobCv.setPoint(matchingPoint);
-                    newJobCv.setCv(savedCV);
-                    newJobCv.setApplyDate(null);
-                    newJobCv.setIsApplied(false);
-                    jobCvService.save(newJobCv);
-                }
-            }
-        }
+//        List<Job> listJob = jobRepo.findBySpecialization(savedCV.getSpecialization().getId());
+//        for (Job job : listJob) {
+//            int matchingPoint = JobCVUtils.checkCVmatchJob(job, savedCV);
+//            if (matchingPoint > 0) {
+//                Optional<JobCV> existingJobCv =  jobCvService.getByJobIdAndCvId(job.getId(), savedCV.getId());
+//                if (existingJobCv.isPresent()){
+//                    existingJobCv.get().setIsMatching(true);
+//                    existingJobCv.get().setPoint(matchingPoint);
+//                    jobCvService.save(existingJobCv.get());
+//                }
+//                else {
+//                    JobCV newJobCv = new JobCV();
+//                    newJobCv.setJob(job);
+//                    newJobCv.setStatus(CvStatus.NEW);
+//                    newJobCv.setIsMatching(true);
+//                    newJobCv.setPoint(matchingPoint);
+//                    newJobCv.setCv(savedCV);
+//                    newJobCv.setIsApplied(false);
+//                    jobCvService.save(newJobCv);
+//                }
+//            }
+//        }
     }
 
     public Page<CV> getByJobId(Integer page, Integer size, String jobId) {

@@ -42,14 +42,14 @@ public class CvController {
         return cv.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping(path = "/match-with-job/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<UserCvDto>> getUserHasCVmatchJob(@PathVariable("jobId") String jobId) {
-        if (jobService.getById(jobId).isPresent()){
-            List<UserCvDto> users = userService.getByMatchingJob(jobId);
-            return ResponseEntity.ok(users);
-        }
-        throw new IllegalArgumentException("Job not found for ID: "+jobId);
-    }
+//    @GetMapping(path = "/match-with-job/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<List<UserCvDto>> getUserHasCVmatchJob(@PathVariable("jobId") String jobId) {
+//        if (jobService.getById(jobId).isPresent()){
+//            List<UserCvDto> users = userService.getByMatchingJob(jobId);
+//            return ResponseEntity.ok(users);
+//        }
+//        throw new IllegalArgumentException("Job not found for ID: "+jobId);
+//    }
 
     @PostMapping(path = "/create-update", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CV> updateCV(@RequestBody CVRequestDTO requestCV) throws InvocationTargetException, IllegalAccessException {
@@ -62,17 +62,17 @@ public class CvController {
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping(path = "/applied-job/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<UserCvDto>> getCvAppliedJob (
-            @PathVariable("jobId") String jobId,
-            @RequestParam(value = "page", required = false) Integer page,
-            @RequestParam(value = "size", required = false) Integer size) {
-        if (jobService.getById(jobId).isPresent()){
-            List<UserCvDto> users = userService.getByJobApplied(jobId);
-            return ResponseEntity.ok(users);
-        }
-        throw new IllegalArgumentException("Job not found for ID: "+jobId);
-    }
+//    @GetMapping(path = "/applied-job/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<List<UserCvDto>> getCvAppliedJob (
+//            @PathVariable("jobId") String jobId,
+//            @RequestParam(value = "page", required = false) Integer page,
+//            @RequestParam(value = "size", required = false) Integer size) {
+//        if (jobService.getById(jobId).isPresent()){
+//            List<UserCvDto> users = userService.getByJobApplied(jobId);
+//            return ResponseEntity.ok(users);
+//        }
+//        throw new IllegalArgumentException("Job not found for ID: "+jobId);
+//    }
 
     @PostMapping(path = "/{cvId}/apply/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MessageResponse> applyCvForJob(@PathVariable("cvId") String cvId,

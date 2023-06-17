@@ -182,7 +182,7 @@ public class CompanyController {
             companyService.approve(dto.getCompanyRegistrationList());
         else
             companyService.reject(dto.getCompanyRegistrationList());
-        return ResponseEntity.ok(new MessageResponse("Chấp thuận các công ty thành công!"));
+        return ResponseEntity.ok(new MessageResponse("Duyệt công ty thành công!"));
     }
 
 }
