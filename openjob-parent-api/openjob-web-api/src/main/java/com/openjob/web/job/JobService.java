@@ -1,6 +1,7 @@
 package com.openjob.web.job;
 
 import com.openjob.common.enums.CvStatus;
+import com.openjob.common.enums.JobStatus;
 import com.openjob.common.enums.Role;
 import com.openjob.common.model.*;
 import com.openjob.web.company.CompanyService;
@@ -66,8 +67,12 @@ public class JobService {
         Optional<Specialization> specialization = speService.getById(jobDTO.getSpecializationId());
         if (Objects.isNull(company) || specialization.isEmpty())
             throw new IllegalArgumentException("Company/Specialization not found!");
+
+        Major major = specialization.get().getMajor();
+        job.setMajor(major);
         job.setCompany(company);
         job.setSpecialization(specialization.get());
+        job.setJobStatus(JobStatus.NEW);
 
         Job savedJob = jobRepo.save(job);
 

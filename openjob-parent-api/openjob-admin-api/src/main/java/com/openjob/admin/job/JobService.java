@@ -1,13 +1,13 @@
 package com.openjob.admin.job;
 
 import com.openjob.common.model.Job;
+import com.openjob.common.model.SalaryModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -54,6 +54,18 @@ public class JobService {
     public Page<Job> search(Specification<Job> jobSpec, Pageable pageable) {
         return jobRepo.findAll(jobSpec, pageable);
     }
+
+    public void approve(List<Job> jobs) {
+        List<String> ids = jobs.stream().map(Job::getId).collect(Collectors.toList());
+        jobRepo.approveByIds(ids);
+    }
+
+    public void reject(List<Job> jobs, List<String> rejectReasons) {
+        List<String> ids = jobs.stream().map(Job::getId).collect(Collectors.toList());
+        jobRepo.rejectByIds(ids);
+        // TODO: send mail about the reason
+    }
+
 
 //    public Page<Job> getAllwithSkillnotverified(Integer page, Integer size) {
 //        Pageable pageable = PageRequest.of(page, size);

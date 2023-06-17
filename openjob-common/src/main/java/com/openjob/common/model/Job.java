@@ -2,6 +2,7 @@ package com.openjob.common.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.openjob.common.enums.JobLevel;
+import com.openjob.common.enums.JobStatus;
 import com.openjob.common.enums.JobType;
 import com.openjob.common.enums.WorkPlace;
 import com.openjob.common.model.converter.SalaryConverter;
@@ -61,18 +62,22 @@ public class Job extends BaseAuditEntity {
     @Enumerated(value = EnumType.STRING)
     private JobType jobType;
 
-    @Convert(converter = SalaryConverter.class)
+//    @Convert(converter = SalaryConverter.class)
+    @Embedded
     private SalaryModel salaryInfo;
+
+    @Enumerated(EnumType.STRING)
+    private JobStatus jobStatus;
 
     @OneToOne
     @JoinColumn
     @JsonIgnore
     private Specialization specialization;
 
-//    @OneToOne
-//    @JoinColumn
-//    @JsonIgnore
-//    private Major major;
+    @OneToOne
+    @JoinColumn
+    @JsonIgnore
+    private Major major;
 
     @OneToOne
     @JoinColumn

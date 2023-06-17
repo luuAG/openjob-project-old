@@ -1,8 +1,12 @@
 package com.openjob.admin.job;
 
 import com.openjob.admin.dto.JobPaginationDTO;
+import com.openjob.admin.dto.ReviewJobDTO;
+import com.openjob.common.enums.SalaryType;
 import com.openjob.common.model.Job;
 import com.openjob.common.model.PagingModel;
+import com.openjob.common.model.SalaryModel;
+import com.openjob.common.response.MessageResponse;
 import lombok.RequiredArgsConstructor;
 import net.kaczmarzyk.spring.data.jpa.domain.*;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.Conjunction;
@@ -12,10 +16,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -36,12 +40,13 @@ public class JobController {
                             @Spec(path = "jobLevel", spec = Equal.class),
                             @Spec(path = "jobType", spec = Equal.class),
                             @Spec(path = "workplace", spec = Equal.class),
-                            @Spec(path = "salaryInfo.min", params = "minSalary", spec = GreaterThanOrEqual.class),
-                            @Spec(path = "salaryInfo.max", params = "maxSalary", spec = LessThanOrEqual.class),
-                            @Spec(path = "salaryInfo.isNegotiable", params = "isSalaryNegotiable", spec = Equal.class),
-                            @Spec(path = "salaryInfo.salaryType", params = "salaryType", spec = Equal.class),
                             @Spec(path = "major.id", params = "majorId", spec = Equal.class),
-                            @Spec(path = "specialization.id", params = "speId", spec = Equal.class)
+                            @Spec(path = "specialization.id", params = "speId", spec = Equal.class),
+                            @Spec(path = "salaryInfo.minSalary", params = "minSalary", spec = GreaterThanOrEqual.class),
+                            @Spec(path = "salaryInfo.maxSalary", params = "maxSalary", spec = LessThanOrEqual.class),
+                            @Spec(path = "salaryInfo.isSalaryNegotiable", params = "isSalaryNegotiable", spec = Equal.class),
+                            @Spec(path = "salaryInfo.salaryType", params = "salaryType", spec = Equal.class),
+                            @Spec(path = "jobStatus", spec = Equal.class)
                     })
             Specification<Job> jobSpec,
             PagingModel pagingModel) {
@@ -94,6 +99,16 @@ public class JobController {
     public ResponseEntity<Job> getById(@PathVariable("jobId") String jobId) {
         Optional<Job> job = jobService.getById(jobId);
         return job.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PostMapping(path = "/job/review/{isApprove}")
+    public ResponseEntity<MessageResponse> reviewJobs(@PathVariable("isApprove") Boolean isApprove, @RequestBody ReviewJobDTO reviewJobDTO){
+        if (isApprove){
+            jobService.approve(reviewJobDTO.getJobs());
+        }else {
+            jobService.reject(reviewJobDTO.getJobs(), reviewJobDTO.getRejectReasons());
+        }
+        return ResponseEntity.ok(new MessageResponse("Duyệt tin thành công!"));
     }
 
 
