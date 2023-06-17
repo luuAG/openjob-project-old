@@ -8,4 +8,5 @@ public class JobSkillDTO {
     private Skill skill;
     private Boolean isRequired;
     private double weight;
+    private double yoe;
 }
