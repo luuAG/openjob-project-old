@@ -137,8 +137,18 @@ public class JobService {
 
     @Async
     public void findCVmatchJob(Job savedJob) {
-//        List<CV> listCV = cvRepo.findBySpecialization(savedJob.getSpecialization().getId());
-//
+        List<CV> listCV = cvRepo.findBySpecialization(savedJob.getSpecialization().getId());
+        Set<Skill> mustHaveSkills = savedJob.getJobSkills().stream()
+                .filter(JobSkill::isRequired)
+                .map(JobSkill::getSkill)
+                .collect(Collectors.toSet());
+        // filter list CV by job requirement
+        listCV = listCV.stream().filter(cv -> {
+            Set<Skill> tempMustHaveSkills = Set.copyOf(mustHaveSkills);
+            cv.getListSkill().forEach(tempMustHaveSkills::remove);
+            return tempMustHaveSkills.isEmpty();
+        }).collect(Collectors.toList());
+
 //        for (CV cv : listCV) {
 //            int matchingPoint = JobCVUtils.checkCVmatchJob(savedJob, cv);
 //            if (matchingPoint > 0) {

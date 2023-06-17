@@ -33,5 +33,5 @@ public class JobCV {
 
     private Boolean isApplied;
 
-    private Integer point;
+    private Double point;
 }
