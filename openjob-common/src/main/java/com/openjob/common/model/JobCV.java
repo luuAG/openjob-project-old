@@ -2,14 +2,17 @@ package com.openjob.common.model;
 
 import com.openjob.common.enums.CvStatus;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
 @Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "job_id", "cv_id" }) })
-@Data
-public class JobCV {
+@Getter
+@Setter
+public class JobCV extends BaseAuditEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -26,12 +29,12 @@ public class JobCV {
     @Column(columnDefinition = "varchar(10) default 'NEW'")
     private CvStatus status;
 
-    private Date applyDate;
+//    private Date applyDate;
 
     @Column(columnDefinition = "bit(1) default false")
     private Boolean isMatching;
 
     private Boolean isApplied;
 
-    private Integer point;
+    private Double point;
 }

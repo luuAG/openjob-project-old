@@ -97,6 +97,7 @@ public class JobService {
             }
             jobSkill.setRequired(JSfromRequest.getIsRequired());
             jobSkill.setJob(savedJob);
+            jobSkill.setWeight(JSfromRequest.getWeight());
             realListJobSkill.add(jobSkillRepo.save(jobSkill));
         }
 
