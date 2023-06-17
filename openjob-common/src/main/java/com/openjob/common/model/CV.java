@@ -46,12 +46,13 @@ public class CV {
     @JoinColumn
     private Major major;
 
-    @OneToMany(orphanRemoval = true)
-    @JoinTable(
-        name = "cv_skill",
-        joinColumns = @JoinColumn(name = "cv_id"),
-        inverseJoinColumns = @JoinColumn(name = "skill_id")
-    )
-    private List<Skill> listSkill;
+//    @OneToMany(orphanRemoval = true)
+//    @JoinTable(
+//        name = "cv_skill",
+//        joinColumns = @JoinColumn(name = "cv_id"),
+//        inverseJoinColumns = @JoinColumn(name = "skill_id")
+//    )
+    @OneToMany(mappedBy = "cv", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<CvSkill> skills;
 
 }

@@ -1,41 +1,26 @@
 package com.openjob.web.util;
 
 import com.openjob.common.enums.ExperienceValue;
-import com.openjob.common.model.CV;
-import com.openjob.common.model.Job;
-import com.openjob.common.model.JobSkill;
-import com.openjob.common.model.Skill;
+import com.openjob.common.model.*;
 
 import java.util.Objects;
 
 public class JobCVUtils {
-    public static int checkCVmatchJob(Job job, CV cv){
-        int point = 0;
+    public static double scoreCv(Job job, CV cv){
+        double score = 0;
         for (JobSkill jobSkill : job.getJobSkills()){
-            boolean isRequiredSkillMatched = true;
-            if (jobSkill.isRequired())
-                isRequiredSkillMatched  = false;
-            for (Skill skillInCV : cv.getListSkill()) {
-                if (checkSkillMatched(jobSkill.getSkill(), skillInCV)){
-                    point++;
-                    if (jobSkill.isRequired())
-                        isRequiredSkillMatched = true;
-                    break;
-                }
+            for (CvSkill cvSkill : cv.getSkills()) {
+                if (Objects.equals(jobSkill.getSkill().getId(), cvSkill.getId())){
+                        score += cvSkill.getYoe() * jobSkill.getWeight();
+                } else
+                    score += cvSkill.getYoe();
             }
-            if ( ! isRequiredSkillMatched)
-                return 0;
 
         }
 
-        return point;
+        return score;
     }
 
-    private static boolean checkSkillMatched(Skill skillInJob, Skill skillInCV) {
-       // TODO:
-
-        return false;
-    }
 
 
 }

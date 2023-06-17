@@ -8,7 +8,7 @@ import javax.persistence.*;
 @Entity
 @Table
 @Data
-public class JobSkill {
+public class CvSkill {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -16,13 +16,11 @@ public class JobSkill {
     @ManyToOne
     @JoinColumn
     @JsonIgnore
-    private Job job;
+    private CV cv;
 
     @ManyToOne
     @JoinColumn
     private Skill skill;
 
-    private boolean isRequired;
-    private double weight;
     private double yoe;
 }
