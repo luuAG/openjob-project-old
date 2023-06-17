@@ -12,9 +12,10 @@ import com.openjob.web.user.UserService;
 import com.openjob.web.util.AuthenticationUtils;
 import com.openjob.web.util.NullAwareBeanUtils;
 import lombok.RequiredArgsConstructor;
-import net.kaczmarzyk.spring.data.jpa.domain.Equal;
-import net.kaczmarzyk.spring.data.jpa.domain.Like;
+import net.kaczmarzyk.spring.data.jpa.domain.*;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.*;
+import net.kaczmarzyk.spring.data.jpa.web.annotation.Conjunction;
+import net.kaczmarzyk.spring.data.jpa.web.annotation.Join;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -106,17 +107,17 @@ public class JobController {
 
     }
 
-    @GetMapping(path = "/by-company/{companyId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<JobPaginationDTO> getJobByCompany(@PathVariable("companyId") String cId,
-                                                     @RequestParam("page") Integer page,
-                                                     @RequestParam("size") Integer size) {
-        Page<Job> jobPage = jobService.getByCompanyId(page, size, cId);
-        return ResponseEntity.ok(new JobPaginationDTO(
-                jobPage.getContent(),
-                jobPage.getTotalPages(),
-                jobPage.getTotalElements()
-        ));
-    }
+//    @GetMapping(path = "/by-company/{companyId}", produces = MediaType.APPLICATION_JSON_VALUE)
+//    public ResponseEntity<JobPaginationDTO> getJobByCompany(@PathVariable("companyId") String cId,
+//                                                     @RequestParam("page") Integer page,
+//                                                     @RequestParam("size") Integer size) {
+//        Page<Job> jobPage = jobService.getByCompanyId(page, size, cId);
+//        return ResponseEntity.ok(new JobPaginationDTO(
+//                jobPage.getContent(),
+//                jobPage.getTotalPages(),
+//                jobPage.getTotalElements()
+//        ));
+//    }
 
     @PostMapping(path = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MessageResponse> createNewJob(@RequestBody JobRequestDTO reqJob) throws InvocationTargetException, IllegalAccessException {
@@ -175,4 +176,38 @@ public class JobController {
         ));
     }
 
+    @GetMapping(path = "/by-company/{companyId}")
+    public ResponseEntity<JobPaginationDTO> getAll(
+            @Conjunction(
+                    value = @Or({
+                            @Spec(path = "title", params = "keyword", spec = Like.class),
+                            @Spec(path = "company.name", params = "keyword", spec = Like.class)}),
+                    and = {
+                            @Spec(path = "createdAt", params = {"startDate", "endDate"}, spec = Between.class),
+                            @Spec(path = "isActive", spec = Equal.class),
+                            @Spec(path = "company.address", params = "address", spec = Like.class),
+                            @Spec(path = "jobLevel", spec = Equal.class),
+                            @Spec(path = "jobType", spec = Equal.class),
+                            @Spec(path = "workplace", spec = Equal.class),
+                            @Spec(path = "major.id", params = "majorId", spec = Equal.class),
+                            @Spec(path = "specialization.id", params = "speId", spec = Equal.class),
+                            @Spec(path = "salaryInfo.minSalary", params = "minSalary", spec = GreaterThanOrEqual.class),
+                            @Spec(path = "salaryInfo.maxSalary", params = "maxSalary", spec = LessThanOrEqual.class),
+                            @Spec(path = "salaryInfo.isSalaryNegotiable", params = "isSalaryNegotiable", spec = Equal.class),
+                            @Spec(path = "salaryInfo.salaryType", params = "salaryType", spec = Equal.class),
+                            @Spec(path = "jobStatus", spec = Equal.class)
+                    })
+            Specification<Job> jobSpec,
+            PagingModel pagingModel,
+            @PathVariable("companyId") String companyId) {
+        if (jobSpec == null)
+            jobSpec = Specification.where(null);
+        jobSpec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("company").get("id"), companyId));
+        Page<Job> pageJob = jobService.search(jobSpec, pagingModel.getPageable());
+        return ResponseEntity.ok(new JobPaginationDTO(
+                pageJob.getContent(),
+                pageJob.getTotalPages(),
+                pageJob.getTotalElements())
+        );
+    }
 }
