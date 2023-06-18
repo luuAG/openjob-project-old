@@ -37,4 +37,8 @@ public class CompanyService {
             }
         }
     }
+
+    public void updateAccountBalance(String companyId, Double amount) {
+        companyRepo.updateAccountBalance(companyId, amount);
+    }
 }

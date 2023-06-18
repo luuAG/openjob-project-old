@@ -1,5 +1,6 @@
 package com.openjob.common.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -21,6 +22,7 @@ public class Province {
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "_province_id", referencedColumnName = "id")
+    @JsonIgnore
     private Collection<District> districts;
 
 }

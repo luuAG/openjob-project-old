@@ -9,6 +9,8 @@ import com.openjob.common.model.converter.SalaryConverter;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -84,7 +86,7 @@ public class Job extends BaseAuditEntity {
     @JsonIgnore
     private Company company;
 
-    @OneToMany(mappedBy = "job", orphanRemoval = true, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "job", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<JobSkill> jobSkills;
 
     public Job(String id, String title, Date expiredAt,  Specialization specialization, List<JobSkill> jobSkills) {

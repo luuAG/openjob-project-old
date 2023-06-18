@@ -8,5 +8,5 @@ import lombok.Setter;
 public class ExecutePaymentDTO {
     private String paymentId;
     private String payerId;
-    private String userId;
+    private String companyId;
 }

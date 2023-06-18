@@ -204,9 +204,12 @@ public class JobController {
             Specification<Job> jobSpec,
             PagingModel pagingModel,
             @PathVariable("companyId") String companyId) {
+
+        Specification<Job> companyIdSpec = (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("company").get("id"), companyId);
         if (jobSpec == null)
-            jobSpec = Specification.where(null);
-        jobSpec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("company").get("id"), companyId));
+            jobSpec = companyIdSpec;
+        else
+            jobSpec = jobSpec.and(companyIdSpec);
         Page<Job> pageJob = jobService.search(jobSpec, pagingModel.getPageable());
         return ResponseEntity.ok(new JobPaginationDTO(
                 pageJob.getContent(),
