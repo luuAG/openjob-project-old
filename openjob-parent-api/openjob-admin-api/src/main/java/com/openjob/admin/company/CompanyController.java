@@ -79,6 +79,8 @@ public class CompanyController {
         hr.setRole(Role.HR);
         hr.setAuthProvider(AuthProvider.DATABASE);
         User savedHr = hrService.create(hr);
+        savedCompany.setHeadHunter(savedHr);
+        companyService.save(savedCompany);
 
 //        if (Objects.nonNull(savedHr)){
 //            MimeMessagePreparator message = mimeMessage -> {

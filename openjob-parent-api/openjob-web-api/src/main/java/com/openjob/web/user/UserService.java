@@ -8,6 +8,7 @@ import com.openjob.web.util.NullAwareBeanUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserService {
     private final UserRepository userRepo;
     private final BCryptPasswordEncoder passwordEncoder;

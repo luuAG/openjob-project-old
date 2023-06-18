@@ -15,12 +15,14 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AdminUserService extends AbstractBaseService<Admin> implements UserDetailsService {
     private final AdminUserRepository adminUserRepo;
     private final BCryptPasswordEncoder passwordEncoder;
