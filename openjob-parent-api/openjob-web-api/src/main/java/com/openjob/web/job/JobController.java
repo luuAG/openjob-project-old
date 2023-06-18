@@ -121,13 +121,24 @@ public class JobController {
 
     @PostMapping(path = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MessageResponse> createNewJob(@RequestBody JobRequestDTO reqJob) throws InvocationTargetException, IllegalAccessException {
-        Job savedJob = jobService.saveNewJob(reqJob);
+        Job savedJob = jobService.saveUpdate(reqJob);
         if(Objects.nonNull(savedJob)){
 //            jobService.findCVmatchJob(savedJob); // async
             return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("New job is created successfully!"));
         }
 
         return ResponseEntity.badRequest().body(new MessageResponse("Creating job failed!"));
+    }
+
+    @PostMapping(path = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MessageResponse> updateJob(@RequestBody JobRequestDTO reqJob) throws InvocationTargetException, IllegalAccessException {
+        Job savedJob = jobService.saveUpdate(reqJob);
+        if(Objects.nonNull(savedJob)){
+//            jobService.findCVmatchJob(savedJob); // async
+            return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("Job is updated successfully!"));
+        }
+
+        return ResponseEntity.badRequest().body(new MessageResponse("Updating job failed!"));
     }
 
     @DeleteMapping(path = "/delete/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -191,7 +202,7 @@ public class JobController {
                             @Spec(path = "company.address", params = "address", spec = Like.class),
                             @Spec(path = "jobLevel", spec = Equal.class),
                             @Spec(path = "jobType", spec = Equal.class),
-                            @Spec(path = "workplace", spec = Equal.class),
+                            @Spec(path = "workPlace", spec = Equal.class),
                             @Spec(path = "major.id", params = "majorId", spec = Equal.class),
                             @Spec(path = "specialization.id", params = "speId", spec = Equal.class),
                             @Spec(path = "salaryInfo.minSalary", params = "minSalary", spec = GreaterThanOrEqual.class),

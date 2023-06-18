@@ -1,6 +1,7 @@
 package com.openjob.web.dto;
 
 import com.openjob.common.enums.JobLevel;
+import com.openjob.common.enums.JobStatus;
 import com.openjob.common.enums.JobType;
 import com.openjob.common.enums.WorkPlace;
 import com.openjob.common.model.SalaryModel;
@@ -28,5 +29,6 @@ public class JobRequestDTO {
     private Integer specializationId;
     private List<JobSkillDTO> listJobSkillDTO;
     private String companyId;
+    private JobStatus jobStatus;
 
 }

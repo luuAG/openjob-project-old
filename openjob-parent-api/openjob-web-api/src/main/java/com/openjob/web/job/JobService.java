@@ -58,10 +58,14 @@ public class JobService {
         return jobRepo.findById(id);
     }
 
-    public Job saveNewJob(JobRequestDTO jobDTO) throws InvocationTargetException, IllegalAccessException {
+    public Job saveUpdate(JobRequestDTO jobDTO) throws InvocationTargetException, IllegalAccessException {
         NullAwareBeanUtils beanCopier = NullAwareBeanUtils.getInstance();
         Job job = new Job();
         beanCopier.copyProperties(job, jobDTO);
+
+        if (job.getId() != null){
+            job.setUpdatedAt(new Date());
+        }
 
         Company company = companyService.getById(jobDTO.getCompanyId());
         Optional<Specialization> specialization = speService.getById(jobDTO.getSpecializationId());

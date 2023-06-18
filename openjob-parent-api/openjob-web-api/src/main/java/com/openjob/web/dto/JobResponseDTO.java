@@ -1,10 +1,10 @@
 package com.openjob.web.dto;
 
+import com.openjob.common.enums.JobLevel;
+import com.openjob.common.enums.JobStatus;
+import com.openjob.common.enums.JobType;
 import com.openjob.common.enums.WorkPlace;
-import com.openjob.common.model.Company;
-import com.openjob.common.model.JobSkill;
-import com.openjob.common.model.Major;
-import com.openjob.common.model.Specialization;
+import com.openjob.common.model.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,4 +28,9 @@ public class JobResponseDTO {
     private Company company;
     private List<JobSkill> jobSkills;
     private Boolean isApplied;
+    //
+    private JobLevel jobLevel;
+    private JobType jobType;
+    private SalaryModel salaryInfo;
+    private JobStatus jobStatus;
 }

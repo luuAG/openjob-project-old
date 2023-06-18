@@ -42,7 +42,7 @@ public class JobController {
                             @Spec(path = "company.address", params = "address", spec = Like.class),
                             @Spec(path = "jobLevel", spec = Equal.class),
                             @Spec(path = "jobType", spec = Equal.class),
-                            @Spec(path = "workplace", spec = Equal.class),
+                            @Spec(path = "workPlace", spec = Equal.class),
                             @Spec(path = "major.id", params = "majorId", spec = Equal.class),
                             @Spec(path = "specialization.id", params = "speId", spec = Equal.class),
                             @Spec(path = "salaryInfo.minSalary", params = "minSalary", spec = GreaterThanOrEqual.class),
