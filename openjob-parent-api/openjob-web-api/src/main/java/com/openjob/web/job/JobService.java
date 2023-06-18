@@ -261,8 +261,8 @@ public class JobService {
         if (loggedInUser == null) {
             loggedInUser = userService.getByEmail("duongvannam2001@gmail.com");
         }
-        Set<Integer> skillIds = loggedInUser.getCv().getListSkill().stream()
-                .map(Skill::getId)
+        Set<Integer> skillIds = loggedInUser.getCv().getSkills().stream()
+                .map(cvSkill -> cvSkill.getSkill().getId())
                 .collect(Collectors.toSet());
 
         return jobRepo.findBySkillIds(skillIds, pageable);

@@ -123,7 +123,7 @@ public class JobController {
     public ResponseEntity<MessageResponse> createNewJob(@RequestBody JobRequestDTO reqJob) throws InvocationTargetException, IllegalAccessException {
         Job savedJob = jobService.saveNewJob(reqJob);
         if(Objects.nonNull(savedJob)){
-            jobService.findCVmatchJob(savedJob); // async
+//            jobService.findCVmatchJob(savedJob); // async
             return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("New job is created successfully!"));
         }
 

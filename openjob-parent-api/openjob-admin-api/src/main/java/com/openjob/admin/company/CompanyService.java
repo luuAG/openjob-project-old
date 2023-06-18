@@ -87,7 +87,9 @@ public class CompanyService  {
             hr.setPosition(companyRegistration.getPosition());
             hr.setCompany(savedCompany);
 
-            hrService.create(hr);
+            User savedHr =hrService.create(hr);
+            savedCompany.setHeadHunter(savedHr);
+            companyRepo.save(savedCompany);
 
             companyRegistrationService.deleteById(companyRegistration.getId());
         });

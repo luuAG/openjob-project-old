@@ -58,24 +58,29 @@ public class CvService {
         cv.setUser(user.orElseThrow());
         cv.setSpecialization(specialization.orElseThrow());
         cv.setMajor(major.orElseThrow());
+        CV savedCV = cvRepo.save(cv);
 
-        List<Skill> realListSkill = new ArrayList<>();
+        List<CvSkill> realListSkill = new ArrayList<>();
 
+        // detect new skill
         for (int i = 0; i < cvDto.getListSkill().size(); i++) {
-            Skill skillFromRequest = cv.getListSkill().get(i);
+            Skill skillFromRequest = cv.getSkills().get(i).getSkill();
             Optional<Skill> skillInDB = skillRepo.findByName(skillFromRequest.getName());
-            if (skillInDB.isPresent()) {
-                realListSkill.add(skillInDB.get());
-            } else {
-                skillFromRequest.setSpecialization(cv.getSpecialization());
-                skillFromRequest.setIsVerified(skillRepo.existsByName(skillFromRequest.getName()));
-                Skill savedSkill = skillRepo.save(skillFromRequest);
-                realListSkill.add(savedSkill);
-            }
 
+            CvSkill realCvSkill = new CvSkill();
+            realCvSkill.setCv(savedCV);
+            realCvSkill.setYoe(cvDto.getListSkill().get(i).getYoe());
+            if (skillInDB.isEmpty()) { // new skill
+                skillFromRequest.setSpecialization(cv.getSpecialization());
+                skillFromRequest.setIsVerified(false);
+                Skill savedSkill = skillRepo.save(skillFromRequest);
+                realCvSkill.setSkill(savedSkill);
+            } else {                   // old skill
+                realCvSkill.setSkill(skillInDB.get());
+            }
         }
 
-        cv.setListSkill(realListSkill);
+        cv.setSkills(realListSkill);
         return cvRepo.save(cv);
     }
 

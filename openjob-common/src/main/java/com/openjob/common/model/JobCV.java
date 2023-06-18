@@ -12,7 +12,7 @@ import java.util.Date;
 @Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "job_id", "cv_id" }) })
 @Getter
 @Setter
-public class JobCV extends BaseAuditEntity {
+public class JobCV {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -29,7 +29,7 @@ public class JobCV extends BaseAuditEntity {
     @Column(columnDefinition = "varchar(10) default 'NEW'")
     private CvStatus status;
 
-//    private Date applyDate;
+    private Date applyDate;
 
     @Column(columnDefinition = "bit(1) default false")
     private Boolean isMatching;
