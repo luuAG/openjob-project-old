@@ -17,6 +17,7 @@ import java.util.List;
 
 @Getter
 public class JobRequestDTO {
+    private String id;
     private String title;
     private String description;
     private String hoursPerWeek;

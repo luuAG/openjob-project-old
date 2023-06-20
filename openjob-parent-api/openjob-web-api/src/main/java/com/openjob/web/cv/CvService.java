@@ -37,6 +37,7 @@ public class CvService {
     private final JobRepository jobRepo;
     private final JobCvService jobCvService;
     private final MajorService majorService;
+    private final CvSkillRepository cvSkillRepo;
 
     public Optional<CV> getById(String id) {
         return cvRepo.findById(id);
@@ -47,24 +48,35 @@ public class CvService {
     }
 
     public CV saveUpdate(CVRequestDTO cvDto) throws InvocationTargetException, IllegalAccessException {
-        CV cv = new CV();
+        Optional<CV> optionalCV = getByUserId(cvDto.getUserId());
+        CV cv;
+        if (optionalCV.isPresent()){
+            cv = optionalCV.get();
+        }
+        else {
+            cv = new CV();
+            Optional<User> user = userService.get(cvDto.getUserId());
+            cv.setUser(user.orElseThrow());
+        }
         NullAwareBeanUtils mapper = NullAwareBeanUtils.getInstance();
         mapper.copyProperties(cv, cvDto);
 
-        Optional<User> user = userService.get(cvDto.getUserId());
         Optional<Specialization> specialization = speService.getById(cvDto.getSpecializationId());
         Optional<Major> major = majorService.getById(cvDto.getMajorId());
 
-        cv.setUser(user.orElseThrow());
         cv.setSpecialization(specialization.orElseThrow());
         cv.setMajor(major.orElseThrow());
-        CV savedCV = cvRepo.save(cv);
 
-        List<CvSkill> realListSkill = new ArrayList<>();
+
+        cv.getSkills().clear();
+        CV savedCV = cvRepo.save(cv);
+        if (cv.getId() != null) {
+            cvSkillRepo.deleteByCvId(cv.getId());
+        }
 
         // detect new skill
         for (int i = 0; i < cvDto.getListSkill().size(); i++) {
-            Skill skillFromRequest = cv.getSkills().get(i).getSkill();
+            Skill skillFromRequest = cvDto.getListSkill().get(i).getSkill();
             Optional<Skill> skillInDB = skillRepo.findByName(skillFromRequest.getName());
 
             CvSkill realCvSkill = new CvSkill();
@@ -78,9 +90,8 @@ public class CvService {
             } else {                   // old skill
                 realCvSkill.setSkill(skillInDB.get());
             }
+            savedCV.getSkills().add(realCvSkill);
         }
-
-        cv.setSkills(realListSkill);
         return cvRepo.save(cv);
     }
 

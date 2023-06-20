@@ -54,10 +54,10 @@ public class CvController {
     @PostMapping(path = "/create-update", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CV> updateCV(@RequestBody CVRequestDTO requestCV) throws InvocationTargetException, IllegalAccessException {
         CV savedCV = cvService.saveUpdate(requestCV);
-//        if (Objects.nonNull(savedCV)){
+        if (Objects.nonNull(savedCV)){
 //            cvService.findJobMatchCV(savedCV); // async
-//            return ResponseEntity.ok(savedCV);
-//        }
+            return ResponseEntity.ok(savedCV);
+        }
 
         return ResponseEntity.notFound().build();
     }

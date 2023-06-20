@@ -60,12 +60,17 @@ public class JobService {
 
     public Job saveUpdate(JobRequestDTO jobDTO) throws InvocationTargetException, IllegalAccessException {
         NullAwareBeanUtils beanCopier = NullAwareBeanUtils.getInstance();
-        Job job = new Job();
-        beanCopier.copyProperties(job, jobDTO);
-
-        if (job.getId() != null){
+        Job job;
+        if (jobDTO.getId() == null) {
+            job = new Job();
+            job.setCreatedAt(new Date());
+        }
+        else {
+            job = getById(jobDTO.getId()).orElseThrow();
             job.setUpdatedAt(new Date());
         }
+        beanCopier.copyProperties(job, jobDTO);
+
 
         Company company = companyService.getById(jobDTO.getCompanyId());
         Optional<Specialization> specialization = speService.getById(jobDTO.getSpecializationId());
@@ -78,9 +83,9 @@ public class JobService {
         job.setSpecialization(specialization.get());
         job.setJobStatus(JobStatus.NEW);
 
+        job.getJobSkills().clear();
         Job savedJob = jobRepo.save(job);
-
-        List<JobSkill> realListJobSkill = new ArrayList<>();
+        jobSkillRepo.deleteByJobId(savedJob.getId());
 
         // detect new skill
         for (int i = 0; i < jobDTO.getListJobSkillDTO().size(); i++) {
@@ -103,13 +108,10 @@ public class JobService {
             jobSkill.setJob(savedJob);
             jobSkill.setWeight(JSfromRequest.getWeight());
             jobSkill.setYoe(JSfromRequest.getYoe());
-            realListJobSkill.add(jobSkillRepo.save(jobSkill));
+            savedJob.getJobSkills().add(jobSkillRepo.save(jobSkill));
         }
 
-
-        job.setJobSkills(realListJobSkill);
-        job.setCreatedAt(new Date());
-        return jobRepo.save(job);
+        return jobRepo.save(savedJob);
     }
 
     public Page<Job> searchByKeywordAndLocationAndCompany(Integer size, Integer page, String keyword, String location, String companyId) {

@@ -14,6 +14,7 @@ import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -86,8 +87,14 @@ public class Job extends BaseAuditEntity {
     @JsonIgnore
     private Company company;
 
-    @OneToMany(mappedBy = "job", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "job", orphanRemoval = true, cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
     private List<JobSkill> jobSkills;
+
+    public List<JobSkill> getJobSkills(){
+        if (this.jobSkills == null)
+            this.jobSkills = new ArrayList<>();
+        return this.jobSkills;
+    }
 
     public Job(String id, String title, Date expiredAt,  Specialization specialization, List<JobSkill> jobSkills) {
         this.id = id;

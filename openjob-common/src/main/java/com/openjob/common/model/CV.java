@@ -7,6 +7,7 @@ import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -57,4 +58,9 @@ public class CV {
     @OneToMany(mappedBy = "cv", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<CvSkill> skills;
 
+    public List<CvSkill> getSkills(){
+        if (this.skills == null)
+            this.skills = new ArrayList<>();
+        return this.skills;
+    }
 }

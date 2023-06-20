@@ -2,6 +2,7 @@ package com.openjob.web.dto;
 
 import com.openjob.common.model.CvSkill;
 import com.openjob.common.model.Skill;
+import com.openjob.web.user.UserService;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,5 +22,6 @@ public class CVRequestDTO {
     private Integer specializationId;
     private Integer majorId;
     private List<CvSkill> listSkill;
+
 
 }
