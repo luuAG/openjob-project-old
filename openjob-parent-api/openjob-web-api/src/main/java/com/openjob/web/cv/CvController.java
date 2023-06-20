@@ -63,7 +63,7 @@ public class CvController {
     }
 
 //    @GetMapping(path = "/applied-job/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<List<UserCvDto>> getCvAppliedJob (
+//    public ResponseEntity<Page<UserCvDto>> getCvAppliedJob (
 //            @PathVariable("jobId") String jobId,
 //            @RequestParam(value = "page", required = false) Integer page,
 //            @RequestParam(value = "size", required = false) Integer size) {

@@ -239,7 +239,7 @@ public class JobService {
 
     public List<Job> getRelevantJobs(Job job) {
         Specialization specialization = job.getSpecialization();
-        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "created_at"));
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
         return jobRepo.findBySpecialization(specialization.getId(), pageable);
     }
 

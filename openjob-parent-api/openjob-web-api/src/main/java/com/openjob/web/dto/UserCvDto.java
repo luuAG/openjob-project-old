@@ -15,10 +15,10 @@ public class UserCvDto {
     private String gender;
     private String email;
     private CvStatus cvStatus;
-    private Integer point;
+    private Double point;
 
     public UserCvDto(String userid, String cvId, String firstName, String lastName, String email,
-                     String phone, String gender, Integer point, CvStatus status) {
+                     String phone, String gender, Double point, CvStatus status) {
         this.userId = userid;
         this.cvId = cvId;
         this.firstName =firstName;

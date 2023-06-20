@@ -31,8 +31,8 @@ public interface JobRepository extends JpaRepository<Job, String>, JpaSpecificat
     @Override
     void deleteById(String s);
 
-    @Query("select j from Job j where j.specialization.id=?1")
-    List<Job> findBySpecialization(Integer id);
+//    @Query("select j from Job j where j.specialization.id=?1")
+//    List<Job> findBySpecialization(Integer id);
 
     @Query("select j from Job j where j.company.id=?1")
     Page<Job> findByCompanyId(String cId, Pageable pageable);
