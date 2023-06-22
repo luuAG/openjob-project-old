@@ -33,4 +33,6 @@ public class JobResponseDTO {
     private JobType jobType;
     private SalaryModel salaryInfo;
     private JobStatus jobStatus;
+
+    private List<JobResponseDTO> relevantJobs;
 }

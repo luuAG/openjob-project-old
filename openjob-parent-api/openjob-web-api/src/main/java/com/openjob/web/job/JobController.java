@@ -42,11 +42,6 @@ public class JobController {
 
     @GetMapping(path = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<JobResponsePaginationDTO> searchJob(
-//            @RequestParam("page") Integer page,
-//            @RequestParam("size") Integer size,
-//            @RequestParam(value = "keyword", required = false) String keyword,
-//            @RequestParam(value = "location", required = false) String location,
-//            @RequestParam(value = "companyId", required = false) String companyId,
             @Join(path = "jobSkills", alias = "jobSkill")
             @Join(path = "jobSkill.skill", alias = "skill")
             @Conjunction(
@@ -68,24 +63,16 @@ public class JobController {
         User loggedInUser = authenticationUtils.getLoggedInUser(request);
 
         List<JobResponseDTO> jobResponseDTOs = new ArrayList<>();
-//        Page<Job> pageJob = jobService.searchByKeywordAndLocationAndCompany(size, page, keyword, location, companyId);
+        Collection<JobResponseDTO> relevantJobDtos = new ArrayList<>();
         Page<Job> jobPage = jobService.search(jobSpec, pagingModel.getPageable());
-        // map job to dto
-        jobPage.getContent().forEach(job -> {
-            JobResponseDTO tempDto = jobService.mapJobToJobResponseDTO(job, loggedInUser);
-            jobResponseDTOs.add(tempDto);
-        });
-
-        // get relevant jobs
-        List<JobResponseDTO> relevantJobDtos = null;
-        if (!jobPage.isEmpty()) {
-            List<Job> relevantJobs = jobService.getRelevantJobs(jobPage.getContent().get(0));
-            // map relevant jobs to dto
-            relevantJobDtos = relevantJobs.stream()
-                    .map(job -> jobService.mapJobToJobResponseDTO(job, loggedInUser))
+        if (!jobPage.isEmpty()){
+            // map job to dto
+            jobResponseDTOs = jobPage.getContent().stream()
+                    .map(job ->  jobService.mapJobToJobResponseDTO(job, loggedInUser))
                     .collect(Collectors.toList());
+            // get relevant job dto
+            relevantJobDtos = getRelevantJobs(jobPage.getContent().get(0), loggedInUser);
         }
-
 
         return ResponseEntity.ok(new JobResponsePaginationDTO(
                 jobResponseDTOs,
@@ -95,12 +82,22 @@ public class JobController {
         ));
     }
 
+    private List<JobResponseDTO> getRelevantJobs(Job job, User loggedInUser){
+        List<Job> relevantJobs = jobService.getRelevantJobs(job);
+        // map  jobs to dto
+        return relevantJobs.stream()
+                .map(aJob -> jobService.mapJobToJobResponseDTO(aJob, loggedInUser))
+                .collect(Collectors.toList());
+
+    }
+
     @GetMapping(path = "/details/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<JobResponseDTO> getJobDetails(@PathVariable("id") String id, HttpServletRequest request) throws IOException {
         Optional<Job> job = jobService.getById(id);
         User finalLoggedInUser = authenticationUtils.getLoggedInUser(request);
         if (job.isPresent()) {
             JobResponseDTO toReturnDTO = jobService.mapJobToJobResponseDTO(job.get(), finalLoggedInUser);
+            toReturnDTO.setRelevantJobs(getRelevantJobs(job.get(), finalLoggedInUser));
             return ResponseEntity.ok(toReturnDTO);
         }
         return ResponseEntity.notFound().build();
@@ -123,7 +120,7 @@ public class JobController {
     public ResponseEntity<MessageResponse> createNewJob(@RequestBody JobRequestDTO reqJob) throws InvocationTargetException, IllegalAccessException {
         Job savedJob = jobService.saveUpdate(reqJob);
         if(Objects.nonNull(savedJob)){
-//            jobService.findCVmatchJob(savedJob); // async
+            jobService.findCVmatchJob(savedJob); // async
             return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("New job is created successfully!"));
         }
 
@@ -147,18 +144,31 @@ public class JobController {
         return ResponseEntity.ok(new MessageResponse("Job is deleted!"));
     }
 
-//    @GetMapping(path = "/applied-by-user/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<JobCvPaginationDTO> getJobAppliedByUser(@PathVariable("userId")String userId,
-//                                                                  @RequestParam("page") Integer page,
-//                                                                  @RequestParam("size") Integer size){
-//        Page<JobCV> pageJobCv = jobService.getJobAppliedByUser(page, size, userId);
-//
-//        return ResponseEntity.ok(new JobCvPaginationDTO(
-//                pageJobCv.getContent(),
-//                pageJobCv.getTotalPages(),
-//                pageJobCv.getTotalElements()
-//        ));
-//    }
+    @GetMapping(path = "/applied-by-user/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<JobCvPaginationDTO> getJobAppliedByUser(
+            @PathVariable("userId")String userId,
+            @Join(path = "job", alias = "job")
+            @Conjunction(
+                    value = @Or({
+                            @Spec(path = "job.title", params = "keyword", spec = Like.class),
+                            @Spec(path = "job.company.name", params = "keyword", spec = Like.class)
+                    }),
+                    and = {
+                            @Spec(path = "applyDate", params = {"startDate", "endDate"}, spec = Between.class),
+                            @Spec(path = "status", spec = Equal.class),
+                            @Spec(path = "isApplied", constVal = "true", spec = Equal.class)
+                    }
+            ) Specification<JobCV> jobCvSpec,
+            PagingModel pagingModel){
+        jobCvSpec = jobCvSpec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("cv").get("user").get("id"), userId));
+        Page<JobCV> pageJobCv = jobCvService.searchJobCv(jobCvSpec, pagingModel.getPageable());
+
+        return ResponseEntity.ok(new JobCvPaginationDTO(
+                pageJobCv.getContent(),
+                pageJobCv.getTotalPages(),
+                pageJobCv.getTotalElements()
+        ));
+    }
 
     @PostMapping("/{jobId}/reset-expired-date")
     public ResponseEntity<MessageResponse> resetExpiredDate(@PathVariable("jobId")String jobId,

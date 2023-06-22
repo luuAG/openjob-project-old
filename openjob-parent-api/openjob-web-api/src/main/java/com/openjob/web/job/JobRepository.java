@@ -43,6 +43,9 @@ public interface JobRepository extends JpaRepository<Job, String>, JpaSpecificat
     @Query("select j from Job j where j.specialization.id=?1")
     List<Job> findBySpecialization(Integer id, Pageable pageable);
 
+    @Query("select j from Job j where j.specialization.id=?1")
+    List<Job> findBySpecialization(Integer id);
+
     @Query("select j from Job j join j.jobSkills js where js.skill.id in ?1")
     Page<Job> findBySkillIds(Set<Integer> skillIds, Pageable pageable);
 

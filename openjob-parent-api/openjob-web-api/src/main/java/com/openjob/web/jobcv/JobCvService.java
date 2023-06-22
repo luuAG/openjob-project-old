@@ -8,10 +8,12 @@ import com.openjob.web.cv.CvRepository;
 import com.openjob.web.exception.ResourceNotFoundException;
 import com.openjob.web.job.JobRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -48,7 +50,7 @@ public class JobCvService {
     public void deleteApplication(String cvId, String jobId) {
         Optional<JobCV> jobCV = jobCvRepo.findByJobIdAndCvId(jobId, cvId);
         if (jobCV.isPresent()) {
-            if (Objects.nonNull(jobCV.get().getIsMatching())  && jobCV.get().getIsMatching()){
+            if (Objects.nonNull(jobCV.get().getIsMatched())  && jobCV.get().getIsMatched()){
                 jobCV.get().setIsApplied(false);
                 jobCvRepo.save(jobCV.get());
             } else {
@@ -109,5 +111,9 @@ public class JobCvService {
 
     public void deleteByJobId(String jobId) {
         jobCvRepo.deleteByJobId(jobId);
+    }
+
+    public Page<JobCV> searchJobCv(Specification<JobCV> jobCvSpec, Pageable pageable) {
+        return jobCvRepo.findAll(jobCvSpec, pageable);
     }
 }

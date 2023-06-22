@@ -3,7 +3,6 @@ package com.openjob.web.user;
 
 import com.openjob.common.model.User;
 import com.openjob.common.util.CloudinaryUtils;
-import com.openjob.web.dto.UserCvDto;
 import com.openjob.web.util.NullAwareBeanUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

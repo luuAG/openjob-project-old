@@ -1,12 +1,9 @@
 package com.openjob.web.user;
 
 import com.openjob.common.model.User;
-import com.openjob.web.dto.UserCvDto;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository

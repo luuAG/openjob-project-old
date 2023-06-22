@@ -1,7 +1,6 @@
 package com.openjob.common.model;
 
 import com.openjob.common.enums.CvStatus;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -32,7 +31,7 @@ public class JobCV {
     private Date applyDate;
 
     @Column(columnDefinition = "bit(1) default false")
-    private Boolean isMatching;
+    private Boolean isMatched;
 
     private Boolean isApplied;
 

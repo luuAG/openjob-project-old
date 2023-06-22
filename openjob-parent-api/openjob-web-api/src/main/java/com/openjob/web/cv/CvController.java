@@ -1,14 +1,10 @@
 package com.openjob.web.cv;
 
-import com.openjob.common.model.CV;
-import com.openjob.common.model.Company;
-import com.openjob.common.model.JobCV;
-import com.openjob.common.model.PagingModel;
+import com.openjob.common.model.*;
 import com.openjob.common.response.MessageResponse;
 import com.openjob.web.dto.CVRequestDTO;
 import com.openjob.web.dto.CvDTO;
 import com.openjob.web.dto.CvPaginationDTO;
-import com.openjob.web.dto.UserCvDto;
 import com.openjob.web.job.JobService;
 import com.openjob.web.jobcv.JobCvService;
 import com.openjob.web.user.UserService;
@@ -42,37 +38,85 @@ public class CvController {
         return cv.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-//    @GetMapping(path = "/match-with-job/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<List<UserCvDto>> getUserHasCVmatchJob(@PathVariable("jobId") String jobId) {
-//        if (jobService.getById(jobId).isPresent()){
-//            List<UserCvDto> users = userService.getByMatchingJob(jobId);
-//            return ResponseEntity.ok(users);
-//        }
-//        throw new IllegalArgumentException("Job not found for ID: "+jobId);
-//    }
+    @GetMapping(path = "/match-with-job/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)
+        public ResponseEntity<CvPaginationDTO> getCvMatchedJob(
+            @PathVariable("jobId") final String jobId,
+            @Join(path = "cv", alias = "cv")
+            @Join(path = "cv.listSkill", alias = "skill")
+            @Conjunction(
+                    value =
+                    @Or({
+                            @Spec(path = "cv.education", params = "keyword", spec = Like.class),
+                            @Spec(path = "cv.experience", params = "keyword", spec = Like.class),
+                            @Spec(path = "cv.certificate", params = "keyword", spec = Like.class),
+                            @Spec(path = "cv.major.id", params = "majorId", spec = Equal.class),
+                            @Spec(path = "cv.specialization.id", params = "specializationId", spec = Equal.class),
+                    }),
+                    and = {
+                            @Spec(path = "skill.id", params = "skill1", spec = Equal.class),
+                            @Spec(path = "skill.id", params = "skill2", spec = Equal.class),
+                            @Spec(path = "skill.id", params = "skill3", spec = Equal.class),
+                            @Spec(path = "skill.id", params = "skill4", spec = Equal.class),
+                            @Spec(path = "skill.id", params = "skill5", spec = Equal.class),
+                            @Spec(path = "isMatched", constVal = "true", spec = Equal.class)
+                    }
+            ) Specification<JobCV> jobCvSpec, PagingModel pagingModel){
+        jobCvSpec = jobCvSpec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("job").get("id"), jobId));
+
+        Page<JobCV> jobCVPage = jobCvService.searchJobCv(jobCvSpec, pagingModel.getPageable());
+        List<CvDTO> cvDTOs = cvService.mapToCvDto(jobCVPage.getContent());
+        return ResponseEntity.ok(new CvPaginationDTO(
+                cvDTOs,
+                jobCVPage.getTotalPages(),
+                jobCVPage.getTotalElements())
+        );
+        }
 
     @PostMapping(path = "/create-update", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CV> updateCV(@RequestBody CVRequestDTO requestCV) throws InvocationTargetException, IllegalAccessException {
         CV savedCV = cvService.saveUpdate(requestCV);
         if (Objects.nonNull(savedCV)){
-//            cvService.findJobMatchCV(savedCV); // async
+            cvService.findJobMatchCV(savedCV); // async
             return ResponseEntity.ok(savedCV);
         }
 
         return ResponseEntity.notFound().build();
     }
 
-//    @GetMapping(path = "/applied-job/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<Page<UserCvDto>> getCvAppliedJob (
-//            @PathVariable("jobId") String jobId,
-//            @RequestParam(value = "page", required = false) Integer page,
-//            @RequestParam(value = "size", required = false) Integer size) {
-//        if (jobService.getById(jobId).isPresent()){
-//            List<UserCvDto> users = userService.getByJobApplied(jobId);
-//            return ResponseEntity.ok(users);
-//        }
-//        throw new IllegalArgumentException("Job not found for ID: "+jobId);
-//    }
+    @GetMapping(path = "/applied-job/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CvPaginationDTO> getCvAppliedJob(
+            @PathVariable("jobId") final String jobId,
+            @Join(path = "cv", alias = "cv")
+            @Join(path = "cv.listSkill", alias = "skill")
+            @Conjunction(
+                    value =
+                    @Or({
+                            @Spec(path = "cv.education", params = "keyword", spec = Like.class),
+                            @Spec(path = "cv.experience", params = "keyword", spec = Like.class),
+                            @Spec(path = "cv.certificate", params = "keyword", spec = Like.class),
+                            @Spec(path = "cv.major.id", params = "majorId", spec = Equal.class),
+                            @Spec(path = "cv.specialization.id", params = "specializationId", spec = Equal.class),
+                    }),
+                    and = {
+                            @Spec(path = "skill.id", params = "skill1", spec = Equal.class),
+                            @Spec(path = "skill.id", params = "skill2", spec = Equal.class),
+                            @Spec(path = "skill.id", params = "skill3", spec = Equal.class),
+                            @Spec(path = "skill.id", params = "skill4", spec = Equal.class),
+                            @Spec(path = "skill.id", params = "skill5", spec = Equal.class),
+                            @Spec(path = "isApplied", constVal = "true", spec = Equal.class)
+                    }
+            ) Specification<JobCV> jobCvSpec, PagingModel pagingModel){
+
+        jobCvSpec = jobCvSpec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("job").get("id"), jobId));
+
+        Page<JobCV> jobCVPage = jobCvService.searchJobCv(jobCvSpec, pagingModel.getPageable());
+        List<CvDTO> cvDTOs = cvService.mapToCvDto(jobCVPage.getContent());
+        return ResponseEntity.ok(new CvPaginationDTO(
+                cvDTOs,
+                jobCVPage.getTotalPages(),
+                jobCVPage.getTotalElements())
+        );
+    }
 
     @PostMapping(path = "/{cvId}/apply/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MessageResponse> applyCvForJob(@PathVariable("cvId") String cvId,

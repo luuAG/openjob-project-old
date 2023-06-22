@@ -27,10 +27,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -179,7 +175,7 @@ public class JobService {
             if (matchingPoint > 0) {
                 Optional<JobCV> existingJobCv =  jobCvService.getByJobIdAndCvId(savedJob.getId(), cv.getId());
                 if (existingJobCv.isPresent()){
-                    existingJobCv.get().setIsMatching(true);
+                    existingJobCv.get().setIsMatched(true);
                     existingJobCv.get().setPoint(matchingPoint);
                     jobCvService.save(existingJobCv.get());
                 }
@@ -187,7 +183,7 @@ public class JobService {
                     JobCV newJobCv = new JobCV();
                     newJobCv.setJob(savedJob);
                     newJobCv.setStatus(CvStatus.NEW);
-                    newJobCv.setIsMatching(true);
+                    newJobCv.setIsMatched(true);
                     newJobCv.setPoint(matchingPoint);
                     newJobCv.setCv(cv);
                     newJobCv.setApplyDate(null);

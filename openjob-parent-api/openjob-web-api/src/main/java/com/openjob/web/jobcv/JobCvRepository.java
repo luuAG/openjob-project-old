@@ -4,6 +4,7 @@ import com.openjob.common.model.JobCV;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface JobCvRepository extends JpaRepository<JobCV, Integer> {
+public interface JobCvRepository extends JpaRepository<JobCV, Integer>, JpaSpecificationExecutor<JobCV> {
 
     @Modifying
     @Query("delete from JobCV jc where jc.cv.id=?1 and jc.job.id=?2")
