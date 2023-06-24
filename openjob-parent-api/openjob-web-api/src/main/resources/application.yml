@@ -4,6 +4,9 @@ server:
     servlet:
         context-path: /api/web
 spring:
+    mail:
+        username: openjob.team@gmail.com
+        password: imhkvarfhsqtkrgo
     thymeleaf:
         enabled: true
         prefix: classpath:/templates/

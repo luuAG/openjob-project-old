@@ -42,19 +42,28 @@ public class JobController {
 
     @GetMapping(path = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<JobResponsePaginationDTO> searchJob(
-            @Join(path = "jobSkills", alias = "jobSkill")
-            @Join(path = "jobSkill.skill", alias = "skill")
+            @Join(path = "jobSkills", alias = "js")
+            @Join(path = "js.skill", alias = "skill")
             @Conjunction(
-                value = {
-                    @Or({@Spec(path = "title", params = "keyword", spec = Like.class),
-                        @Spec(path = "company.name", params = "keyword", spec = Like.class),
-                        @Spec(path = "skill.name", params = "keyword", spec = Like.class),}),
-                    },
-                and = {
-                    @Spec(path = "company.id", params = "companyId",spec = Equal.class),
-                    @Spec(path = "company.address", params = "location",spec = Equal.class)
-                }
-            )
+                    value = @Or({
+                            @Spec(path = "title", params = "keyword", spec = Like.class),
+                            @Spec(path = "company.name", params = "keyword", spec = Like.class)}),
+                    and = {
+                            @Spec(path = "createdAt", params = {"startDate", "endDate"}, spec = Between.class),
+                            @Spec(path = "isActive", spec = Equal.class),
+                            @Spec(path = "company.address", params = "address", spec = Like.class),
+                            @Spec(path = "jobLevel", spec = Equal.class),
+                            @Spec(path = "jobType", spec = Equal.class),
+                            @Spec(path = "workPlace", spec = Equal.class),
+                            @Spec(path = "major.id", params = "majorId", spec = Equal.class),
+                            @Spec(path = "specialization.id", params = "speId", spec = Equal.class),
+                            @Spec(path = "salaryInfo.minSalary", params = "minSalary", spec = GreaterThanOrEqual.class),
+                            @Spec(path = "salaryInfo.maxSalary", params = "maxSalary", spec = LessThanOrEqual.class),
+                            @Spec(path = "salaryInfo.isSalaryNegotiable", params = "isSalaryNegotiable", spec = Equal.class),
+                            @Spec(path = "salaryInfo.salaryType", params = "salaryType", spec = Equal.class),
+                            @Spec(path = "jobStatus", spec = Equal.class),
+                            @Spec(path = "skill.id", params = "skillId", spec = Equal.class)
+                    })
             Specification<Job> jobSpec,
             PagingModel pagingModel,
             HttpServletRequest request) throws IOException {
@@ -117,8 +126,8 @@ public class JobController {
 //    }
 
     @PostMapping(path = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<MessageResponse> createNewJob(@RequestBody JobRequestDTO reqJob) throws InvocationTargetException, IllegalAccessException {
-        Job savedJob = jobService.saveUpdate(reqJob);
+    public ResponseEntity<MessageResponse> createNewJob(@RequestBody JobRequestDTO reqJob, HttpServletRequest request) throws InvocationTargetException, IllegalAccessException, IOException {
+        Job savedJob = jobService.saveUpdate(reqJob, request);
         if(Objects.nonNull(savedJob)){
             jobService.findCVmatchJob(savedJob); // async
             return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("New job is created successfully!"));
@@ -128,8 +137,8 @@ public class JobController {
     }
 
     @PostMapping(path = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<MessageResponse> updateJob(@RequestBody JobRequestDTO reqJob) throws InvocationTargetException, IllegalAccessException {
-        Job savedJob = jobService.saveUpdate(reqJob);
+    public ResponseEntity<MessageResponse> updateJob(@RequestBody JobRequestDTO reqJob, HttpServletRequest request) throws InvocationTargetException, IllegalAccessException, IOException {
+        Job savedJob = jobService.saveUpdate(reqJob, request);
         if(Objects.nonNull(savedJob)){
 //            jobService.findCVmatchJob(savedJob); // async
             return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("Job is updated successfully!"));

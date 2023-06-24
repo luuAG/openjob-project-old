@@ -16,6 +16,7 @@ import com.openjob.web.major.MajorService;
 import com.openjob.web.skill.SkillRepository;
 import com.openjob.web.specialization.SpecializationService;
 import com.openjob.web.user.UserService;
+import com.openjob.web.util.AuthenticationUtils;
 import com.openjob.web.util.JobCVUtils;
 import com.openjob.web.util.NullAwareBeanUtils;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -47,6 +50,7 @@ public class JobService {
     private final SpecializationService speService;
     private final JobSkillRepository jobSkillRepo;
     private final MajorService majorService;
+    private final AuthenticationUtils authenticationUtils;
     private final Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
 
 
@@ -54,7 +58,7 @@ public class JobService {
         return jobRepo.findById(id);
     }
 
-    public Job saveUpdate(JobRequestDTO jobDTO) throws InvocationTargetException, IllegalAccessException {
+    public Job saveUpdate(JobRequestDTO jobDTO, HttpServletRequest request) throws InvocationTargetException, IllegalAccessException, IOException {
         NullAwareBeanUtils beanCopier = NullAwareBeanUtils.getInstance();
         Job job;
         if (jobDTO.getId() == null) {
@@ -93,8 +97,9 @@ public class JobService {
             // if new skill -> save new skill and set to jobSkill
             if (skillInDB.isEmpty()){
                 skillFromRequest.setSpecialization(savedJob.getSpecialization());
-//                skillFromRequest.setIsVerified(skillRepo.existsByName(skillFromRequest.getName()));
                 skillFromRequest.setIsVerified(false);
+                skillFromRequest.setCreatedAt(new Date());
+                skillFromRequest.setCreatedBy(authenticationUtils.getLoggedInUser(request).getFirstName());
                 Skill savedSkill = skillRepo.save(skillFromRequest);
                 jobSkill.setSkill(savedSkill);
             } else { // if existing skill -> set to jobSkill

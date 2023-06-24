@@ -18,6 +18,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Objects;
@@ -73,10 +75,10 @@ public class CvController {
         }
 
     @PostMapping(path = "/create-update", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CV> updateCV(@RequestBody CVRequestDTO requestCV) throws InvocationTargetException, IllegalAccessException {
-        CV savedCV = cvService.saveUpdate(requestCV);
+    public ResponseEntity<CV> updateCV(@RequestBody CVRequestDTO requestCV, HttpServletRequest request) throws InvocationTargetException, IllegalAccessException, IOException {
+        CV savedCV = cvService.saveUpdate(requestCV, request);
         if (Objects.nonNull(savedCV)){
-            cvService.findJobMatchCV(savedCV); // async
+//            cvService.findJobMatchCV(savedCV); // async
             return ResponseEntity.ok(savedCV);
         }
 

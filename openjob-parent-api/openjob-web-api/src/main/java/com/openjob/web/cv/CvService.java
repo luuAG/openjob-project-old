@@ -9,6 +9,7 @@ import com.openjob.web.major.MajorService;
 import com.openjob.web.skill.SkillRepository;
 import com.openjob.web.specialization.SpecializationService;
 import com.openjob.web.user.UserService;
+import com.openjob.web.util.AuthenticationUtils;
 import com.openjob.web.util.NullAwareBeanUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,7 +19,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,6 +39,7 @@ public class CvService {
     private final JobCvService jobCvService;
     private final MajorService majorService;
     private final CvSkillRepository cvSkillRepo;
+    private final AuthenticationUtils authenticationUtils;
 
     public Optional<CV> getById(String id) {
         return cvRepo.findById(id);
@@ -44,7 +49,7 @@ public class CvService {
         return cvRepo.findByUserId(userId);
     }
 
-    public CV saveUpdate(CVRequestDTO cvDto) throws InvocationTargetException, IllegalAccessException {
+    public CV saveUpdate(CVRequestDTO cvDto, HttpServletRequest request) throws InvocationTargetException, IllegalAccessException, IOException {
         Optional<CV> optionalCV = getByUserId(cvDto.getUserId());
         CV cv;
         if (optionalCV.isPresent()){
@@ -82,6 +87,8 @@ public class CvService {
             if (skillInDB.isEmpty()) { // new skill
                 skillFromRequest.setSpecialization(cv.getSpecialization());
                 skillFromRequest.setIsVerified(false);
+                skillFromRequest.setCreatedAt(new Date());
+                skillFromRequest.setCreatedBy(authenticationUtils.getLoggedInUser(request).getFirstName());
                 Skill savedSkill = skillRepo.save(skillFromRequest);
                 realCvSkill.setSkill(savedSkill);
             } else {                   // old skill
