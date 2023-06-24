@@ -23,7 +23,7 @@ public interface CompanyRepository extends JpaRepository<Company, String> {
     @Query("select c from Company c where (c.name like %?1% or c.description like %?1%) and c.address like %?2%")
     Page<Company> findByKeywordAndLocation(String keyword, String location, Pageable pageable);
 
-    @Query("update Company c set c.accountBalance=?2 where c.id=?1")
+    @Query("update Company c set c.accountBalance = c.accountBalance + ?2 where c.id=?1")
     @Modifying
     void updateAccountBalance(String companyId, Double amount);
 }

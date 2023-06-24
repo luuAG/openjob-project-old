@@ -25,4 +25,14 @@ public interface CompanyRepository extends JpaRepository<Company, String>, JpaSp
     @Query("delete from CompanyRegistration cr where cr.id in :ids")
     @Modifying
     void rejectManyCompaniesByIds(@Param("ids") List<String> ids);
+
+    @Query("update Company c set c.amountOfFreeJobs=?1, c.amountOfFreeCvViews=?2 " +
+            "where c.memberType=com.openjob.common.enums.MemberType.DEFAULT")
+    @Modifying
+    void resetFreeServiceForAll(Integer freeJob, Integer freeCvView);
+
+    @Query("update Company c set c.amountOfFreeJobs=?1, c.amountOfFreeCvViews=?2 " +
+            "where c.memberType=com.openjob.common.enums.MemberType.PREMIUM")
+    @Modifying
+    void resetPremiumServiceForAll(Integer premiumFreeJob, Integer premiumFreeViewCv);
 }

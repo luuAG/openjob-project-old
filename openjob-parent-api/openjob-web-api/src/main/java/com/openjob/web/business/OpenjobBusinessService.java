@@ -1,12 +1,8 @@
-package com.openjob.admin.business;
+package com.openjob.web.business;
 
 
-import com.openjob.admin.company.CompanyRepository;
-import com.openjob.admin.company.CompanyService;
 import com.openjob.common.model.OpenjobBusiness;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class OpenjobBusinessService {
     private final OpenjobBusinessRepository repository;
-    private final CompanyRepository companyRepository;
 
     public OpenjobBusiness get(){
         return repository.findAll().get(0);
@@ -44,14 +39,6 @@ public class OpenjobBusinessService {
         data.setPremiumPrice(openjobBusiness.getPremiumPrice());
 
         return repository.save(data);
-    }
-
-    @Scheduled(cron = "0 0 0 1 * *")
-    @Async
-    public void resetFreeServiceForAllCompanies(){
-        OpenjobBusiness openjobBusiness = get();
-        companyRepository.resetFreeServiceForAll(openjobBusiness.getFreeJob(), openjobBusiness.getFreeCvView());
-        companyRepository.resetPremiumServiceForAll(openjobBusiness.getPremiumFreeJob(), openjobBusiness.getPremiumFreeViewCv());
     }
 }
 

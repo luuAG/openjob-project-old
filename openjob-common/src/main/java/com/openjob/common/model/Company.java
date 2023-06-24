@@ -67,6 +67,9 @@ public class Company extends BaseAuditEntity{
     @JsonIgnore
     private User headHunter;
 
+    private int amountOfFreeJobs;
+    private int amountOfFreeCvViews;
+
     @Transient
     private String[] base64Images;
     @Transient

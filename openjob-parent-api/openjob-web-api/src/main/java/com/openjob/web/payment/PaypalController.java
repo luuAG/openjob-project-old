@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
 @Controller
 @RequiredArgsConstructor
@@ -36,15 +37,16 @@ public class PaypalController {
     }
 
     @PostMapping("/pay")
-    @ResponseBody
-    public String createPayment(@ModelAttribute CreatePaymentDTO dto) {
+    public RedirectView createPayment(@ModelAttribute CreatePaymentDTO dto) {
         try {
             Payment payment = paypalService.createPayment(dto.getPrice(), "USD", "Paypal", "ORDER",
                     "Nap tien", clientBaseUrl+ "/paypal" + FAILURE_URL,
-                    clientBaseUrl+ "/client/paypal" + SUCCESS_URL);
+                    clientBaseUrl+ "/dashboard/paypal" + SUCCESS_URL);
             for(Links link:payment.getLinks()) {
                 if(link.getRel().equals("approval_url")) {
-                    return link.getHref();
+                    RedirectView redirectView = new RedirectView();
+                    redirectView.setUrl(link.getHref());
+                    return redirectView;
                 }
             }
         } catch (PayPalRESTException e) {

@@ -62,43 +62,6 @@ public class JobController {
         );
     }
 
-//    @GetMapping(path = "/jobs", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<JobPaginationDTO> getAll(@RequestParam("page")Integer page,
-//                                                   @RequestParam("size")Integer size,
-//                                                   @RequestParam(value = "keyword", required = false)String keyword,
-//                                                   @RequestParam(value = "majorId", required = false)Integer majorId,
-//                                                   @RequestParam(value = "specializationId", required = false)Integer specializationId) {
-//        Page<Job> jobPage = jobService.getAll(page, size, keyword, majorId, specializationId);
-//        return ResponseEntity.ok(new JobPaginationDTO(
-//                jobPage.getContent(),
-//                jobPage.getTotalPages(),
-//                jobPage.getTotalElements()));
-//    }
-
-
-//    @GetMapping(path = "/jobs", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<JobPaginationDTO> getAll(@RequestParam("page")Integer page,
-//                                                   @RequestParam("size")Integer size,
-//                                                   @RequestParam(value = "keyword", required = false)String keyword) {
-//        Page<Job> jobPage = jobService.getAll(page, size, keyword);
-//        return ResponseEntity.ok(new JobPaginationDTO(
-//                jobPage.getContent(),
-//                jobPage.getTotalPages(),
-//                jobPage.getTotalElements()));
-//    }
-
-//    @GetMapping(path = "/job/by-company/{companyId}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<JobPaginationDTO> getAll(@PathVariable("companyId") String companyId,
-//                                                    @RequestParam("page")Integer page,
-//                                                   @RequestParam("size")Integer size,
-//                                                   @RequestParam(value = "keyword", required = false)String keyword) {
-//        Page<Job> jobPage = jobService.getAllByCompanyId(page, size, keyword, companyId);
-//        return ResponseEntity.ok(new JobPaginationDTO(
-//                jobPage.getContent(),
-//                jobPage.getTotalPages(),
-//                jobPage.getTotalElements()));
-//    }
-
     @GetMapping(path = "/job/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Job> getById(@PathVariable("jobId") String jobId) {
         Optional<Job> job = jobService.getById(jobId);

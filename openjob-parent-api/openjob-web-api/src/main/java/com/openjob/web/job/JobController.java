@@ -1,11 +1,13 @@
 package com.openjob.web.job;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.openjob.common.enums.MemberType;
 import com.openjob.common.model.Job;
 import com.openjob.common.model.JobCV;
 import com.openjob.common.model.PagingModel;
 import com.openjob.common.model.User;
 import com.openjob.common.response.MessageResponse;
+import com.openjob.web.cv.CvService;
 import com.openjob.web.dto.*;
 import com.openjob.web.jobcv.JobCvService;
 import com.openjob.web.user.UserService;
@@ -39,6 +41,7 @@ public class JobController {
     private final JobService jobService;
     private final JobCvService jobCvService;
     private final AuthenticationUtils authenticationUtils;
+    private final CvService cvService;
 
     @GetMapping(path = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<JobResponsePaginationDTO> searchJob(
@@ -127,7 +130,8 @@ public class JobController {
     public ResponseEntity<MessageResponse> createNewJob(@RequestBody JobRequestDTO reqJob, HttpServletRequest request) throws InvocationTargetException, IllegalAccessException, IOException {
         Job savedJob = jobService.saveUpdate(reqJob, request);
         if(Objects.nonNull(savedJob)){
-            jobService.findCVmatchJob(savedJob); // async
+            if (savedJob.getCompany().getMemberType().equals(MemberType.PREMIUM))
+                cvService.findCVmatchJob(savedJob); // async
             return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("New job is created successfully!"));
         }
 
@@ -138,7 +142,8 @@ public class JobController {
     public ResponseEntity<MessageResponse> updateJob(@RequestBody JobRequestDTO reqJob, HttpServletRequest request) throws InvocationTargetException, IllegalAccessException, IOException {
         Job savedJob = jobService.saveUpdate(reqJob, request);
         if(Objects.nonNull(savedJob)){
-//            jobService.findCVmatchJob(savedJob); // async
+            if (savedJob.getCompany().getMemberType().equals(MemberType.PREMIUM))
+                cvService.findCVmatchJob(savedJob); // async
             return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("Job is updated successfully!"));
         }
 

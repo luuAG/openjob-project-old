@@ -1,26 +1,24 @@
 package com.openjob.web.job;
 
-import com.openjob.common.enums.CvStatus;
 import com.openjob.common.enums.JobStatus;
 import com.openjob.common.enums.Role;
 import com.openjob.common.model.*;
 import com.openjob.web.company.CompanyService;
-import com.openjob.web.cv.CvRepository;
 import com.openjob.web.dto.JobRequestDTO;
 import com.openjob.web.dto.JobResponseDTO;
 import com.openjob.web.dto.JobSkillDTO;
-import com.openjob.web.jobcv.JobCvRepository;
 import com.openjob.web.jobcv.JobCvService;
 import com.openjob.web.jobskill.JobSkillRepository;
-import com.openjob.web.major.MajorService;
 import com.openjob.web.skill.SkillRepository;
 import com.openjob.web.specialization.SpecializationService;
 import com.openjob.web.user.UserService;
 import com.openjob.web.util.AuthenticationUtils;
-import com.openjob.web.util.JobCVUtils;
 import com.openjob.web.util.NullAwareBeanUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -45,12 +43,9 @@ public class JobService {
     private final JobRepository jobRepo;
     private final SkillRepository skillRepo;
     private final JobCvService jobCvService;
-    private final JobCvRepository jobCvRepo;
-    private final CvRepository cvRepo;
     private final CompanyService companyService;
     private final SpecializationService speService;
     private final JobSkillRepository jobSkillRepo;
-    private final MajorService majorService;
     private final AuthenticationUtils authenticationUtils;
 
 
@@ -119,68 +114,6 @@ public class JobService {
 
     public void deleteById(String jobId) {
         jobRepo.deleteById(jobId);
-    }
-
-    @Async
-    public void findCVmatchJob(Job savedJob) {
-        List<CV> listCV = cvRepo.findBySpecialization(savedJob.getSpecialization().getId());
-        List<JobSkill> jobSkills = savedJob.getJobSkills();
-        Set<Skill> mustHaveSkills = jobSkills.stream()
-                .filter(JobSkill::isRequired)
-                .map(JobSkill::getSkill)
-                .collect(Collectors.toSet());
-        // filter list CV by job requirement: must-have & yoe
-        listCV = listCV.stream()
-                .filter(cv -> { // must-have
-                    Set<Skill> tempMustHaveSkills = new HashSet<>(mustHaveSkills);
-                    List<Skill> cvSkill = cv.getSkills().stream().map(CvSkill::getSkill).collect(Collectors.toList());
-                    cvSkill.forEach(tempMustHaveSkills::remove);
-                    return tempMustHaveSkills.isEmpty();
-                })
-                .filter(cv -> { // yoe
-                    Skill mutualSkill;
-                    for (CvSkill cvSkill : cv.getSkills()){
-                        for (JobSkill jobSkill : jobSkills){
-                            if (Objects.equals(cvSkill.getSkill().getId(), jobSkill.getSkill().getId())){
-                                mutualSkill = cvSkill.getSkill();
-                                if (mustHaveSkills.contains(mutualSkill) && cvSkill.getYoe() < jobSkill.getYoe())
-                                    return false;
-                            }
-                        }
-                    }
-                    return true;
-                })
-                .collect(Collectors.toList());
-
-        for (CV cv : listCV) {
-            double matchingPoint = JobCVUtils.scoreCv(savedJob, cv);
-            if (matchingPoint > 0) {
-                Optional<JobCV> existingJobCv =  jobCvService.getByJobIdAndCvId(savedJob.getId(), cv.getId());
-                if (existingJobCv.isPresent()){
-                    existingJobCv.get().setIsMatched(true);
-                    existingJobCv.get().setPoint(matchingPoint);
-                    jobCvService.save(existingJobCv.get());
-                }
-                else {
-                    JobCV newJobCv = new JobCV();
-                    newJobCv.setJob(savedJob);
-                    newJobCv.setStatus(CvStatus.NEW);
-                    newJobCv.setIsMatched(true);
-                    newJobCv.setPoint(matchingPoint);
-                    newJobCv.setCv(cv);
-                    newJobCv.setApplyDate(null);
-                    newJobCv.setIsApplied(false);
-                    jobCvService.save(newJobCv);
-                }
-            }
-        }
-
-    }
-
-
-    public Page<JobCV> getJobAppliedByUser(Integer page, Integer size, String userId) {
-        Pageable pageable = PageRequest.of(page, size);
-        return jobCvRepo.findJobAppliedByUserId(userId, pageable);
     }
 
     @Scheduled(cron = "0 0 0 * * *")

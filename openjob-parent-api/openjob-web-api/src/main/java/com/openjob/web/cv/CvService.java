@@ -1,30 +1,31 @@
 package com.openjob.web.cv;
 
+import com.openjob.common.enums.CvStatus;
 import com.openjob.common.model.*;
 import com.openjob.web.dto.CVRequestDTO;
 import com.openjob.web.dto.CvDTO;
-import com.openjob.web.job.JobRepository;
 import com.openjob.web.jobcv.JobCvService;
 import com.openjob.web.major.MajorService;
 import com.openjob.web.skill.SkillRepository;
 import com.openjob.web.specialization.SpecializationService;
 import com.openjob.web.user.UserService;
 import com.openjob.web.util.AuthenticationUtils;
+import com.openjob.web.util.JobCVUtils;
 import com.openjob.web.util.NullAwareBeanUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,7 +36,6 @@ public class CvService {
     private final SkillRepository skillRepo;
     private final SpecializationService speService;
     private final UserService userService;
-    private final JobRepository jobRepo;
     private final JobCvService jobCvService;
     private final MajorService majorService;
     private final CvSkillRepository cvSkillRepo;
@@ -99,16 +99,6 @@ public class CvService {
         return cvRepo.save(cv);
     }
 
-    public Page<CV> getByJobId(Integer page, Integer size, String jobId) {
-        Pageable pageable = PageRequest.of(page, size);
-        return cvRepo.findByJobId(jobId, pageable);
-    }
-
-    public Page<CV> getCvAppliedByJobId(Integer page, Integer size, String jobId) {
-        Pageable pageable = PageRequest.of(page, size);
-        return cvRepo.findCvAppliedByJobId(jobId, pageable);
-    }
-
     public Page<CV> search(Specification<CV> cvSpec, Pageable pageable) {
         return cvRepo.findAll(cvSpec, pageable);
     }
@@ -147,6 +137,68 @@ public class CvService {
             }).collect(Collectors.toList());
         }
         return null;
+
+    }
+
+    @Scheduled(cron = "0 0 */12 * * *")
+    @Async
+    public void matchCvAndJobs(){
+
+    }
+
+    @Async
+    public void findCVmatchJob(Job savedJob) {
+        List<CV> listCV = cvRepo.findBySpecialization(savedJob.getSpecialization().getId());
+        List<JobSkill> jobSkills = savedJob.getJobSkills();
+        Set<Skill> mustHaveSkills = jobSkills.stream()
+                .filter(JobSkill::isRequired)
+                .map(JobSkill::getSkill)
+                .collect(Collectors.toSet());
+        // filter list CV by job requirement: must-have & yoe
+        listCV = listCV.stream()
+                .filter(cv -> { // must-have
+                    Set<Skill> tempMustHaveSkills = new HashSet<>(mustHaveSkills);
+                    List<Skill> cvSkill = cv.getSkills().stream().map(CvSkill::getSkill).collect(Collectors.toList());
+                    cvSkill.forEach(tempMustHaveSkills::remove);
+                    return tempMustHaveSkills.isEmpty();
+                })
+                .filter(cv -> { // yoe
+                    Skill mutualSkill;
+                    for (CvSkill cvSkill : cv.getSkills()){
+                        for (JobSkill jobSkill : jobSkills){
+                            if (Objects.equals(cvSkill.getSkill().getId(), jobSkill.getSkill().getId())){
+                                mutualSkill = cvSkill.getSkill();
+                                if (mustHaveSkills.contains(mutualSkill) && cvSkill.getYoe() < jobSkill.getYoe())
+                                    return false;
+                            }
+                        }
+                    }
+                    return true;
+                })
+                .collect(Collectors.toList());
+
+        for (CV cv : listCV) {
+            double matchingPoint = JobCVUtils.scoreCv(savedJob, cv);
+            if (matchingPoint > 0) {
+                Optional<JobCV> existingJobCv =  jobCvService.getByJobIdAndCvId(savedJob.getId(), cv.getId());
+                if (existingJobCv.isPresent()){
+                    existingJobCv.get().setIsMatched(true);
+                    existingJobCv.get().setPoint(matchingPoint);
+                    jobCvService.save(existingJobCv.get());
+                }
+                else {
+                    JobCV newJobCv = new JobCV();
+                    newJobCv.setJob(savedJob);
+                    newJobCv.setStatus(CvStatus.NEW);
+                    newJobCv.setIsMatched(true);
+                    newJobCv.setPoint(matchingPoint);
+                    newJobCv.setCv(cv);
+                    newJobCv.setApplyDate(null);
+                    newJobCv.setIsApplied(false);
+                    jobCvService.save(newJobCv);
+                }
+            }
+        }
 
     }
 }
