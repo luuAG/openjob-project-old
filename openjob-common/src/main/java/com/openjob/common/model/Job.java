@@ -86,7 +86,8 @@ public class Job extends BaseAuditEntity {
 
     @OneToOne
     @JoinColumn
-    @JsonIncludeProperties({"id, name"})
+    @JsonIgnoreProperties({"description", "phone", "address", "totalEmployee", "logoUrl", "imageUrlsString", "contractEndDate",
+            "accountBalance", "isActive", "memberType", "companyType", "scope", "email", "headHunter"})
     private Company company;
 
     @OneToMany(mappedBy = "job", orphanRemoval = true, cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)

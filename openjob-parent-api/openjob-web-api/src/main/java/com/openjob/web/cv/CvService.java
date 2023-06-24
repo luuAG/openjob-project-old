@@ -115,6 +115,8 @@ public class CvService {
 
 
     public List<CvDTO> mapToCvDto(List<?> content) {
+        if (content == null || content.size() == 0)
+            return (List<CvDTO>) content;
         if (content.get(0) instanceof JobCV) {
             return content.stream().map(item -> {
                 CvDTO cvDTO = new CvDTO();
