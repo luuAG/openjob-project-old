@@ -14,6 +14,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -30,6 +31,7 @@ public class JobCvService {
         if (jobCV.isPresent()) {
             jobCV.get().setIsApplied(true);
             jobCV.get().setStatus(CvStatus.NEW);
+            jobCV.get().setApplyDate(new Date());
             jobCvRepo.save(jobCV.get());
         } else {
             Optional<Job> job = jobRepo.findById(jobId);
@@ -40,6 +42,7 @@ public class JobCvService {
                 newJobCv.setCv(cv.get());
                 newJobCv.setIsApplied(true);
                 newJobCv.setStatus(CvStatus.NEW);
+                newJobCv.setApplyDate(new Date());
                 jobCvRepo.save(newJobCv);
             } else
                 throw new IllegalArgumentException("CV or Job not found!");

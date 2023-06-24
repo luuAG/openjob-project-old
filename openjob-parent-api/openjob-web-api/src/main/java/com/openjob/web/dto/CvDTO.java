@@ -42,5 +42,7 @@ public class CvDTO {
 
     private Boolean isApplied;
 
-    private List<CvSkill> listSkill;
+    private boolean isActive;
+
+    private List<CvSkill> skills;
 }

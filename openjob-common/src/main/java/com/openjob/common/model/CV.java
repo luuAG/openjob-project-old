@@ -49,6 +49,8 @@ public class CV {
     @JoinColumn
     private Major major;
 
+    private boolean isActive;
+
 //    @OneToMany(orphanRemoval = true)
 //    @JoinTable(
 //        name = "cv_skill",

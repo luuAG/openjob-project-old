@@ -61,14 +61,12 @@ public class JobController {
                             @Spec(path = "salaryInfo.maxSalary", params = "maxSalary", spec = LessThanOrEqual.class),
                             @Spec(path = "salaryInfo.isSalaryNegotiable", params = "isSalaryNegotiable", spec = Equal.class),
                             @Spec(path = "salaryInfo.salaryType", params = "salaryType", spec = Equal.class),
-                            @Spec(path = "jobStatus", spec = Equal.class),
+                            @Spec(path = "jobStatus", constVal = "APPROVED", spec = Equal.class),
                             @Spec(path = "skill.id", params = "skillId", spec = Equal.class)
                     })
             Specification<Job> jobSpec,
             PagingModel pagingModel,
             HttpServletRequest request) throws IOException {
-
-
         User loggedInUser = authenticationUtils.getLoggedInUser(request);
 
         List<JobResponseDTO> jobResponseDTOs = new ArrayList<>();

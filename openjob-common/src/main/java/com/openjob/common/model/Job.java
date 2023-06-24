@@ -1,6 +1,8 @@
 package com.openjob.common.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.openjob.common.enums.JobLevel;
 import com.openjob.common.enums.JobStatus;
 import com.openjob.common.enums.JobType;
@@ -84,7 +86,7 @@ public class Job extends BaseAuditEntity {
 
     @OneToOne
     @JoinColumn
-    @JsonIgnore
+    @JsonIncludeProperties({"id, name"})
     private Company company;
 
     @OneToMany(mappedBy = "job", orphanRemoval = true, cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)

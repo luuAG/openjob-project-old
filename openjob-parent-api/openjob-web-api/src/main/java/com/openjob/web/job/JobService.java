@@ -115,31 +115,6 @@ public class JobService {
         return jobRepo.save(savedJob);
     }
 
-    public Page<Job> searchByKeywordAndLocationAndCompany(Integer size, Integer page, String keyword, String location, String companyId) {
-        Page<Job> pageJob;
-        Pageable pageable = PageRequest.of(page, size, sort);
-        if (Objects.isNull(location) || location.isBlank()) {
-            if (Objects.isNull(keyword) || keyword.isBlank())
-                pageJob = jobRepo.findAll(pageable);
-            else
-                pageJob = jobRepo.findByKeyword(keyword, pageable);
-        } else {
-            if (Objects.isNull(keyword) || keyword.isBlank())
-                pageJob = jobRepo.findByLocation(location, pageable);
-            else
-                pageJob = jobRepo.findByKeywordAndLocation(keyword, location, pageable);
-        }
-        if (Objects.nonNull(companyId) && !companyId.isBlank()) {
-            List<Job> jobs = new ArrayList<>(pageJob.getContent());
-            for (int i = 0; i < jobs.size(); i++)
-                if (!jobs.get(i).getCompany().getId().equals(companyId))
-                    jobs.remove(jobs.get(i));
-
-            return new PageImpl<>(jobs);
-        }
-        return pageJob;
-    }
-
     public void deleteById(String jobId) {
         jobRepo.deleteById(jobId);
     }
@@ -200,10 +175,6 @@ public class JobService {
 
     }
 
-    public Page<Job> getByCompanyId(Integer page, Integer size, String cId) {
-        Pageable pageable = PageRequest.of(page, size, sort);
-        return jobRepo.findByCompanyId(cId, pageable);
-    }
 
     public Page<JobCV> getJobAppliedByUser(Integer page, Integer size, String userId) {
         Pageable pageable = PageRequest.of(page, size);
@@ -218,6 +189,17 @@ public class JobService {
                 .filter(job -> TimeUnit.DAYS.convert(
                         today.getTime() - job.getExpiredAt().getTime(), TimeUnit.MILLISECONDS) >= 7)
                 .collect(Collectors.toList());
+        // delete from db
+        expiredJob.forEach(job -> {
+            jobCvService.deleteByJobId(job.getId());
+            jobRepo.deleteById(job.getId());
+        });
+    }
+
+    @Scheduled(cron = "0 0 0 * * *")
+    @Async
+    public void updateStatusExpiredJob() {
+        List<Job> expiredJob = getExpiredJob().stream().peek(job -> job.setJobStatus(JobStatus.HIDDEN)).collect(Collectors.toList());
         // delete from db
         expiredJob.forEach(job -> {
             jobCvService.deleteByJobId(job.getId());
