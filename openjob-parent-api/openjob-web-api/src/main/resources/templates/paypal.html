@@ -119,7 +119,7 @@
         <form method="post"  action="/api/web/paypal/pay">
                 <img src="https://logos-world.net/wp-content/uploads/2020/07/PayPal-Logo.png" style="max-width: 100%;">
                 <label for="price">Price</label>
-                <input type="text" id="price" name="price" th:value="${price}">
+                <input type="text" id="price" name="price" th:value="${price}" required readonly>
                 <input type="submit" value="Continue to checkout" class="btn">
         </form>
     </div>

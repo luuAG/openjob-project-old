@@ -13,6 +13,7 @@ import com.openjob.web.jobcv.JobCvService;
 import com.openjob.web.user.UserService;
 import com.openjob.web.util.AuthenticationUtils;
 import com.openjob.web.util.NullAwareBeanUtils;
+import com.openjob.web.util.PriceCalculationUtils;
 import lombok.RequiredArgsConstructor;
 import net.kaczmarzyk.spring.data.jpa.domain.*;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.*;
@@ -42,6 +43,7 @@ public class JobController {
     private final JobCvService jobCvService;
     private final AuthenticationUtils authenticationUtils;
     private final CvService cvService;
+    private final PriceCalculationUtils priceCalculationUtils;
 
     @GetMapping(path = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<JobResponsePaginationDTO> searchJob(
@@ -249,5 +251,10 @@ public class JobController {
                 pageJob.getTotalPages(),
                 pageJob.getTotalElements())
         );
+    }
+
+    @PostMapping("/price/{companyId}")
+    public double getJobPrice(@RequestBody JobRequestDTO jobRequestDTO, @PathVariable("companyId") String companyId){
+        return priceCalculationUtils.calculateJobPrice(companyId, jobRequestDTO);
     }
 }

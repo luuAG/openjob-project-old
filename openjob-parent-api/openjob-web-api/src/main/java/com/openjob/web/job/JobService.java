@@ -3,6 +3,7 @@ package com.openjob.web.job;
 import com.openjob.common.enums.JobStatus;
 import com.openjob.common.enums.Role;
 import com.openjob.common.model.*;
+import com.openjob.web.business.OpenjobBusinessService;
 import com.openjob.web.company.CompanyService;
 import com.openjob.web.dto.JobRequestDTO;
 import com.openjob.web.dto.JobResponseDTO;
@@ -47,6 +48,7 @@ public class JobService {
     private final SpecializationService speService;
     private final JobSkillRepository jobSkillRepo;
     private final AuthenticationUtils authenticationUtils;
+    private final OpenjobBusinessService openjobBusinessService;
 
 
 
@@ -56,6 +58,12 @@ public class JobService {
     }
 
     public Job saveUpdate(JobRequestDTO jobDTO, HttpServletRequest request) throws InvocationTargetException, IllegalAccessException, IOException {
+        // validation
+        Company company = companyService.getById(jobDTO.getCompanyId());
+        Optional<Specialization> specialization = speService.getById(jobDTO.getSpecializationId());
+        if (Objects.isNull(company) || specialization.isEmpty())
+            throw new IllegalArgumentException("Company/Specialization not found!");
+
         NullAwareBeanUtils beanCopier = NullAwareBeanUtils.getInstance();
         Job job;
         if (jobDTO.getId() == null) {
@@ -67,12 +75,6 @@ public class JobService {
             job.setUpdatedAt(new Date());
         }
         beanCopier.copyProperties(job, jobDTO);
-
-
-        Company company = companyService.getById(jobDTO.getCompanyId());
-        Optional<Specialization> specialization = speService.getById(jobDTO.getSpecializationId());
-        if (Objects.isNull(company) || specialization.isEmpty())
-            throw new IllegalArgumentException("Company/Specialization not found!");
 
         Major major = specialization.get().getMajor();
         job.setMajor(major);
@@ -109,6 +111,7 @@ public class JobService {
             savedJob.getJobSkills().add(jobSkillRepo.save(jobSkill));
         }
 
+        companyService.updateAccountBalance(company.getId(), - jobDTO.getJobPrice());
         return jobRepo.save(savedJob);
     }
 

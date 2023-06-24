@@ -45,7 +45,7 @@ public class Company extends BaseAuditEntity{
     @Temporal(TemporalType.TIMESTAMP)
     private Date contractEndDate;
     @Column
-    private Double accountBalance;
+    private double accountBalance;
     @Column
     private Boolean isActive;
 

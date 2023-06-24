@@ -62,7 +62,7 @@ public class PaypalController {
             Payment payment = paypalService.executePayment(dto.getPaymentId(), dto.getPayerId());
             System.out.println(payment.toJSON());
             if (payment.getState().equals("approved")) {
-                companyService.updateAccountBalance(dto.getCompanyId(), Double.valueOf(payment.getTransactions().get(0).getAmount().getTotal()));
+                companyService.updateAccountBalance(dto.getCompanyId(), Double.parseDouble(payment.getTransactions().get(0).getAmount().getTotal()) * 10);
                 return ResponseEntity.ok("Thanh toán thành công");
             }
         } catch (PayPalRESTException e) {

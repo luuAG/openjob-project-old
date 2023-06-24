@@ -31,5 +31,5 @@ public class JobRequestDTO {
     private List<JobSkillDTO> listJobSkillDTO;
     private String companyId;
     private JobStatus jobStatus;
-
+    private double jobPrice;
 }
