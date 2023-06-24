@@ -28,6 +28,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -51,7 +52,8 @@ public class JobService {
     private final JobSkillRepository jobSkillRepo;
     private final MajorService majorService;
     private final AuthenticationUtils authenticationUtils;
-    private final Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+
+
 
 
     public Optional<Job> getById(String id) {
@@ -198,8 +200,9 @@ public class JobService {
 
     @Scheduled(cron = "0 0 0 * * *")
     @Async
+    @PostConstruct
     public void updateStatusExpiredJob() {
-        List<Job> expiredJob = getExpiredJob().stream().peek(job -> job.setJobStatus(JobStatus.HIDDEN)).collect(Collectors.toList());
+        List<Job> expiredJob = jobRepo.findUnhiddenExpiredJob().stream().peek(job -> job.setJobStatus(JobStatus.HIDDEN)).collect(Collectors.toList());
         jobRepo.saveAll(expiredJob);
     }
 

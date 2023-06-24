@@ -23,6 +23,9 @@ public interface JobRepository extends JpaRepository<Job, String>, JpaSpecificat
     @Query("select j from Job j where current_date() > j.expiredAt")
     List<Job> findExpiredJob();
 
+    @Query("select j from Job j where current_date() > j.expiredAt and j.jobStatus <> com.openjob.common.enums.JobStatus.HIDDEN")
+    List<Job> findUnhiddenExpiredJob();
+
     @Query("select j from Job j where j.specialization.id=?1 and j.jobStatus = com.openjob.common.enums.JobStatus.APPROVED")
     List<Job> findBySpecialization(Integer id, Pageable pageable);
 
