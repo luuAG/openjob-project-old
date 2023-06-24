@@ -200,11 +200,7 @@ public class JobService {
     @Async
     public void updateStatusExpiredJob() {
         List<Job> expiredJob = getExpiredJob().stream().peek(job -> job.setJobStatus(JobStatus.HIDDEN)).collect(Collectors.toList());
-        // delete from db
-        expiredJob.forEach(job -> {
-            jobCvService.deleteByJobId(job.getId());
-            jobRepo.deleteById(job.getId());
-        });
+        jobRepo.saveAll(expiredJob);
     }
 
     public List<Job> getExpiredJob() {
