@@ -168,9 +168,11 @@ public class CvController {
         return ResponseEntity.ok(cvService.getCvForCompanyView(cvId, companyId));
     }
 
-    @PostMapping("/{cvId}/charge-company/{companyId}")
-    public ResponseEntity<MessageResponse> chargeCompanyForViewCv(@PathVariable("cvId") String cvId, @PathVariable("companyId") String companyId){
-        cvService.chargeCompanyForViewCv(cvId, companyId);
+    @PostMapping("/{cvId}/charge-company/{companyId}/{isFree}")
+    public ResponseEntity<MessageResponse> chargeCompanyForViewCv(@PathVariable("cvId") String cvId,
+                                                                  @PathVariable("companyId") String companyId,
+                                                                  @PathVariable("isFree") Boolean isFree){
+        cvService.chargeCompanyForViewCv(cvId, companyId, isFree);
         return ResponseEntity.ok(new MessageResponse("Thanh toán thành công!"));
     }
 }

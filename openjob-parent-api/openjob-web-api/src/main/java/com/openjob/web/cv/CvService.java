@@ -238,13 +238,17 @@ public class CvService {
         return cvDTO;
     }
 
-    public void chargeCompanyForViewCv(String cvId, String companyId) {
+    public void chargeCompanyForViewCv(String cvId, String companyId, Boolean isFree) {
         CvCompany cvCompany = new CvCompany();
         cvCompany.setCompany(companyService.getById(companyId));
         cvCompany.setCv(getById(cvId).orElseThrow());
         cvCompany.setCreatedAt(new Date());
         cvCompanyRepo.save(cvCompany);
-
-        companyService.updateAccountBalance(companyId, - openjobBusinessService.get().getBaseCvViewPrice());
+        if (isFree){
+            Company company = companyService.getById(companyId);
+            company.setAmountOfFreeCvViews(company.getAmountOfFreeCvViews() - 1);
+        }
+        else
+            companyService.updateAccountBalance(companyId, - openjobBusinessService.get().getBaseCvViewPrice());
     }
 }
