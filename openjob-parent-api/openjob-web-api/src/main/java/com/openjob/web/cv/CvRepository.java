@@ -26,6 +26,6 @@ public interface CvRepository extends JpaRepository<CV, String>, JpaSpecificatio
     @Query("select cv from JobCV jcv join CV cv on jcv.cv.id=cv.id where jcv.job.id=?1 and jcv.isApplied=true")
     Page<CV> findCvAppliedByJobId(String jobId, Pageable pageable);
 
-    @Query("select case when count(cc)>0 then true else false end from CvCompany cc where cc.id=?1 and cc.company.id=?2")
+    @Query("select case when count(cc)>0 then true else false end from CvCompany cc where cc.cv.id=?1 and cc.company.id=?2")
     boolean checkCompanyChargedToViewCv(String cvId, String companyId);
 }
