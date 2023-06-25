@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Properties;
 
 @Component
-@EnableAsync
+@EnableAsync(proxyTargetClass = true)
 public class CustomJavaMailSender extends JavaMailSenderImpl {
 
     @Value("${spring.mail.username}")

@@ -15,6 +15,7 @@ import com.openjob.web.specialization.SpecializationService;
 import com.openjob.web.user.UserService;
 import com.openjob.web.util.AuthenticationUtils;
 import com.openjob.web.util.NullAwareBeanUtils;
+import com.openjob.web.util.PriceCalculationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -48,7 +49,7 @@ public class JobService {
     private final SpecializationService speService;
     private final JobSkillRepository jobSkillRepo;
     private final AuthenticationUtils authenticationUtils;
-    private final OpenjobBusinessService openjobBusinessService;
+    private final PriceCalculationUtils priceCalculationUtils;
 
 
 
@@ -63,6 +64,12 @@ public class JobService {
         Optional<Specialization> specialization = speService.getById(jobDTO.getSpecializationId());
         if (Objects.isNull(company) || specialization.isEmpty())
             throw new IllegalArgumentException("Company/Specialization not found!");
+        // charge for job
+        double price = priceCalculationUtils.calculateJobPrice(company.getId(), jobDTO);
+        if (price == 0.0f)
+            company.setAmountOfFreeJobs(company.getAmountOfFreeJobs() - 1);
+        else
+            companyService.updateAccountBalance(company.getId(), -price);
 
         NullAwareBeanUtils beanCopier = NullAwareBeanUtils.getInstance();
         Job job;

@@ -112,17 +112,6 @@ public class JobController {
 
     }
 
-//    @GetMapping(path = "/by-company/{companyId}", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<JobPaginationDTO> getJobByCompany(@PathVariable("companyId") String cId,
-//                                                     @RequestParam("page") Integer page,
-//                                                     @RequestParam("size") Integer size) {
-//        Page<Job> jobPage = jobService.getByCompanyId(page, size, cId);
-//        return ResponseEntity.ok(new JobPaginationDTO(
-//                jobPage.getContent(),
-//                jobPage.getTotalPages(),
-//                jobPage.getTotalElements()
-//        ));
-//    }
 
     @PostMapping(path = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MessageResponse> createNewJob(@RequestBody JobRequestDTO reqJob, HttpServletRequest request) throws InvocationTargetException, IllegalAccessException, IOException {

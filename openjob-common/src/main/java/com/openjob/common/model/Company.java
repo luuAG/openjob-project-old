@@ -78,8 +78,7 @@ public class Company extends BaseAuditEntity{
 
 
     public void setImageUrlsStringCustom(List<String> urls) {
-        if (StringUtils.isEmpty(this.imageUrlsString))
-            this.imageUrlsString = "";
+        this.imageUrlsString = "";
         urls.forEach(url -> this.imageUrlsString += url + ", ");
     }
     public void initializeImageUrls(){

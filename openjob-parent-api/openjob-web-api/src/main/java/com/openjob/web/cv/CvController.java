@@ -41,7 +41,8 @@ public class CvController {
         public ResponseEntity<CvPaginationDTO> getCvMatchedJob(
             @PathVariable("jobId") final String jobId,
             @Join(path = "cv", alias = "cv")
-            @Join(path = "cv.listSkill", alias = "skill")
+            @Join(path = "cv.skills", alias = "cvSkill")
+            @Join(path = "cvSkill.skill", alias = "skill")
             @Conjunction(
                     value =
                     @Or({
@@ -52,11 +53,7 @@ public class CvController {
                             @Spec(path = "cv.specialization.id", params = "specializationId", spec = Equal.class),
                     }),
                     and = {
-                            @Spec(path = "skill.id", params = "skill1", spec = Equal.class),
-                            @Spec(path = "skill.id", params = "skill2", spec = Equal.class),
-                            @Spec(path = "skill.id", params = "skill3", spec = Equal.class),
-                            @Spec(path = "skill.id", params = "skill4", spec = Equal.class),
-                            @Spec(path = "skill.id", params = "skill5", spec = Equal.class),
+                            @Spec(path = "skill.id", params = "skillId", spec = Equal.class),
                             @Spec(path = "isMatched", constVal = "true", spec = Equal.class)
                     }
             ) Specification<JobCV> jobCvSpec, PagingModel pagingModel){
@@ -86,7 +83,8 @@ public class CvController {
     public ResponseEntity<CvPaginationDTO> getCvAppliedJob(
             @PathVariable("jobId") final String jobId,
             @Join(path = "cv", alias = "cv")
-            @Join(path = "cv.listSkill", alias = "skill")
+            @Join(path = "cv.skills", alias = "cvSkill")
+            @Join(path = "cvSkill.skill", alias = "skill")
             @Conjunction(
                     value =
                     @Or({
@@ -97,11 +95,7 @@ public class CvController {
                             @Spec(path = "cv.specialization.id", params = "specializationId", spec = Equal.class),
                     }),
                     and = {
-                            @Spec(path = "skill.id", params = "skill1", spec = Equal.class),
-                            @Spec(path = "skill.id", params = "skill2", spec = Equal.class),
-                            @Spec(path = "skill.id", params = "skill3", spec = Equal.class),
-                            @Spec(path = "skill.id", params = "skill4", spec = Equal.class),
-                            @Spec(path = "skill.id", params = "skill5", spec = Equal.class),
+                            @Spec(path = "skill.id", params = "skillId", spec = Equal.class),
                             @Spec(path = "isApplied", constVal = "true", spec = Equal.class)
                     }
             ) Specification<JobCV> jobCvSpec, PagingModel pagingModel){
@@ -136,7 +130,8 @@ public class CvController {
 
     @GetMapping()
     public ResponseEntity<CvPaginationDTO> searchCv(
-        @Join(path = "listSkill", alias = "skill")
+        @Join(path = "skills", alias = "cvSkill")
+        @Join(path = "cvSkill.skill", alias = "skill")
         @Conjunction(
                 value =
                     @Or({
@@ -147,11 +142,7 @@ public class CvController {
                         @Spec(path = "specialization.id", params = "specializationId", spec = Equal.class),
                     }),
                 and = {
-                    @Spec(path = "skill.id", params = "skill1", spec = Equal.class),
-                    @Spec(path = "skill.id", params = "skill2", spec = Equal.class),
-                    @Spec(path = "skill.id", params = "skill3", spec = Equal.class),
-                    @Spec(path = "skill.id", params = "skill4", spec = Equal.class),
-                    @Spec(path = "skill.id", params = "skill5", spec = Equal.class),
+                    @Spec(path = "skill.id", params = "skillId", spec = Equal.class)
                 }
         ) Specification<CV> cvSpec, PagingModel pagingModel){
         Page<CV> pageCv = cvService.search(cvSpec, pagingModel.getPageable());

@@ -1,4 +1,4 @@
-package com.openjob.admin.config.mvc;
+package com.openjob.admin.config;
 
 import net.kaczmarzyk.spring.data.jpa.web.SpecificationArgumentResolver;
 import org.springframework.context.annotation.Configuration;

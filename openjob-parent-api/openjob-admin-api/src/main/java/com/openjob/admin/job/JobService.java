@@ -55,14 +55,18 @@ public class JobService {
     public void reject(List<Job> jobs, List<String> rejectReasons) {
         List<String> ids = jobs.stream().map(Job::getId).collect(Collectors.toList());
         jobRepo.rejectByIds(ids);
-        // TODO: send mail about the reason
+        // send mail about the reason and refund
         for (int i=0; i<jobs.size(); i++){
+            // refund
+
+
+            // send mail
             Map<String, String> extraData = new HashMap<>();
             extraData.put(MailTemplateVariable.REASON.getTemplateVariable(), rejectReasons.get(i) == null ? "" : rejectReasons.get(i));
 
             MailSetting mailSetting = new MailSetting(
                     jobs.get(i).getCompany().getEmail(),
-                    "Công việc đã được duyệt",
+                    "Công việc không được duyệt",
                     settingService.getByName(MailCase.MAIL_JOB_REJECTED.name()).orElseThrow().getValue(),
                     null,
                     jobs.get(i).getCompany(),
