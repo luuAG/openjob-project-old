@@ -6,6 +6,7 @@ import com.openjob.common.model.*;
 import com.openjob.web.business.OpenjobBusinessService;
 import com.openjob.web.company.CompanyService;
 import com.openjob.web.dto.CVRequestDTO;
+import com.openjob.web.dto.CVwithExtraDataDTO;
 import com.openjob.web.dto.CvDTO;
 import com.openjob.web.jobcv.JobCvService;
 import com.openjob.web.major.MajorService;
@@ -228,13 +229,12 @@ public class CvService {
 
     }
 
-    public CvDTO getCvForCompanyView(String cvId, String companyId) throws InvocationTargetException, IllegalAccessException {
+    public CVwithExtraDataDTO getCvForCompanyView(String cvId, String companyId) {
         boolean isCharged = cvRepo.checkCompanyChargedToViewCv(cvId, companyId);
         CV cv = cvRepo.getById(cvId);
-        CvDTO cvDTO = new CvDTO();
-        NullAwareBeanUtils.getInstance().copyProperties(cvDTO, cv);
+        CVwithExtraDataDTO cvDTO = new CVwithExtraDataDTO();
+        cvDTO.setCv(cv);
         cvDTO.setChargedToView(isCharged);
-        cvDTO.setUserId(cv.getUser().getId());
 
         return cvDTO;
     }

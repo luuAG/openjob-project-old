@@ -3,6 +3,7 @@ package com.openjob.web.cv;
 import com.openjob.common.model.*;
 import com.openjob.common.response.MessageResponse;
 import com.openjob.web.dto.CVRequestDTO;
+import com.openjob.web.dto.CVwithExtraDataDTO;
 import com.openjob.web.dto.CvDTO;
 import com.openjob.web.dto.CvPaginationDTO;
 import com.openjob.web.job.JobService;
@@ -167,7 +168,7 @@ public class CvController {
     }
 
     @GetMapping("/{cvId}/view-by-company/{companyId}")
-    public ResponseEntity<CvDTO> companyViewCv(@PathVariable("cvId") String cvId, @PathVariable("companyId") String companyId) throws InvocationTargetException, IllegalAccessException {
+    public ResponseEntity<CVwithExtraDataDTO> companyViewCv(@PathVariable("cvId") String cvId, @PathVariable("companyId") String companyId) {
         return ResponseEntity.ok(cvService.getCvForCompanyView(cvId, companyId));
     }
 

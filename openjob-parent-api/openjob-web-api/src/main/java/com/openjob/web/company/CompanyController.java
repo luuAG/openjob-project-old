@@ -45,4 +45,10 @@ public class CompanyController {
         companyRegistrationService.save(registration);
         return ResponseEntity.ok(new MessageResponse("Đăng ký thành công! Chúng tôi sẽ liên hệ bạn sớm!"));
     }
+
+    @PostMapping("/company/{companyId}/upgrade")
+    public ResponseEntity<MessageResponse> upgradeMembership(@PathVariable("companyId") String companyId){
+        companyService.upgradeMembership(companyId);
+        return ResponseEntity.ok(new MessageResponse("Thanh toán thành công"));
+    }
 }
