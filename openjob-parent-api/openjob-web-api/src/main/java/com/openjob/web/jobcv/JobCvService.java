@@ -4,6 +4,7 @@ import com.openjob.common.enums.CvStatus;
 import com.openjob.common.model.CV;
 import com.openjob.common.model.Job;
 import com.openjob.common.model.JobCV;
+import com.openjob.common.model.User;
 import com.openjob.web.cv.CvRepository;
 import com.openjob.web.exception.ResourceNotFoundException;
 import com.openjob.web.job.JobRepository;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -118,5 +120,9 @@ public class JobCvService {
 
     public Page<JobCV> searchJobCv(Specification<JobCV> jobCvSpec, Pageable pageable) {
         return jobCvRepo.findAll(jobCvSpec, pageable);
+    }
+
+    public List<User> getUserAppliedJob(String jobId) {
+        return jobCvRepo.findUserAppliedJob(jobId);
     }
 }

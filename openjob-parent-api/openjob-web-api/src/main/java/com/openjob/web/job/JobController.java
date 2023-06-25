@@ -1,6 +1,5 @@
 package com.openjob.web.job;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.openjob.common.enums.MemberType;
 import com.openjob.common.model.Job;
 import com.openjob.common.model.JobCV;
@@ -10,18 +9,15 @@ import com.openjob.common.response.MessageResponse;
 import com.openjob.web.cv.CvService;
 import com.openjob.web.dto.*;
 import com.openjob.web.jobcv.JobCvService;
-import com.openjob.web.user.UserService;
 import com.openjob.web.util.AuthenticationUtils;
-import com.openjob.web.util.NullAwareBeanUtils;
 import com.openjob.web.util.PriceCalculationUtils;
 import lombok.RequiredArgsConstructor;
 import net.kaczmarzyk.spring.data.jpa.domain.*;
-import net.kaczmarzyk.spring.data.jpa.web.annotation.*;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.Conjunction;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.Join;
-import org.apache.commons.codec.binary.Base64;
+import net.kaczmarzyk.spring.data.jpa.web.annotation.Or;
+import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

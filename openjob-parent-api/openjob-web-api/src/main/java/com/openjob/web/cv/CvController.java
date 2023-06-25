@@ -165,4 +165,15 @@ public class CvController {
                 pageCv.getTotalElements())
         );
     }
+
+    @GetMapping("/{cvId}/view-by-company/{companyId}")
+    public ResponseEntity<CvDTO> companyViewCv(@PathVariable("cvId") String cvId, @PathVariable("companyId") String companyId) throws InvocationTargetException, IllegalAccessException {
+        return ResponseEntity.ok(cvService.getCvForCompanyView(cvId, companyId));
+    }
+
+    @PostMapping("/{cvId}/charge-company/{companyId}")
+    public ResponseEntity<MessageResponse> chargeCompanyForViewCv(@PathVariable("cvId") String cvId, @PathVariable("companyId") String companyId){
+        cvService.chargeCompanyForViewCv(cvId, companyId);
+        return ResponseEntity.ok(new MessageResponse("Thanh toán thành công!"));
+    }
 }

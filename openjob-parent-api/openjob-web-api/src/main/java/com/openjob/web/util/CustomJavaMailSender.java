@@ -6,17 +6,19 @@ import com.openjob.common.model.Job;
 import com.openjob.common.model.MailSetting;
 import com.openjob.common.model.User;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.security.core.parameters.P;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.Properties;
 
 @Component
+@EnableAsync(proxyTargetClass = true)
 public class CustomJavaMailSender extends JavaMailSenderImpl {
 
     @Value("${spring.mail.username}")

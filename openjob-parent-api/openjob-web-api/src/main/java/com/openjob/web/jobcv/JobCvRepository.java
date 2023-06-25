@@ -1,6 +1,7 @@
 package com.openjob.web.jobcv;
 
 import com.openjob.common.model.JobCV;
+import com.openjob.common.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,6 +10,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -30,4 +32,7 @@ public interface JobCvRepository extends JpaRepository<JobCV, Integer>, JpaSpeci
     @Query("delete from JobCV jcv where jcv.job.id=?1")
     @Modifying
     void deleteByJobId(String jobId);
+
+    @Query("select jcv.cv.user from JobCV jcv where jcv.job.id=?1 and jcv.isApplied=true")
+    List<User> findUserAppliedJob(String jobId);
 }

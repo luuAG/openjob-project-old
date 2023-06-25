@@ -6,6 +6,7 @@ import com.openjob.admin.company.CompanyService;
 import com.openjob.common.model.OpenjobBusiness;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@EnableAsync
 public class OpenjobBusinessService {
     private final OpenjobBusinessRepository repository;
     private final CompanyRepository companyRepository;

@@ -45,4 +45,6 @@ public class CvDTO {
     private boolean isActive;
 
     private List<CvSkill> skills;
+
+    private boolean isChargedToView;
 }

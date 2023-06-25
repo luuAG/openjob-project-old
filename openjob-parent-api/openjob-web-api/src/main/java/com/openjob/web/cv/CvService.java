@@ -1,15 +1,20 @@
 package com.openjob.web.cv;
 
 import com.openjob.common.enums.CvStatus;
+import com.openjob.common.enums.MailCase;
 import com.openjob.common.model.*;
+import com.openjob.web.business.OpenjobBusinessService;
+import com.openjob.web.company.CompanyService;
 import com.openjob.web.dto.CVRequestDTO;
 import com.openjob.web.dto.CvDTO;
 import com.openjob.web.jobcv.JobCvService;
 import com.openjob.web.major.MajorService;
+import com.openjob.web.setting.SettingService;
 import com.openjob.web.skill.SkillRepository;
 import com.openjob.web.specialization.SpecializationService;
 import com.openjob.web.user.UserService;
 import com.openjob.web.util.AuthenticationUtils;
+import com.openjob.web.util.CustomJavaMailSender;
 import com.openjob.web.util.JobCVUtils;
 import com.openjob.web.util.NullAwareBeanUtils;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +23,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +37,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@EnableAsync
 public class CvService {
     private final CvRepository cvRepo;
     private final SkillRepository skillRepo;
@@ -40,6 +47,11 @@ public class CvService {
     private final MajorService majorService;
     private final CvSkillRepository cvSkillRepo;
     private final AuthenticationUtils authenticationUtils;
+    private final CustomJavaMailSender mailSender;
+    private final SettingService settingService;
+    private final CvCompanyRepository cvCompanyRepo;
+    private final CompanyService companyService;
+    private final OpenjobBusinessService openjobBusinessService;
 
     public Optional<CV> getById(String id) {
         return cvRepo.findById(id);
@@ -177,6 +189,7 @@ public class CvService {
                 })
                 .collect(Collectors.toList());
 
+        boolean hasMatch = false;
         for (CV cv : listCV) {
             double matchingPoint = JobCVUtils.scoreCv(savedJob, cv);
             if (matchingPoint > 0) {
@@ -197,8 +210,42 @@ public class CvService {
                     newJobCv.setIsApplied(false);
                     jobCvService.save(newJobCv);
                 }
+                hasMatch = true;
             }
         }
 
+        if (hasMatch){
+            MailSetting mailSetting = new MailSetting(
+                    savedJob.getCompany().getEmail(),
+                    "Đã có ứng viên phù hợp với công việc",
+                    settingService.getByMailCase(MailCase.MAIL_JOB_HAS_MATCH).getValue(),
+                    null,
+                    savedJob.getCompany(),
+                    savedJob,
+                    null);
+            mailSender.sendMail(mailSetting);
+        }
+
+    }
+
+    public CvDTO getCvForCompanyView(String cvId, String companyId) throws InvocationTargetException, IllegalAccessException {
+        boolean isCharged = cvRepo.checkCompanyChargedToViewCv(cvId, companyId);
+        CV cv = cvRepo.getById(cvId);
+        CvDTO cvDTO = new CvDTO();
+        NullAwareBeanUtils.getInstance().copyProperties(cvDTO, cv);
+        cvDTO.setChargedToView(isCharged);
+        cvDTO.setUserId(cv.getUser().getId());
+
+        return cvDTO;
+    }
+
+    public void chargeCompanyForViewCv(String cvId, String companyId) {
+        CvCompany cvCompany = new CvCompany();
+        cvCompany.setCompany(companyService.getById(companyId));
+        cvCompany.setCv(getById(cvId).orElseThrow());
+        cvCompany.setCreatedAt(new Date());
+        cvCompanyRepo.save(cvCompany);
+
+        companyService.updateAccountBalance(companyId, - openjobBusinessService.get().getBaseCvViewPrice());
     }
 }

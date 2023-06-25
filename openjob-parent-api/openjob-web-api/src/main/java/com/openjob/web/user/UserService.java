@@ -66,7 +66,7 @@ public class UserService {
             String returnedUrl = CloudinaryUtils.upload(imageBytes, UUID.randomUUID().toString());
             userInfo.getCompany().setDescription(replaceImgTag(userInfo.getCompany().getDescription(), returnedUrl));
         }
-        if (Objects.nonNull(userInfo.getCompany()) && Objects.nonNull(userInfo.getCompany().getBase64Images())) {
+        if (Objects.nonNull(userInfo.getCompany()) && Objects.nonNull(userInfo.getCompany().getBase64Images()) && userInfo.getCompany().getBase64Images().length > 0) {
             List<String> urls = Arrays.stream(userInfo.getCompany().getImageUrlsString().split(", ")).collect(Collectors.toList());
             urls.remove(null);
             urls.remove("");

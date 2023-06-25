@@ -4,11 +4,9 @@ import com.openjob.admin.dto.*;
 import com.openjob.admin.setting.SettingService;
 import com.openjob.admin.util.CustomJavaMailSender;
 import com.openjob.common.enums.AuthProvider;
+import com.openjob.common.enums.MailCase;
 import com.openjob.common.enums.Role;
-import com.openjob.common.model.Company;
-import com.openjob.common.model.CompanyRegistration;
-import com.openjob.common.model.PagingModel;
-import com.openjob.common.model.User;
+import com.openjob.common.model.*;
 import com.openjob.common.response.MessageResponse;
 import lombok.RequiredArgsConstructor;
 import net.kaczmarzyk.spring.data.jpa.domain.Between;
@@ -82,43 +80,21 @@ public class CompanyController {
         savedCompany.setHeadHunter(savedHr);
         companyService.save(savedCompany);
 
-//        if (Objects.nonNull(savedHr)){
-//            MimeMessagePreparator message = mimeMessage -> {
-//                MimeMessageHelper message1 = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-//                message1.setFrom("duongvannam2001@gmail.com");
-//                message1.setTo(savedHr.getEmail());
-//                message1.setSubject("Tài khoản OpenJob đã được tạo");
-//                String text = settingService.getByName("MAIL_NEW_HR_ACCOUNT").orElseThrow().getValue();
-//                text = text.replace("[[company]]", company.getName())
-//                        .replace("[[email]]", savedHr.getEmail())
-//                        .replace("[[password]]", "12345678");
-//                message1.setText(text, true);
-//            };
-//            try {
-//                mailSender.reloadProperties();
-//                mailSender.getMailSender().send(message);
-//            } catch (Exception ex) {
-//                hrService.delete(savedHr);
-//                throw ex;
-//            }
-//        }
+        if (Objects.nonNull(savedHr)){
+            MailSetting mailSetting = new MailSetting(
+                    company.getEmail(),
+                    "Tài khoản đã được tạo",
+                    settingService.getByName(MailCase.MAIL_COMPANY_CREATED.name()).orElseThrow().getValue(),
+                    null,
+                    company,
+                    null,
+                    null);
+            mailSender.sendMail(mailSetting); // async
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 new CompanyHeadhunterResponseDTO(savedHr.getCompany().getId(), savedHr.getId())
         );
     }
-
-//    @GetMapping(path = "/companies", produces = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<CompanyPaginationDTO> getCompanies(
-//            @RequestParam Integer page,
-//            @RequestParam Integer size,
-//            @RequestParam(required = false) String keyword) {
-//        Page<Company> pageCompany = companyService.search(page, size, keyword);
-//        return ResponseEntity.ok(new CompanyPaginationDTO(
-//                pageCompany.getContent(),
-//                pageCompany.getTotalPages(),
-//                pageCompany.getTotalElements())
-//        );
-//    }
 
     @GetMapping(path = "/companies", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CompanyPaginationDTO> getCompanies(

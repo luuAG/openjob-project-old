@@ -69,18 +69,18 @@ public class JobService {
         if (jobDTO.getId() == null) {
             job = new Job();
             job.setCreatedAt(new Date());
+            job.setJobStatus(JobStatus.NEW);
         }
         else {
             job = getById(jobDTO.getId()).orElseThrow();
             job.setUpdatedAt(new Date());
         }
         beanCopier.copyProperties(job, jobDTO);
-
         Major major = specialization.get().getMajor();
         job.setMajor(major);
         job.setCompany(company);
         job.setSpecialization(specialization.get());
-        job.setJobStatus(JobStatus.NEW);
+
 
         job.getJobSkills().clear();
         Job savedJob = jobRepo.save(job);
@@ -140,6 +140,14 @@ public class JobService {
     public void updateStatusExpiredJob() {
         List<Job> expiredJob = jobRepo.findUnhiddenExpiredJob().stream().peek(job -> job.setJobStatus(JobStatus.HIDDEN)).collect(Collectors.toList());
         jobRepo.saveAll(expiredJob);
+        // TODO:
+//        for (Job job : expiredJob){
+//            List<User> users = jobCvService.getUserAppliedJob(job.getId());
+//            for (User user : users){
+//                MailSetting mailSetting = new MailSetting()
+//            }
+//
+//        }
     }
 
     public List<Job> getExpiredJob() {

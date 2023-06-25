@@ -1,24 +1,31 @@
 package com.openjob.admin.util;
 
-import com.openjob.admin.setting.SettingService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.openjob.common.enums.MailTemplateVariable;
+import com.openjob.common.model.Company;
+import com.openjob.common.model.Job;
+import com.openjob.common.model.MailSetting;
+import com.openjob.common.model.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.mail.javamail.MimeMessagePreparator;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
 import java.util.Properties;
 
 @Component
+@EnableAsync
 public class CustomJavaMailSender extends JavaMailSenderImpl {
-    @Autowired
-    private SettingService settingService;
 
     @Value("${spring.mail.username}")
     private String mailUsername;
     @Value("${spring.mail.password}")
     private String mailPassword;
 
-    private JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+    private final JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
 
     public void getInstance(){
 
@@ -37,11 +44,48 @@ public class CustomJavaMailSender extends JavaMailSenderImpl {
         props.put("mail.smtps.allow8bitmime", "true");
     }
 
-    public void reloadProperties(){
+    private void reloadProperties(){
         getInstance();
     }
 
-    public JavaMailSenderImpl getMailSender(){
-        return this.mailSender;
+    @Async
+    public void sendMail(MailSetting mailSetting){
+        MimeMessagePreparator message = mimeMessage -> {
+            MimeMessageHelper message1 = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            message1.setFrom(mailUsername);
+            message1.setTo(mailSetting.getRecipient());
+            message1.setSubject(mailSetting.getSubject());
+            message1.setText(processTemplateVariables(mailSetting.getBody(), mailSetting), true);
+        };
+        try {
+            reloadProperties();
+            mailSender.send(message);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            throw ex;
+        }
     }
+
+    private String processTemplateVariables(String body, MailSetting mailSetting) {
+        if (mailSetting.getCompany() != null) {
+            Company company = mailSetting.getCompany();
+            body = body.replace(MailTemplateVariable.COMPANY_NAME.getTemplateVariable(), company.getName());
+        }
+        if (mailSetting.getJob() != null) {
+            Job job = mailSetting.getJob();
+            body = body.replace(MailTemplateVariable.JOB_TITLE.getTemplateVariable(), job.getTitle());
+        }
+        if (mailSetting.getUser() != null) {
+            User user = mailSetting.getUser();
+            body = body.replace(MailTemplateVariable.USER_NAME.getTemplateVariable(), user.getFirstName());
+        }
+        if (mailSetting.getExtraData() != null) {
+            for (Map.Entry<String, String> data : mailSetting.getExtraData().entrySet()) {
+                body = body.replace(data.getKey(), data.getValue());
+            }
+        }
+
+        return body;
+    }
+
 }
