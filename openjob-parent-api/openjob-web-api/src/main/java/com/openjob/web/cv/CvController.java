@@ -3,12 +3,10 @@ package com.openjob.web.cv;
 import com.openjob.common.model.*;
 import com.openjob.common.response.MessageResponse;
 import com.openjob.web.dto.CVRequestDTO;
-import com.openjob.web.dto.CVwithExtraDataDTO;
+import com.openjob.web.dto.UserCVwithExtraDataDTO;
 import com.openjob.web.dto.CvDTO;
 import com.openjob.web.dto.CvPaginationDTO;
-import com.openjob.web.job.JobService;
 import com.openjob.web.jobcv.JobCvService;
-import com.openjob.web.user.UserService;
 import lombok.RequiredArgsConstructor;
 import net.kaczmarzyk.spring.data.jpa.domain.Equal;
 import net.kaczmarzyk.spring.data.jpa.domain.Like;
@@ -31,8 +29,6 @@ import java.util.Optional;
 @RequestMapping("/cv")
 public class CvController {
     private final CvService cvService;
-    private final JobService jobService;
-    private final UserService userService;
     private final JobCvService jobCvService;
 
     @GetMapping(path = "/byuserid/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -168,7 +164,7 @@ public class CvController {
     }
 
     @GetMapping("/{cvId}/view-by-company/{companyId}")
-    public ResponseEntity<CVwithExtraDataDTO> companyViewCv(@PathVariable("cvId") String cvId, @PathVariable("companyId") String companyId) {
+    public ResponseEntity<UserCVwithExtraDataDTO> companyViewCv(@PathVariable("cvId") String cvId, @PathVariable("companyId") String companyId) {
         return ResponseEntity.ok(cvService.getCvForCompanyView(cvId, companyId));
     }
 

@@ -6,7 +6,7 @@ import com.openjob.common.model.*;
 import com.openjob.web.business.OpenjobBusinessService;
 import com.openjob.web.company.CompanyService;
 import com.openjob.web.dto.CVRequestDTO;
-import com.openjob.web.dto.CVwithExtraDataDTO;
+import com.openjob.web.dto.UserCVwithExtraDataDTO;
 import com.openjob.web.dto.CvDTO;
 import com.openjob.web.jobcv.JobCvService;
 import com.openjob.web.major.MajorService;
@@ -20,7 +20,6 @@ import com.openjob.web.util.JobCVUtils;
 import com.openjob.web.util.NullAwareBeanUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Async;
@@ -229,11 +228,11 @@ public class CvService {
 
     }
 
-    public CVwithExtraDataDTO getCvForCompanyView(String cvId, String companyId) {
+    public UserCVwithExtraDataDTO getCvForCompanyView(String cvId, String companyId) {
         boolean isCharged = cvRepo.checkCompanyChargedToViewCv(cvId, companyId);
         CV cv = cvRepo.getById(cvId);
-        CVwithExtraDataDTO cvDTO = new CVwithExtraDataDTO();
-        cvDTO.setCv(cv);
+        UserCVwithExtraDataDTO cvDTO = new UserCVwithExtraDataDTO();
+        cvDTO.setUser(cv.getUser());
         cvDTO.setChargedToView(isCharged);
 
         return cvDTO;
