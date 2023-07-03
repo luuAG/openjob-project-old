@@ -54,11 +54,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         if(userOptional.isPresent()) {
             user = userOptional.get();
             if (!user.getIsActive())
-                throw new Exception("Tài khoản của bạn đã bị vô hiệu hoá! Liên hệ quản trị viên của OpenJob để biết thêm chi tiết!");
+                throw new Exception("ACCOUNT_DISABLED");
             if (user.getRole().equals(Role.USER)){
                 Company company = companyRepo.findByHeadHunterId(user.getId());
                 if (!company.getIsActive())
-                    throw new Exception("Tài khoản của bạn đã bị vô hiệu hoá! Liên hệ quản trị viên của OpenJob để biết thêm chi tiết!");
+                    throw new Exception("ACCOUNT_DISABLED");
             }
 //            if(!user.getAuthProvider().name()
 //                    .equalsIgnoreCase(oAuth2UserRequest.getClientRegistration().getRegistrationId())) {
