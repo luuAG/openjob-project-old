@@ -12,6 +12,6 @@ import java.util.Optional;
 @Repository
 public interface CvRepository extends JpaRepository<CV, String>, JpaSpecificationExecutor<CV> {
 
-    @Query("select cv from CV cv where cv.specialization.id=?1")
+    @Query("select cv from CV cv where cv.specialization.id=?1 and cv.isActive=true")
     List<CV> findBySpecializationId(Integer id);
 }

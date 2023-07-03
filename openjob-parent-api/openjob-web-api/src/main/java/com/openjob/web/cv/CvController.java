@@ -142,7 +142,8 @@ public class CvController {
                         @Spec(path = "specialization.id", params = "specializationId", spec = Equal.class),
                     }),
                 and = {
-                    @Spec(path = "skill.id", params = "skillId", spec = Equal.class)
+                    @Spec(path = "skill.id", params = "skillId", spec = Equal.class),
+                    @Spec(path = "isActive", constVal = "true", spec = Equal.class)
                 }
         ) Specification<CV> cvSpec, PagingModel pagingModel){
         Page<CV> pageCv = cvService.search(cvSpec, pagingModel.getPageable());
