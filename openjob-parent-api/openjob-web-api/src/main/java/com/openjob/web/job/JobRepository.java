@@ -20,16 +20,25 @@ public interface JobRepository extends JpaRepository<Job, String>, JpaSpecificat
     void deleteById(String s);
 
 
-    @Query("select j from Job j where current_date() > j.expiredAt")
+    @Query("select distinct j from Job j where current_date() > j.expiredAt")
     List<Job> findExpiredJob();
 
-    @Query("select j from Job j where current_date() > j.expiredAt and j.jobStatus <> com.openjob.common.enums.JobStatus.HIDDEN")
+    @Query("select distinct j from Job j where current_date() > j.expiredAt and j.jobStatus <> com.openjob.common.enums.JobStatus.HIDDEN")
     List<Job> findUnhiddenExpiredJob();
 
-    @Query("select j from Job j where j.specialization.id=?1 and j.jobStatus = com.openjob.common.enums.JobStatus.APPROVED")
+    @Query("select distinct j " +
+            "from Job j " +
+            "where j.specialization.id=?1 " +
+            "and j.jobStatus = com.openjob.common.enums.JobStatus.APPROVED " +
+            "and j.company.isActive=true")
     List<Job> findBySpecialization(Integer id, Pageable pageable);
 
-    @Query("select j from Job j join j.jobSkills js where js.skill.id in ?1 and j.jobStatus = com.openjob.common.enums.JobStatus.APPROVED")
+    @Query("select distinct j " +
+            "from Job j " +
+            "join j.jobSkills js " +
+            "where js.skill.id in ?1 " +
+            "and j.jobStatus = com.openjob.common.enums.JobStatus.APPROVED " +
+            "and j.company.isActive=true")
     Page<Job> findBySkillIds(Set<Integer> skillIds, Pageable pageable);
 
 }

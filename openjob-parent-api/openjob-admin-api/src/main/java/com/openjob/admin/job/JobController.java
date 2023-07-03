@@ -1,11 +1,10 @@
 package com.openjob.admin.job;
 
+import com.openjob.admin.dto.DeactivateJobDTO;
 import com.openjob.admin.dto.JobPaginationDTO;
 import com.openjob.admin.dto.ReviewJobDTO;
-import com.openjob.common.enums.SalaryType;
 import com.openjob.common.model.Job;
 import com.openjob.common.model.PagingModel;
-import com.openjob.common.model.SalaryModel;
 import com.openjob.common.response.MessageResponse;
 import lombok.RequiredArgsConstructor;
 import net.kaczmarzyk.spring.data.jpa.domain.*;
@@ -19,8 +18,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -76,6 +73,18 @@ public class JobController {
             jobService.reject(reviewJobDTO.getJobs(), reviewJobDTO.getRejectReasons());
         }
         return ResponseEntity.ok(new MessageResponse("Duyệt tin thành công!"));
+    }
+
+    @PostMapping(path = "/job/deactivate")
+    public ResponseEntity<MessageResponse> deactivateJobs(@RequestBody DeactivateJobDTO deactivateJobDTO){
+        jobService.deactivate(deactivateJobDTO.getJobId(), deactivateJobDTO.getReason());
+        return ResponseEntity.ok(new MessageResponse("Đã vô hiệu hoá tin tuyển dụng"));
+    }
+
+    @PostMapping(path = "/job/activate")
+    public ResponseEntity<MessageResponse> activateJobs(@RequestBody DeactivateJobDTO deactivateJobDTO){
+        jobService.activate(deactivateJobDTO.getJobId(), deactivateJobDTO.getReason());
+        return ResponseEntity.ok(new MessageResponse("Đã kích hoạt tin tuyển dụng"));
     }
 
 

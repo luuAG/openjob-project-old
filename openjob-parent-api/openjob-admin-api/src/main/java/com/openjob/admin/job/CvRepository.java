@@ -1,8 +1,6 @@
-package com.openjob.web.cv;
+package com.openjob.admin.job;
 
 import com.openjob.common.model.CV;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -14,9 +12,6 @@ import java.util.Optional;
 @Repository
 public interface CvRepository extends JpaRepository<CV, String>, JpaSpecificationExecutor<CV> {
 
-    @Query("select cv from CV cv where cv.user.id=?1")
-    Optional<CV> findByUserId(String userId);
-
-    @Query("select case when count(cc)>0 then true else false end from CvCompany cc where cc.cv.id=?1 and cc.company.id=?2")
-    boolean checkCompanyChargedToViewCv(String cvId, String companyId);
+    @Query("select cv from CV cv where cv.specialization.id=?1")
+    List<CV> findBySpecializationId(Integer id);
 }

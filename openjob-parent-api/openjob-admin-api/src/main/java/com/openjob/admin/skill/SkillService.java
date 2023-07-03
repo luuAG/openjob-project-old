@@ -21,11 +21,6 @@ public class SkillService {
     @Autowired
     private SkillRepository skillRepo;
 
-
-    public void verifySkill (Integer skillId){
-        skillRepo.verifySkill(skillId);
-    }
-
     public Collection<Skill> getAll(){
         return skillRepo.findAll();
     }
@@ -52,10 +47,6 @@ public class SkillService {
 
     public Collection<Skill> getBySpecialization(Integer speId) {
         return skillRepo.getBySpecialization(speId);
-    }
-
-    public boolean checkExist(Integer id) {
-        return skillRepo.existsById(id);
     }
 
     public Page<Skill> getNotVerified(Integer page, Integer size) {

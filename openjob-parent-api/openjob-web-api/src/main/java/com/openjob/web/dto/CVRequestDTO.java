@@ -22,6 +22,7 @@ public class CVRequestDTO {
     private Integer specializationId;
     private Integer majorId;
     private boolean isActive;
+    private String cvType;
     private List<CvSkill> listSkill;
 
 

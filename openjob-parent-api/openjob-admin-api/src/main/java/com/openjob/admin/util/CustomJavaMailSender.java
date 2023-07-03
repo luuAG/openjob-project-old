@@ -70,6 +70,7 @@ public class CustomJavaMailSender extends JavaMailSenderImpl {
         if (mailSetting.getCompany() != null) {
             Company company = mailSetting.getCompany();
             body = body.replace(MailTemplateVariable.COMPANY_NAME.getTemplateVariable(), company.getName());
+            body = body.replace(MailTemplateVariable.COMPANY_EMAIL.getTemplateVariable(), company.getEmail());
         }
         if (mailSetting.getJob() != null) {
             Job job = mailSetting.getJob();
@@ -77,7 +78,7 @@ public class CustomJavaMailSender extends JavaMailSenderImpl {
         }
         if (mailSetting.getUser() != null) {
             User user = mailSetting.getUser();
-            body = body.replace(MailTemplateVariable.USER_NAME.getTemplateVariable(), user.getFirstName());
+            body = body.replace(MailTemplateVariable.USER_NAME.getTemplateVariable(), user.getFirstName() +" "+ user.getLastName());
         }
         if (mailSetting.getExtraData() != null) {
             for (Map.Entry<String, String> data : mailSetting.getExtraData().entrySet()) {

@@ -44,5 +44,7 @@ public class CvDTO {
 
     private boolean isActive;
 
+    private String cvType;
+
     private List<CvSkill> skills;
 }

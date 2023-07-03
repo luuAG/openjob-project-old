@@ -1,11 +1,14 @@
 package com.openjob.admin.company;
 
+import com.openjob.admin.setting.SettingService;
+import com.openjob.admin.util.CustomJavaMailSender;
+import com.openjob.common.enums.MailCase;
+import com.openjob.common.model.MailSetting;
 import com.openjob.common.model.User;
 import com.openjob.common.util.CloudinaryUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.NestedExceptionUtils;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +21,9 @@ import java.util.stream.Collectors;
 @Transactional
 public class HrService {
     private final HrRepository hrRepo;
+    private final SettingService settingService;
+    private final CustomJavaMailSender mailSender;
+    private final CompanyRepository companyRepo;
 
     public void activate(String companyId){
         hrRepo.activate(companyId);
@@ -61,7 +67,7 @@ public class HrService {
                     String returnedUrl = CloudinaryUtils.upload(imageBytes, "companyLogo/"+hr.getCompany().getId());
                     hr.getCompany().setLogoUrl(returnedUrl);
                 }
-                if (Objects.nonNull(hr.getCompany().getBase64Images())) {
+                if (Objects.nonNull(hr.getCompany().getBase64Images()) && hr.getCompany().getBase64Images().length > 0) {
                     List<String> urls;
                     if (hr.getCompany().getImageUrlsString() != null){
                         urls= Arrays.stream(hr.getCompany().getImageUrlsString().split(", ")).collect(Collectors.toList());
@@ -71,15 +77,41 @@ public class HrService {
                         urls = new ArrayList<>();
                     }
                     for (String rawBase64Image : hr.getCompany().getBase64Images()){
-                        String base64Image = rawBase64Image.split(",")[1];
-                        byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(base64Image);
+                        if (rawBase64Image != null){
+                            String base64Image = rawBase64Image.split(",")[1];
+                            byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(base64Image);
 
-                        CloudinaryUtils.getInstance();
-                        String returnedUrl = CloudinaryUtils.upload(imageBytes, "companyImages/"+ UUID.randomUUID());
-                        urls.add(returnedUrl);
+                            CloudinaryUtils.getInstance();
+                            String returnedUrl = CloudinaryUtils.upload(imageBytes, "companyImages/"+ UUID.randomUUID());
+                            urls.add(returnedUrl);
+                        }
                     }
                     hr.getCompany().setImageUrlsStringCustom(urls);
                 }
+            }
+            // mail to company if deactivate
+            if (companyRepo.checkActiveById(hr.getCompany().getId()) && !hr.getCompany().getIsActive()){
+                MailSetting mailSetting = new MailSetting(
+                        hr.getCompany().getEmail(),
+                        "Tài khoản của công ty đã bị vô hiệu hoá",
+                        settingService.getByName(MailCase.MAIL_COMPANY_DEACTIVATED.name()).orElseThrow().getValue(),
+                        null,
+                        hr.getCompany(),
+                        null,
+                        null);
+                mailSender.sendMail(mailSetting); // async
+            }
+            // mail to company if activate
+            if (!companyRepo.checkActiveById(hr.getCompany().getId()) && hr.getCompany().getIsActive()){
+                MailSetting mailSetting = new MailSetting(
+                        hr.getCompany().getEmail(),
+                        "Tài khoản của công ty đã được kích hoạt",
+                        settingService.getByName(MailCase.MAIL_COMPANY_REACTIVATED.name()).orElseThrow().getValue(),
+                        null,
+                        hr.getCompany(),
+                        null,
+                        null);
+                mailSender.sendMail(mailSetting); // async
             }
             return hrRepo.save(hr);
         } catch (DataIntegrityViolationException e){

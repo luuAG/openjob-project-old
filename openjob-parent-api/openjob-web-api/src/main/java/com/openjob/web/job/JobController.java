@@ -1,6 +1,5 @@
 package com.openjob.web.job;
 
-import com.openjob.common.enums.MemberType;
 import com.openjob.common.model.Job;
 import com.openjob.common.model.JobCV;
 import com.openjob.common.model.PagingModel;
@@ -38,7 +37,6 @@ public class JobController {
     private final JobService jobService;
     private final JobCvService jobCvService;
     private final AuthenticationUtils authenticationUtils;
-    private final CvService cvService;
     private final PriceCalculationUtils priceCalculationUtils;
 
     @GetMapping(path = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -63,7 +61,8 @@ public class JobController {
                             @Spec(path = "salaryInfo.isSalaryNegotiable", params = "isSalaryNegotiable", spec = Equal.class),
                             @Spec(path = "salaryInfo.salaryType", params = "salaryType", spec = Equal.class),
                             @Spec(path = "jobStatus", constVal = "APPROVED", spec = Equal.class),
-                            @Spec(path = "skill.id", params = "skillId", spec = Equal.class)
+                            @Spec(path = "skill.id", params = "skillId", spec = Equal.class),
+                            @Spec(path = "company.isActive", constVal = "true", spec = Equal.class)
                     })
             Specification<Job> jobSpec,
             PagingModel pagingModel,
@@ -117,8 +116,6 @@ public class JobController {
     public ResponseEntity<MessageResponse> createNewJob(@RequestBody JobRequestDTO reqJob, HttpServletRequest request) throws InvocationTargetException, IllegalAccessException, IOException {
         Job savedJob = jobService.saveUpdate(reqJob, request);
         if(Objects.nonNull(savedJob)){
-            if (savedJob.getCompany().getMemberType().equals(MemberType.PREMIUM))
-                cvService.findCVmatchJob(savedJob); // async
             return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("New job is created successfully!"));
         }
 
@@ -129,8 +126,6 @@ public class JobController {
     public ResponseEntity<MessageResponse> updateJob(@RequestBody JobRequestDTO reqJob, HttpServletRequest request) throws InvocationTargetException, IllegalAccessException, IOException {
         Job savedJob = jobService.saveUpdate(reqJob, request);
         if(Objects.nonNull(savedJob)){
-            if (savedJob.getCompany().getMemberType().equals(MemberType.PREMIUM))
-                cvService.findCVmatchJob(savedJob); // async
             return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("Job is updated successfully!"));
         }
 

@@ -35,4 +35,7 @@ public interface CompanyRepository extends JpaRepository<Company, String>, JpaSp
             "where c.memberType=com.openjob.common.enums.MemberType.PREMIUM")
     @Modifying
     void resetPremiumServiceForAll(Integer premiumFreeJob, Integer premiumFreeViewCv);
+
+    @Query("select c.isActive from Company c where c.id=?1")
+    boolean checkActiveById(String id);
 }

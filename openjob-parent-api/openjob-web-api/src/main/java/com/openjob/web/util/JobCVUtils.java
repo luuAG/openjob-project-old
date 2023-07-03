@@ -1,6 +1,5 @@
 package com.openjob.web.util;
 
-import com.openjob.common.enums.ExperienceValue;
 import com.openjob.common.model.*;
 
 import java.util.Objects;

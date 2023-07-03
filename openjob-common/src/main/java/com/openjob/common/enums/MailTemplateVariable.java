@@ -4,6 +4,7 @@ public enum MailTemplateVariable {
 
 
     COMPANY_NAME("[[companyName]]"),
+    COMPANY_EMAIL("[[companyEmail]]"),
     JOB_TITLE("[[jobTitle]]"),
     USER_NAME("[[userName]]"),
     REASON("[[reason]]");

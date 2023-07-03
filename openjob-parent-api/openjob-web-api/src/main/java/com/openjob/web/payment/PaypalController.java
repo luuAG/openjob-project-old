@@ -1,9 +1,13 @@
 package com.openjob.web.payment;
 
 
+import com.openjob.common.enums.ServiceType;
+import com.openjob.common.model.Company;
+import com.openjob.common.model.Invoice;
 import com.openjob.web.company.CompanyService;
 import com.openjob.web.dto.CreatePaymentDTO;
 import com.openjob.web.dto.ExecutePaymentDTO;
+import com.openjob.web.trackinginvoice.InvoiceService;
 import com.openjob.web.user.UserService;
 import com.paypal.api.payments.Links;
 import com.paypal.api.payments.Payment;
@@ -23,6 +27,7 @@ import org.springframework.web.servlet.view.RedirectView;
 public class PaypalController {
     private final PaypalService paypalService;
     private final CompanyService companyService;
+    private final InvoiceService invoiceService;
 
     @Value("${client.base_url}")
     private String clientBaseUrl;
@@ -63,6 +68,14 @@ public class PaypalController {
             System.out.println(payment.toJSON());
             if (payment.getState().equals("approved")) {
                 companyService.updateAccountBalance(dto.getCompanyId(), Double.parseDouble(payment.getTransactions().get(0).getAmount().getTotal()) * 10);
+                // tracking
+                Company company = companyService.getById(dto.getCompanyId());
+                Invoice invoice = new Invoice();
+                invoice.setCompanyId(company.getId());
+                invoice.setCompanyName(company.getName());
+                invoice.setServiceType(ServiceType.COIN_IN);
+                invoice.setAmount(Double.parseDouble(payment.getTransactions().get(0).getAmount().getTotal()) * 10);
+                invoiceService.save(invoice);
                 return ResponseEntity.ok("Thanh toán thành công");
             }
         } catch (PayPalRESTException e) {

@@ -74,6 +74,8 @@ public class Job extends BaseAuditEntity {
     @Enumerated(EnumType.STRING)
     private JobStatus jobStatus;
 
+    private double price;
+
     @OneToOne
     @JoinColumn
 //    @JsonIgnore

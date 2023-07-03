@@ -1,8 +1,13 @@
 package com.openjob.admin.company;
 
+import com.openjob.admin.setting.SettingService;
+import com.openjob.admin.util.CustomJavaMailSender;
+import com.openjob.common.enums.MailCase;
+import com.openjob.common.enums.MemberType;
 import com.openjob.common.enums.Role;
 import com.openjob.common.model.Company;
 import com.openjob.common.model.CompanyRegistration;
+import com.openjob.common.model.MailSetting;
 import com.openjob.common.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,6 +32,8 @@ public class CompanyService  {
     private final CompanyRepository companyRepo;
     private final HrService hrService;
     private final CompanyRegistrationService companyRegistrationService;
+    private final SettingService settingService;
+    private final CustomJavaMailSender mailSender;
 
     public Optional<Company> get(String id)  {
         return companyRepo.findById(id);
@@ -41,21 +48,15 @@ public class CompanyService  {
             object.setCreatedAt(new Date());
             object.setCreatedBy(username);
         }
+
         return companyRepo.save(object);
     }
 
     public void delete(String id)  {
-        Company company = companyRepo.findById(id).get();
+        Company company = companyRepo.findById(id).orElseThrow();
         companyRepo.delete(company);
     }
 
-    public Page<Company> search(Integer page, Integer size, String keyword) {
-        Pageable pageable = PageRequest.of(page, size);
-        if (Objects.isNull(keyword) || keyword.isBlank()) {
-            return companyRepo.findAll(pageable);
-        }
-        return companyRepo.findByKeyword(keyword, pageable);
-    }
 
     public boolean isExistByName(String name) {
         return companyRepo.findByName(name).isPresent();
@@ -75,6 +76,7 @@ public class CompanyService  {
             company.setName(companyRegistration.getCompanyName());
             company.setEmail(companyRegistration.getEmail());
             company.setIsActive(true);
+            company.setMemberType(MemberType.DEFAULT);
 
             Company savedCompany = save(company);
 
@@ -92,6 +94,18 @@ public class CompanyService  {
             companyRepo.save(savedCompany);
 
             companyRegistrationService.deleteById(companyRegistration.getId());
+
+            if (Objects.nonNull(savedHr)){
+                MailSetting mailSetting = new MailSetting(
+                        savedCompany.getEmail(),
+                        "Tài khoản đã được tạo",
+                        settingService.getByName(MailCase.MAIL_COMPANY_CREATED.name()).orElseThrow().getValue(),
+                        null,
+                        savedCompany,
+                        null,
+                        null);
+                mailSender.sendMail(mailSetting); // async
+            }
         });
     }
 
@@ -99,4 +113,5 @@ public class CompanyService  {
         List<String> ids = companyRegistrationList.stream().map(CompanyRegistration::getId).collect(Collectors.toList());
         companyRepo.rejectManyCompaniesByIds(ids);
     }
+
 }

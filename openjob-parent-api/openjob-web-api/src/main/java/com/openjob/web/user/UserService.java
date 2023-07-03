@@ -71,14 +71,17 @@ public class UserService {
             urls.remove(null);
             urls.remove("");
             for (String rawBase64Image : userInfo.getCompany().getBase64Images()){
-                String base64Image = rawBase64Image.split(",")[1];
-                byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(base64Image);
+                if (rawBase64Image != null){
+                    String base64Image = rawBase64Image.split(",")[1];
+                    byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(base64Image);
 
-                CloudinaryUtils.getInstance();
-                String returnedUrl = CloudinaryUtils.upload(imageBytes, "companyImages/"+ UUID.randomUUID());
-                urls.add(returnedUrl);
+                    CloudinaryUtils.getInstance();
+                    String returnedUrl = CloudinaryUtils.upload(imageBytes, "companyImages/"+ UUID.randomUUID());
+                    urls.add(returnedUrl);
+                }
             }
             existingUser.getCompany().setImageUrlsStringCustom(urls);
+
         }
         return userRepo.save(existingUser);
     }

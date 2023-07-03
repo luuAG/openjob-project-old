@@ -24,6 +24,8 @@ public class PriceCalculationUtils {
         Date date2 = job.getExpiredAt();
         long difference = Math.abs(date2.getTime() - date1.getTime());
         long deviationInDays = TimeUnit.DAYS.convert(difference, TimeUnit.MILLISECONDS) - 1;
+        if (deviationInDays <= 0)
+            return 0;
 
         Company company = companyService.getById(companyId);
 

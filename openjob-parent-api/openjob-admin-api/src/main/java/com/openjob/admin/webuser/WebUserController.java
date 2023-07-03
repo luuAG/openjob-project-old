@@ -46,7 +46,7 @@ public class WebUserController {
     }
 
     @PostMapping(path = "/user/activate/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<MessageResponse> activateUser(@PathVariable String id) throws UserNotFoundException, SQLException {
+    public ResponseEntity<MessageResponse> activateUser(@PathVariable String id) throws UserNotFoundException {
         Optional<User> optionalWebUser = userService.get(id);
         if (optionalWebUser.isPresent()){
             userService.activate(id);
@@ -57,7 +57,7 @@ public class WebUserController {
     }
 
     @DeleteMapping(path = "/user/deactivate/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<MessageResponse> deactivateHr(@PathVariable String id) throws UserNotFoundException, SQLException {
+    public ResponseEntity<MessageResponse> deactivateHr(@PathVariable String id) throws UserNotFoundException {
         Optional<User> optionalWebUser = userService.get(id);
         if (optionalWebUser.isPresent()){
             userService.deactivate(id);

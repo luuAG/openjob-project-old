@@ -2,6 +2,7 @@ package com.openjob.web.cv;
 
 import com.openjob.common.enums.CvStatus;
 import com.openjob.common.enums.MailCase;
+import com.openjob.common.enums.ServiceType;
 import com.openjob.common.model.*;
 import com.openjob.web.business.OpenjobBusinessService;
 import com.openjob.web.company.CompanyService;
@@ -13,6 +14,7 @@ import com.openjob.web.major.MajorService;
 import com.openjob.web.setting.SettingService;
 import com.openjob.web.skill.SkillRepository;
 import com.openjob.web.specialization.SpecializationService;
+import com.openjob.web.trackinginvoice.InvoiceService;
 import com.openjob.web.user.UserService;
 import com.openjob.web.util.AuthenticationUtils;
 import com.openjob.web.util.CustomJavaMailSender;
@@ -52,6 +54,7 @@ public class CvService {
     private final CvCompanyRepository cvCompanyRepo;
     private final CompanyService companyService;
     private final OpenjobBusinessService openjobBusinessService;
+    private final InvoiceService invoiceService;
 
     public Optional<CV> getById(String id) {
         return cvRepo.findById(id);
@@ -127,6 +130,7 @@ public class CvService {
                     NullAwareBeanUtils.getInstance().copyProperties(cvDTO, jobCV.getCv());
                     NullAwareBeanUtils.getInstance().copyProperties(cvDTO, jobCV);
                     cvDTO.setUserId(jobCV.getCv().getUser().getId());
+                    cvDTO.setId(jobCV.getCv().getId());
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     System.out.println("Error while copying JobCV to CvDTO in CvService");
                     throw new RuntimeException("Lỗi hệ thống");
@@ -158,76 +162,6 @@ public class CvService {
 
     }
 
-    @Async
-    public void findCVmatchJob(Job savedJob) {
-        List<CV> listCV = cvRepo.findBySpecialization(savedJob.getSpecialization().getId());
-        List<JobSkill> jobSkills = savedJob.getJobSkills();
-        Set<Skill> mustHaveSkills = jobSkills.stream()
-                .filter(JobSkill::isRequired)
-                .map(JobSkill::getSkill)
-                .collect(Collectors.toSet());
-        // filter list CV by job requirement: must-have & yoe
-        listCV = listCV.stream()
-                .filter(cv -> { // must-have
-                    Set<Skill> tempMustHaveSkills = new HashSet<>(mustHaveSkills);
-                    List<Skill> cvSkill = cv.getSkills().stream().map(CvSkill::getSkill).collect(Collectors.toList());
-                    cvSkill.forEach(tempMustHaveSkills::remove);
-                    return tempMustHaveSkills.isEmpty();
-                })
-                .filter(cv -> { // yoe
-                    Skill mutualSkill;
-                    for (CvSkill cvSkill : cv.getSkills()){
-                        for (JobSkill jobSkill : jobSkills){
-                            if (Objects.equals(cvSkill.getSkill().getId(), jobSkill.getSkill().getId())){
-                                mutualSkill = cvSkill.getSkill();
-                                if (mustHaveSkills.contains(mutualSkill) && cvSkill.getYoe() < jobSkill.getYoe())
-                                    return false;
-                            }
-                        }
-                    }
-                    return true;
-                })
-                .collect(Collectors.toList());
-
-        boolean hasMatch = false;
-        for (CV cv : listCV) {
-            double matchingPoint = JobCVUtils.scoreCv(savedJob, cv);
-            if (matchingPoint > 0) {
-                Optional<JobCV> existingJobCv =  jobCvService.getByJobIdAndCvId(savedJob.getId(), cv.getId());
-                if (existingJobCv.isPresent()){
-                    existingJobCv.get().setIsMatched(true);
-                    existingJobCv.get().setPoint(matchingPoint);
-                    jobCvService.save(existingJobCv.get());
-                }
-                else {
-                    JobCV newJobCv = new JobCV();
-                    newJobCv.setJob(savedJob);
-                    newJobCv.setStatus(CvStatus.NEW);
-                    newJobCv.setIsMatched(true);
-                    newJobCv.setPoint(matchingPoint);
-                    newJobCv.setCv(cv);
-                    newJobCv.setApplyDate(null);
-                    newJobCv.setIsApplied(false);
-                    jobCvService.save(newJobCv);
-                }
-                hasMatch = true;
-            }
-        }
-
-        if (hasMatch){
-            MailSetting mailSetting = new MailSetting(
-                    savedJob.getCompany().getEmail(),
-                    "Đã có ứng viên phù hợp với công việc",
-                    settingService.getByMailCase(MailCase.MAIL_JOB_HAS_MATCH).getValue(),
-                    null,
-                    savedJob.getCompany(),
-                    savedJob,
-                    null);
-            mailSender.sendMail(mailSetting);
-        }
-
-    }
-
     public UserCVwithExtraDataDTO getCvForCompanyView(String cvId, String companyId) {
         boolean isCharged = cvRepo.checkCompanyChargedToViewCv(cvId, companyId);
         CV cv = cvRepo.getById(cvId);
@@ -240,15 +174,26 @@ public class CvService {
 
     public void chargeCompanyForViewCv(String cvId, String companyId, Boolean isFree) {
         CvCompany cvCompany = new CvCompany();
-        cvCompany.setCompany(companyService.getById(companyId));
+
+        Company company = companyService.getById(companyId);
+        cvCompany.setCompany(company);
         cvCompany.setCv(getById(cvId).orElseThrow());
         cvCompany.setCreatedAt(new Date());
         cvCompanyRepo.save(cvCompany);
         if (isFree){
-            Company company = companyService.getById(companyId);
             company.setAmountOfFreeCvViews(company.getAmountOfFreeCvViews() - 1);
+            companyService.save(company);
         }
-        else
-            companyService.updateAccountBalance(companyId, - openjobBusinessService.get().getBaseCvViewPrice());
+        else{
+            double amount = openjobBusinessService.get().getBaseCvViewPrice();
+            companyService.updateAccountBalance(companyId, -amount);
+            // tracking
+            Invoice invoice = new Invoice();
+            invoice.setCompanyId(companyId);
+            invoice.setCompanyName(company.getName());
+            invoice.setServiceType(ServiceType.VIEW_CV);
+            invoice.setAmount(amount);
+            invoiceService.save(invoice);
+        }
     }
 }

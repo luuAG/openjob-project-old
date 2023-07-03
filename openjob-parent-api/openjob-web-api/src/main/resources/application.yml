@@ -39,7 +39,7 @@ spring:
                     provider_disables_autocommit: true
                 dialect: org.hibernate.dialect.MySQL8Dialect
                 format_sql: true
-        show-sql: true
+        show-sql: false
         open-in-view: true
     data:
       jpa:

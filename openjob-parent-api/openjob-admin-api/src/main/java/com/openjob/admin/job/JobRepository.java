@@ -2,7 +2,9 @@ package com.openjob.admin.job;
 
 import com.openjob.common.enums.SalaryType;
 import com.openjob.common.model.Job;
+import com.openjob.common.model.JobCV;
 import com.openjob.common.model.SalaryModel;
+import com.openjob.common.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -14,6 +16,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface JobRepository extends JpaRepository<Job, String>, JpaSpecificationExecutor<Job> {
@@ -41,4 +44,8 @@ public interface JobRepository extends JpaRepository<Job, String>, JpaSpecificat
     @Query("update Job j set j.jobStatus = 'REJECTED' where j.id in ?1")
     @Modifying
     void rejectByIds(List<String> ids);
+
+    @Query("select jcv.cv.user from JobCV jcv where jcv.job.id=?1 and jcv.isApplied=true")
+    List<User> findAllUserAppliedJob(String jobId);
+
 }

@@ -1,26 +1,27 @@
 package com.openjob.web.job;
 
 import com.openjob.common.enums.JobStatus;
+import com.openjob.common.enums.MailCase;
 import com.openjob.common.enums.Role;
+import com.openjob.common.enums.ServiceType;
 import com.openjob.common.model.*;
-import com.openjob.web.business.OpenjobBusinessService;
 import com.openjob.web.company.CompanyService;
 import com.openjob.web.dto.JobRequestDTO;
 import com.openjob.web.dto.JobResponseDTO;
 import com.openjob.web.dto.JobSkillDTO;
 import com.openjob.web.jobcv.JobCvService;
 import com.openjob.web.jobskill.JobSkillRepository;
+import com.openjob.web.setting.SettingService;
 import com.openjob.web.skill.SkillRepository;
 import com.openjob.web.specialization.SpecializationService;
+import com.openjob.web.trackinginvoice.InvoiceService;
 import com.openjob.web.user.UserService;
 import com.openjob.web.util.AuthenticationUtils;
+import com.openjob.web.util.CustomJavaMailSender;
 import com.openjob.web.util.NullAwareBeanUtils;
 import com.openjob.web.util.PriceCalculationUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -50,9 +51,11 @@ public class JobService {
     private final JobSkillRepository jobSkillRepo;
     private final AuthenticationUtils authenticationUtils;
     private final PriceCalculationUtils priceCalculationUtils;
+    private final InvoiceService invoiceService;
+    private final SettingService settingService;
+    private final CustomJavaMailSender mailSender;
 
-
-
+    private List<Job> expiredJobs = new ArrayList<>();
 
     public Optional<Job> getById(String id) {
         return jobRepo.findById(id);
@@ -64,23 +67,66 @@ public class JobService {
         Optional<Specialization> specialization = speService.getById(jobDTO.getSpecializationId());
         if (Objects.isNull(company) || specialization.isEmpty())
             throw new IllegalArgumentException("Company/Specialization not found!");
-        // charge for job
-        double price = priceCalculationUtils.calculateJobPrice(company.getId(), jobDTO);
-        if (price == 0.0f)
-            company.setAmountOfFreeJobs(company.getAmountOfFreeJobs() - 1);
-        else
-            companyService.updateAccountBalance(company.getId(), -price);
 
         NullAwareBeanUtils beanCopier = NullAwareBeanUtils.getInstance();
         Job job;
-        if (jobDTO.getId() == null) {
+        if (jobDTO.getId() == null) { // new job
             job = new Job();
             job.setCreatedAt(new Date());
             job.setJobStatus(JobStatus.NEW);
+
+            // charge for job
+            double price = priceCalculationUtils.calculateJobPrice(company.getId(), jobDTO);
+            job.setPrice(price);
+            if (price == 0.0f){
+                company.setAmountOfFreeJobs(company.getAmountOfFreeJobs() - 1);
+                companyService.save(company);
+            }
+            else{
+                companyService.updateAccountBalance(company.getId(), -price);
+                // tracking
+                Invoice invoice = new Invoice();
+                invoice.setCompanyId(company.getId());
+                invoice.setCompanyName(company.getName());
+                invoice.setServiceType(ServiceType.JOB_POST);
+                invoice.setAmount(price);
+                invoiceService.save(invoice);
+            }
         }
-        else {
+        else { // update job
             job = getById(jobDTO.getId()).orElseThrow();
             job.setUpdatedAt(new Date());
+            // charge for job
+            double price = priceCalculationUtils.calculateJobPrice(company.getId(), jobDTO);
+            if (price != 0.0f){
+                companyService.updateAccountBalance(company.getId(), job.getPrice() - price);
+                job.setPrice(price);
+                // tracking
+                Invoice invoice = new Invoice();
+                invoice.setCompanyId(company.getId());
+                invoice.setCompanyName(company.getName());
+                invoice.setServiceType(ServiceType.UPDATE_JOB);
+                invoice.setAmount(job.getPrice() - price);
+                invoiceService.save(invoice);
+            }
+            // send mail notify to user if job turn hidden
+            if (!JobStatus.HIDDEN.equals(job.getJobStatus()) && JobStatus.HIDDEN.equals(jobDTO.getJobStatus())){
+                List<User> usersAppliedToJob = jobCvService.getByJobId(job.getId()).stream()
+                        .map(jobCV -> jobCV.getCv().getUser())
+                        .collect(Collectors.toList());
+                for (User user : usersAppliedToJob){
+                    MailSetting mailSetting = new MailSetting(
+                            user.getEmail(),
+                            "Công việc bạn ứng tuyển đã ngưng tuyển",
+                            settingService.getByMailCase(MailCase.MAIL_JOB_STOP_TO_USER).getValue(),
+                            user,
+                            job.getCompany(),
+                            job,
+                            null);
+                    mailSender.sendMail(mailSetting); // async
+                }
+            }
+
         }
         beanCopier.copyProperties(job, jobDTO);
         Major major = specialization.get().getMajor();
@@ -123,23 +169,10 @@ public class JobService {
     }
 
     public void deleteById(String jobId) {
+        jobCvService.deleteByJobId(jobId);
         jobRepo.deleteById(jobId);
     }
 
-    @Scheduled(cron = "0 0 0 * * *")
-    @Async
-    public void delete7daysExpiredJob() {
-        Date today = new Date();
-        List<Job> expiredJob = getExpiredJob().stream()
-                .filter(job -> TimeUnit.DAYS.convert(
-                        today.getTime() - job.getExpiredAt().getTime(), TimeUnit.MILLISECONDS) >= 7)
-                .collect(Collectors.toList());
-        // delete from db
-        expiredJob.forEach(job -> {
-            jobCvService.deleteByJobId(job.getId());
-            jobRepo.deleteById(job.getId());
-        });
-    }
 
     @Scheduled(cron = "0 0 0 * * *")
     @Async
@@ -147,14 +180,39 @@ public class JobService {
     public void updateStatusExpiredJob() {
         List<Job> expiredJob = jobRepo.findUnhiddenExpiredJob().stream().peek(job -> job.setJobStatus(JobStatus.HIDDEN)).collect(Collectors.toList());
         jobRepo.saveAll(expiredJob);
-        // TODO:
-//        for (Job job : expiredJob){
-//            List<User> users = jobCvService.getUserAppliedJob(job.getId());
-//            for (User user : users){
-//                MailSetting mailSetting = new MailSetting()
-//            }
-//
-//        }
+    }
+
+    @Scheduled(fixedDelay = 5 * 60000)
+    @Async
+    public void sendMailTo_CompanyAndUser_AboutJobExpiration(){
+        if (this.expiredJobs.size() == 0)
+            this.expiredJobs = getExpiredJob();
+        for (Job job : this.expiredJobs) {
+            // mail to company
+            MailSetting mailSetting = new MailSetting(
+                    job.getCompany().getEmail(),
+                    "Tin tuyển dụng đã hết hạn",
+                    settingService.getByMailCase(MailCase.MAIL_JOB_EXPIRED).getValue(),
+                    null,
+                    job.getCompany(),
+                    job,
+                    null);
+            mailSender.sendMail(mailSetting); // async
+
+            // mail to users
+            List<User> users = jobCvService.getUserAppliedJob(job.getId());
+            for (User user : users){
+                MailSetting mailSettingTemp = new MailSetting(
+                        user.getEmail(),
+                        "Công việc bạn ứng tuyển đã hết hạn",
+                        settingService.getByMailCase(MailCase.MAIL_JOB_STOP_TO_USER).getValue(),
+                        user,
+                        job.getCompany(),
+                        job,
+                        null);
+                mailSender.sendMail(mailSettingTemp); // async
+            }
+        }
     }
 
     public List<Job> getExpiredJob() {
@@ -185,7 +243,7 @@ public class JobService {
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
-        if (Objects.nonNull(loggedInUser) &&  !loggedInUser.getRole().equals(Role.HR))
+        if (Objects.nonNull(loggedInUser) &&  !Role.HR.equals(loggedInUser.getRole()))
             toReturn.setIsApplied(jobCvService.checkUserAppliedJob(loggedInUser.getId(),job.getId()));
         return  toReturn;
     }
@@ -200,10 +258,13 @@ public class JobService {
         if (loggedInUser == null) {
             loggedInUser = userService.getByEmail("duongvannam2001@gmail.com");
         }
-        Set<Integer> skillIds = loggedInUser.getCv().getSkills().stream()
-                .map(cvSkill -> cvSkill.getSkill().getId())
-                .collect(Collectors.toSet());
+        if (loggedInUser.getCv() != null){
+            Set<Integer> skillIds = loggedInUser.getCv().getSkills().stream()
+                    .map(cvSkill -> cvSkill.getSkill().getId())
+                    .collect(Collectors.toSet());
 
-        return jobRepo.findBySkillIds(skillIds, pageable);
+            return jobRepo.findBySkillIds(skillIds, pageable);
+        }
+        return new PageImpl<>(new ArrayList<>());
     }
 }

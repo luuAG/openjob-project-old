@@ -5,6 +5,7 @@ import com.openjob.admin.setting.SettingService;
 import com.openjob.admin.util.CustomJavaMailSender;
 import com.openjob.common.enums.AuthProvider;
 import com.openjob.common.enums.MailCase;
+import com.openjob.common.enums.MemberType;
 import com.openjob.common.enums.Role;
 import com.openjob.common.model.*;
 import com.openjob.common.response.MessageResponse;
@@ -71,6 +72,8 @@ public class CompanyController {
         if (Objects.isNull(company.getName()) || company.getName().isBlank()){
             throw new IllegalArgumentException("Company name is null or blank");
         }
+        company.setIsActive(true);
+        company.setMemberType(MemberType.DEFAULT);
         Company savedCompany = companyService.save(company);
 
         hr.setCompany(savedCompany);

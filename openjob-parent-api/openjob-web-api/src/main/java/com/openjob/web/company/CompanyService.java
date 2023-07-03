@@ -1,8 +1,11 @@
 package com.openjob.web.company;
 
 import com.openjob.common.enums.MemberType;
+import com.openjob.common.enums.ServiceType;
 import com.openjob.common.model.Company;
+import com.openjob.common.model.Invoice;
 import com.openjob.web.business.OpenjobBusinessService;
+import com.openjob.web.trackinginvoice.InvoiceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +22,7 @@ import java.util.Objects;
 public class CompanyService {
     private final CompanyRepository companyRepo;
     private final OpenjobBusinessService openjobBusinessService;
+    private final InvoiceService invoiceService;
 
 
     public Company getById(String id){
@@ -48,10 +52,23 @@ public class CompanyService {
     }
 
     public void upgradeMembership(String companyId) {
+        double price = openjobBusinessService.get().getPremiumPrice();
         Company company = getById(companyId);
         company.setMemberType(MemberType.PREMIUM);
         company.setUpdatedAt(new Date());
-        company.setAccountBalance(company.getAccountBalance() - openjobBusinessService.get().getPremiumPrice());
+        company.setAccountBalance(company.getAccountBalance() - price);
+        companyRepo.save(company);
+
+        // tracking
+        Invoice invoice = new Invoice();
+        invoice.setCompanyId(company.getId());
+        invoice.setCompanyName(company.getName());
+        invoice.setServiceType(ServiceType.UPGRADE_MEMBERSHIP);
+        invoice.setAmount(price);
+        invoiceService.save(invoice);
+    }
+
+    public void save(Company company) {
         companyRepo.save(company);
     }
 }

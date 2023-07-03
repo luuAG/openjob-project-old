@@ -1,13 +1,13 @@
 package com.openjob.web.jobcv;
 
 import com.openjob.common.enums.CvStatus;
-import com.openjob.common.model.CV;
-import com.openjob.common.model.Job;
-import com.openjob.common.model.JobCV;
-import com.openjob.common.model.User;
+import com.openjob.common.enums.MailCase;
+import com.openjob.common.model.*;
 import com.openjob.web.cv.CvRepository;
 import com.openjob.web.exception.ResourceNotFoundException;
 import com.openjob.web.job.JobRepository;
+import com.openjob.web.setting.SettingService;
+import com.openjob.web.util.CustomJavaMailSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +15,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -27,20 +28,24 @@ public class JobCvService {
     private final JobCvRepository jobCvRepo;
     private final CvRepository cvRepo;
     private final JobRepository jobRepo;
+    private final SettingService settingService;
+    private final CustomJavaMailSender mailSender;
 
     public void saveNewApplication(String cvId, String jobId) {
+        Job job;
         Optional<JobCV> jobCV = jobCvRepo.findByJobIdAndCvId(jobId, cvId);
         if (jobCV.isPresent()) {
             jobCV.get().setIsApplied(true);
             jobCV.get().setStatus(CvStatus.NEW);
             jobCV.get().setApplyDate(new Date());
             jobCvRepo.save(jobCV.get());
+            job = jobCV.get().getJob();
         } else {
-            Optional<Job> job = jobRepo.findById(jobId);
+            job = jobRepo.findById(jobId).orElseThrow();
             Optional<CV> cv = cvRepo.findById(cvId);
-            if (job.isPresent() && cv.isPresent()){
+            if (cv.isPresent()){
                 JobCV newJobCv = new JobCV();
-                newJobCv.setJob(job.get());
+                newJobCv.setJob(job);
                 newJobCv.setCv(cv.get());
                 newJobCv.setIsApplied(true);
                 newJobCv.setStatus(CvStatus.NEW);
@@ -49,6 +54,16 @@ public class JobCvService {
             } else
                 throw new IllegalArgumentException("CV or Job not found!");
         }
+        // mail to company
+        MailSetting mailSetting = new MailSetting(
+                job.getCompany().getEmail(),
+                "Đã có ứng viên cho tin tuyển dụng",
+                settingService.getByMailCase(MailCase.MAIL_JOB_HAS_APPLICATION).getValue(),
+                null,
+                job.getCompany(),
+                job,
+                null);
+        mailSender.sendMail(mailSetting); // async
 
     }
 
@@ -76,7 +91,8 @@ public class JobCvService {
             } else
                 throw new ResourceNotFoundException("JobCV", "jobId, cvId", jobId + ", " + cvId);
 
-        }
+        } else
+            throw new EntityNotFoundException("Job/CV not found!");
 
     }
 
@@ -124,5 +140,9 @@ public class JobCvService {
 
     public List<User> getUserAppliedJob(String jobId) {
         return jobCvRepo.findUserAppliedJob(jobId);
+    }
+
+    public List<JobCV> getByJobId(String jobId) {
+        return jobCvRepo.findByJobId(jobId);
     }
 }

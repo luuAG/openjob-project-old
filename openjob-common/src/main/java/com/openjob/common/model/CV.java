@@ -51,6 +51,8 @@ public class CV {
 
     private boolean isActive;
 
+    private String cvType; // template
+
 //    @OneToMany(orphanRemoval = true)
 //    @JoinTable(
 //        name = "cv_skill",
