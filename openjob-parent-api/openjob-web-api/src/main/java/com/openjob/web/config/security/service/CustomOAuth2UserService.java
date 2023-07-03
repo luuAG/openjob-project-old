@@ -55,7 +55,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             user = userOptional.get();
             if (!user.getIsActive())
                 throw new Exception("ACCOUNT_DISABLED");
-            if (user.getRole().equals(Role.USER)){
+            if (user.getRole().equals(Role.HR)){
                 Company company = companyRepo.findByHeadHunterId(user.getId());
                 if (!company.getIsActive())
                     throw new Exception("ACCOUNT_DISABLED");

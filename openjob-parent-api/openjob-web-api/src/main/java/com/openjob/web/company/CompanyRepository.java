@@ -27,6 +27,6 @@ public interface CompanyRepository extends JpaRepository<Company, String> {
     @Modifying
     void updateAccountBalance(String companyId, Double amount);
 
-    @Query("select c from Company c left join User u where u.id = ?1")
+    @Query("select u.company from User u where u.id = ?1")
     Company findByHeadHunterId(String id);
 }
