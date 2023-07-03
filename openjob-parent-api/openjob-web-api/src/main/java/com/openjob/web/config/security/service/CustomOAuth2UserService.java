@@ -2,7 +2,9 @@ package com.openjob.web.config.security.service;
 
 import com.openjob.common.enums.AuthProvider;
 import com.openjob.common.enums.Role;
+import com.openjob.common.model.Company;
 import com.openjob.common.model.User;
+import com.openjob.web.company.CompanyRepository;
 import com.openjob.web.config.security.info.UserPrincipal;
 import com.openjob.web.exception.OAuth2AuthenticationProcessingException;
 import com.openjob.web.config.security.info.OAuth2UserInfo;
@@ -24,6 +26,8 @@ import java.util.Optional;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private CompanyRepository companyRepo;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
@@ -50,7 +54,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         if(userOptional.isPresent()) {
             user = userOptional.get();
             if (!user.getIsActive())
-                throw new Exception("Your account has been disabled. Please contact hotline 8080 to get more details!");
+                throw new Exception("Tài khoản của bạn đã bị vô hiệu hoá! Liên hệ quản trị viên của OpenJob để biết thêm chi tiết!");
+            if (user.getRole().equals(Role.USER)){
+                Company company = companyRepo.findByHeadHunterId(user.getId());
+                if (!company.getIsActive())
+                    throw new Exception("Tài khoản của bạn đã bị vô hiệu hoá! Liên hệ quản trị viên của OpenJob để biết thêm chi tiết!");
+            }
 //            if(!user.getAuthProvider().name()
 //                    .equalsIgnoreCase(oAuth2UserRequest.getClientRegistration().getRegistrationId())) {
 //                throw new OAuth2AuthenticationProcessingException("Looks like you're signed up with " +
