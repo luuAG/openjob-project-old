@@ -164,7 +164,6 @@ public class JobService {
             savedJob.getJobSkills().add(jobSkillRepo.save(jobSkill));
         }
 
-        companyService.updateAccountBalance(company.getId(), - jobDTO.getJobPrice());
         return jobRepo.save(savedJob);
     }
 
