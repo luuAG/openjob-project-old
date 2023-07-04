@@ -7,6 +7,7 @@ import com.openjob.web.cv.CvRepository;
 import com.openjob.web.exception.ResourceNotFoundException;
 import com.openjob.web.job.JobRepository;
 import com.openjob.web.setting.SettingService;
+import com.openjob.web.statistics.StatisticService;
 import com.openjob.web.util.CustomJavaMailSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -30,6 +31,7 @@ public class JobCvService {
     private final JobRepository jobRepo;
     private final SettingService settingService;
     private final CustomJavaMailSender mailSender;
+    private final StatisticService statisticService;
 
     public void saveNewApplication(String cvId, String jobId) {
         Job job;
@@ -64,6 +66,15 @@ public class JobCvService {
                 job,
                 null);
         mailSender.sendMail(mailSetting); // async
+
+        // tracking for statistics
+        JobCvTracking jobCvTracking = new JobCvTracking();
+        jobCvTracking.setJobId(jobId);
+        jobCvTracking.setApplyDate(new Date());
+        jobCvTracking.setCvId(cvId);
+        jobCvTracking.setCvStatus(CvStatus.NEW);
+        statisticService.trackCvApply(jobCvTracking);
+
 
     }
 
@@ -108,11 +119,6 @@ public class JobCvService {
                 throw new ResourceNotFoundException("JobCV", "jobId, cvId", jobId + ", " + cvId);
 
         }
-    }
-
-    public CvStatus getStatus(String jobId, String cvId){
-        Optional<JobCV> jobCV = jobCvRepo.findByJobIdAndCvId(jobId, cvId);
-        return jobCV.orElseThrow().getStatus();
     }
 
     public Optional<JobCV> getByJobIdAndCvId(String jobId, String cvId) {

@@ -171,6 +171,11 @@ public class JobService {
     public void deleteById(String jobId) {
         jobCvService.deleteByJobId(jobId);
         jobRepo.deleteById(jobId);
+        // refund
+        Job job = getById(jobId).orElseThrow();
+        if (job.getJobStatus().equals(JobStatus.NEW)){
+            companyService.updateAccountBalance(job.getCompany().getId(), job.getPrice());
+        }
     }
 
 
