@@ -151,16 +151,20 @@ public class JobService {
         for (int i=0; i<jobs.size(); i++){
             // refund
             Company company = companyService.get(jobs.get(i).getCompany().getId()).orElseThrow();
-            company.setAccountBalance(company.getAccountBalance() + jobs.get(i).getPrice());
-            companyService.save(company);
 
-            // tracking
-            Invoice invoice = new Invoice();
-            invoice.setCompanyId(jobs.get(i).getCompany().getId());
-            invoice.setCompanyName(jobs.get(i).getCompany().getName());
-            invoice.setServiceType(ServiceType.REFUND);
-            invoice.setAmount(jobs.get(i).getPrice());
-            invoiceService.save(invoice);
+            // tracking and refund
+            if (jobs.get(i).getPrice() > 0){
+                // refund
+                company.setAccountBalance(company.getAccountBalance() + jobs.get(i).getPrice());
+                companyService.save(company);
+                // tracking
+                Invoice invoice = new Invoice();
+                invoice.setCompanyId(jobs.get(i).getCompany().getId());
+                invoice.setCompanyName(jobs.get(i).getCompany().getName());
+                invoice.setServiceType(ServiceType.REFUND);
+                invoice.setAmount(jobs.get(i).getPrice());
+                invoiceService.save(invoice);
+            }
 
             // send mail
             Map<String, String> extraData = new HashMap<>();

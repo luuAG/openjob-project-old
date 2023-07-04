@@ -53,7 +53,7 @@
             border-radius: 3px;
         }
 
-        input[type=text] {
+        input {
             width: 100%;
             margin-bottom: 20px;
             padding: 12px;
@@ -118,8 +118,9 @@
     <div class="col-25">
         <form method="post"  action="/api/web/paypal/pay">
                 <img src="https://logos-world.net/wp-content/uploads/2020/07/PayPal-Logo.png" style="max-width: 100%;">
-                <label for="price">Price</label>
-                <input type="text" id="price" name="price" th:value="${price}" required readonly>
+                <i><b>You can modify the amount as you wish (1$ = 10 coin)</b></i>
+                <label for="price">Amount($):</label>
+                <input type="number" min="0" id="price" name="price" th:value="${price}" required>
                 <input type="submit" value="Continue to checkout" class="btn">
         </form>
     </div>

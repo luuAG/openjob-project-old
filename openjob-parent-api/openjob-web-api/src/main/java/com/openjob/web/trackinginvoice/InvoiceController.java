@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController(value = "/tracking")
+@RestController
 @RequiredArgsConstructor
 public class InvoiceController {
     private final InvoiceService invoiceService;
@@ -24,13 +24,15 @@ public class InvoiceController {
     @GetMapping("/invoice/{companyId}")
     public ResponseEntity<Page<Invoice>> getInvoices(
             @And({
-                    @Spec(path = "companyName", spec = Like.class),
                     @Spec(path = "serviceType", spec = Equal.class),
                     @Spec(path = "createdAt", params = {"startDate", "endDate"}, spec = Between.class)
             })Specification<Invoice> invoiceSpec, PagingModel pagingModel,
             @PathVariable("companyId") String companyId){
+        Specification<Invoice> companyIdSpec = (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("companyId"), companyId);
         if (invoiceSpec == null)
-            invoiceSpec = Specification.where((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("companyId"), companyId));
+            invoiceSpec = companyIdSpec;
+        else
+            invoiceSpec = invoiceSpec.and(companyIdSpec);
         return ResponseEntity.ok(invoiceService.getAll(invoiceSpec, pagingModel.getPageable()));
     }
 }
