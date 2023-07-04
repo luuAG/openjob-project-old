@@ -91,9 +91,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private User updateExistingUser(User existingUser, OAuth2UserInfo oAuth2UserInfo) {
         String[] name = oAuth2UserInfo.getName().split(" ");
-        existingUser.setFirstName(name[0]);
-        existingUser.setLastName(oAuth2UserInfo.getName().replace(name[0], "").trim());
-        existingUser.setAvatarUrl(oAuth2UserInfo.getImageUrl());
+        if (StringUtils.isEmpty(existingUser.getFirstName()) || StringUtils.isEmpty(existingUser.getLastName())){
+            existingUser.setFirstName(name[0]);
+            existingUser.setLastName(oAuth2UserInfo.getName().replace(name[0], "").trim());
+        }
+        if (StringUtils.isEmpty(existingUser.getAvatarUrl()))
+            existingUser.setAvatarUrl(oAuth2UserInfo.getImageUrl());
         existingUser.setAuthProvider(AuthProvider.GOOGLE);
         return userRepository.save(existingUser);
     }

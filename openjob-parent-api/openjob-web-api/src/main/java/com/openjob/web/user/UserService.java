@@ -1,8 +1,10 @@
 package com.openjob.web.user;
 
 
+import com.openjob.common.enums.Role;
 import com.openjob.common.model.User;
 import com.openjob.common.util.CloudinaryUtils;
+import com.openjob.web.company.CompanyService;
 import com.openjob.web.util.NullAwareBeanUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 public class UserService {
     private final UserRepository userRepo;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final CompanyService companyService;
 
     public Optional<User> get(String id) {
         return userRepo.findById(id);
@@ -49,6 +52,8 @@ public class UserService {
     public User patchUpdate(User userInfo) throws InvocationTargetException, IllegalAccessException, IOException {
         User existingUser = userRepo.getById(userInfo.getId());
         NullAwareBeanUtils.getInstance().copyProperties(existingUser, userInfo);
+        if (Role.HR.equals(existingUser.getRole()))
+            existingUser.getCompany().setEmail(userInfo.getEmail());
         if (Objects.nonNull(userInfo.getCompany()) && Objects.nonNull(userInfo.getCompany().getLogoUrl()) && userInfo.getCompany().getLogoUrl().startsWith("data:")){
             String base64Image = userInfo.getCompany().getLogoUrl().split(",")[1];
             byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(base64Image);
