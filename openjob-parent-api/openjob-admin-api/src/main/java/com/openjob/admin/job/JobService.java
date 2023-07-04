@@ -2,6 +2,7 @@ package com.openjob.admin.job;
 
 import com.openjob.admin.company.CompanyService;
 import com.openjob.admin.setting.SettingService;
+import com.openjob.admin.statistics.StatisticService;
 import com.openjob.admin.trackinginvoice.InvoiceService;
 import com.openjob.admin.util.CustomJavaMailSender;
 import com.openjob.common.enums.*;
@@ -31,6 +32,7 @@ public class JobService {
     private final CompanyService companyService;
     private final CvRepository cvRepo;
     private final JobCvService jobCvService;
+    private final StatisticService statisticService;
 
     public Optional<Job> getById(String jobId) {
         return jobRepo.findById(jobId);
@@ -59,7 +61,17 @@ public class JobService {
 
             if (MemberType.PREMIUM.equals(company.getMemberType()))
                 findCVmatchJob(job); // async
+
+            // tracking for statistics
+            CompanyStatistic companyStatistic = new CompanyStatistic();
+            companyStatistic.setCompanyId(company.getId());
+            companyStatistic.setCompanyName(company.getName());
+            companyStatistic.setJobId(job.getId());
+            companyStatistic.setJobTitle(job.getTitle());
+            companyStatistic.setJobCreatedAt(new Date());
+            statisticService.trackJob(companyStatistic); // async
         }
+
     }
 
     @Async

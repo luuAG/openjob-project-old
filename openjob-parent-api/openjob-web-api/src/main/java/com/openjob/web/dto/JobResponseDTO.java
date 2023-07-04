@@ -28,6 +28,7 @@ public class JobResponseDTO {
     private Company company;
     private List<JobSkill> jobSkills;
     private Boolean isApplied;
+    private Double price;
     //
     private JobLevel jobLevel;
     private JobType jobType;
