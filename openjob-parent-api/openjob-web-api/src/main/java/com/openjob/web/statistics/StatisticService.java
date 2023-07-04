@@ -1,5 +1,6 @@
 package com.openjob.web.statistics;
 
+import com.openjob.common.enums.CvStatus;
 import com.openjob.common.model.CompanyStatistic;
 import com.openjob.common.model.JobCvTracking;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,8 @@ public class StatisticService {
         jobCvTrackingRepo.save(jobCvTracking);
     }
 
-//    @Async
-//    public void updateCvStatus
+    @Async
+    public void updateCvStatus(String jobId, String cvId, CvStatus cvStatus){
+        jobCvTrackingRepo.updateCvStatus(jobId, cvId, cvStatus);
+    }
 }

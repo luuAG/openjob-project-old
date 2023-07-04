@@ -99,6 +99,9 @@ public class JobCvService {
             if (existingJobCv.isPresent()){
                 existingJobCv.get().setStatus(CvStatus.ACCEPTED);
                 jobCvRepo.save(existingJobCv.get());
+
+                // tracking for statistics
+                statisticService.updateCvStatus(jobId, cvId, CvStatus.ACCEPTED);
             } else
                 throw new ResourceNotFoundException("JobCV", "jobId, cvId", jobId + ", " + cvId);
 
@@ -115,6 +118,9 @@ public class JobCvService {
             if (existingJobCv.isPresent()){
                 existingJobCv.get().setStatus(CvStatus.REJECTED);
                 jobCvRepo.save(existingJobCv.get());
+
+                // tracking for statistics
+                statisticService.updateCvStatus(jobId, cvId, CvStatus.ACCEPTED);
             } else
                 throw new ResourceNotFoundException("JobCV", "jobId, cvId", jobId + ", " + cvId);
 
