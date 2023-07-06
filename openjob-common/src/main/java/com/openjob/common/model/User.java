@@ -3,16 +3,19 @@ package com.openjob.common.model;
 import com.openjob.common.enums.AuthProvider;
 import com.openjob.common.enums.Role;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.Date;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table
-public class User {
+public class User extends BaseAuditEntity {
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
     @Column(columnDefinition = "CHAR(32)")

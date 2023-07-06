@@ -20,6 +20,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -97,6 +98,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
         if (StringUtils.isEmpty(existingUser.getAvatarUrl()))
             existingUser.setAvatarUrl(oAuth2UserInfo.getImageUrl());
+        if (existingUser.getCreatedAt() == null)
+            existingUser.setCreatedAt(new Date());
         existingUser.setAuthProvider(AuthProvider.GOOGLE);
         return userRepository.save(existingUser);
     }

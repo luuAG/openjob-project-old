@@ -12,8 +12,5 @@ import org.springframework.web.bind.annotation.RestController;
 public class StatisticController {
     private final StatisticService statisticService;
 
-    @GetMapping(path = "/job")
-    public ResponseEntity<JobStatisticDTO> getAmountOfJobForEachYear(){
-        return ResponseEntity.ok(statisticService.getJobStatistic());
-    }
+
 }

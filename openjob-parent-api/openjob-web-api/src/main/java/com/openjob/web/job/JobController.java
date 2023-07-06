@@ -123,7 +123,8 @@ public class JobController {
     }
 
     @PostMapping(path = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<MessageResponse> updateJob(@RequestBody JobRequestDTO reqJob, HttpServletRequest request) throws InvocationTargetException, IllegalAccessException, IOException {
+    public ResponseEntity<MessageResponse> updateJob(@RequestBody JobRequestDTO reqJob, HttpServletRequest request)
+            throws InvocationTargetException, IllegalAccessException, IOException {
         Job savedJob = jobService.saveUpdate(reqJob, request);
         if(Objects.nonNull(savedJob)){
             return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("Job is updated successfully!"));

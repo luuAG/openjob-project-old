@@ -1,4 +1,4 @@
-package com.openjob.web.statistics;
+package com.openjob.admin.statistics;
 
 import lombok.Getter;
 import lombok.Setter;
