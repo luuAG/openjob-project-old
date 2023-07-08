@@ -1,6 +1,7 @@
 package com.openjob.web.user;
 
 import com.openjob.common.model.User;
+import com.openjob.common.response.MessageResponse;
 import com.openjob.web.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -36,5 +37,10 @@ public class UserController {
         }
         User updatedUser = userService.patchUpdate(userInfo);
         return ResponseEntity.ok(updatedUser);
+    }
+
+    @GetMapping(path = "/checkMailExist")
+    public ResponseEntity<Boolean> checkMailExist(@RequestParam("email") String email) {
+        return ResponseEntity.ok(userService.existsByEmail(email));
     }
 }

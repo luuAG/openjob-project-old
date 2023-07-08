@@ -96,8 +96,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             existingUser.setFirstName(name[0]);
             existingUser.setLastName(oAuth2UserInfo.getName().replace(name[0], "").trim());
         }
-        if (StringUtils.isEmpty(existingUser.getAvatarUrl()))
-            existingUser.setAvatarUrl(oAuth2UserInfo.getImageUrl());
+        existingUser.setAvatarUrl(oAuth2UserInfo.getImageUrl());
         if (existingUser.getCreatedAt() == null)
             existingUser.setCreatedAt(new Date());
         existingUser.setAuthProvider(AuthProvider.GOOGLE);

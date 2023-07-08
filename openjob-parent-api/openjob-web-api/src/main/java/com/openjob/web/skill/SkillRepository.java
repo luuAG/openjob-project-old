@@ -20,4 +20,7 @@ public interface SkillRepository extends JpaRepository<Skill, Integer> {
     boolean existsByName(String name);
 
     Optional<Skill> findByName(String name);
+
+    @Query("select s from Skill s where s.name=?1 and s.specialization.id=?2")
+    Optional<Skill> findByNameAndSpeId(String name, Integer id);
 }

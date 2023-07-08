@@ -94,7 +94,7 @@ public class CvService {
         // detect new skill
         for (int i = 0; i < cvDto.getListSkill().size(); i++) {
             Skill skillFromRequest = cvDto.getListSkill().get(i).getSkill();
-            Optional<Skill> skillInDB = skillRepo.findByName(skillFromRequest.getName());
+            Optional<Skill> skillInDB = skillRepo.findByNameAndSpeId(skillFromRequest.getName(), savedCV.getSpecialization().getId());
 
             CvSkill realCvSkill = new CvSkill();
             realCvSkill.setCv(savedCV);
