@@ -1,14 +1,12 @@
 package com.openjob.admin.company;
 
+import com.openjob.admin.business.OpenjobBusinessService;
 import com.openjob.admin.setting.SettingService;
 import com.openjob.admin.util.CustomJavaMailSender;
 import com.openjob.common.enums.MailCase;
 import com.openjob.common.enums.MemberType;
 import com.openjob.common.enums.Role;
-import com.openjob.common.model.Company;
-import com.openjob.common.model.CompanyRegistration;
-import com.openjob.common.model.MailSetting;
-import com.openjob.common.model.User;
+import com.openjob.common.model.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +32,7 @@ public class CompanyService  {
     private final CompanyRegistrationService companyRegistrationService;
     private final SettingService settingService;
     private final CustomJavaMailSender mailSender;
+    private final OpenjobBusinessService openjobBusinessService;
 
     public Optional<Company> get(String id)  {
         return companyRepo.findById(id);
@@ -71,12 +70,15 @@ public class CompanyService  {
     }
 
     public void approve(List<CompanyRegistration> companyRegistrationList) {
+        OpenjobBusiness openjobBusiness = openjobBusinessService.get();
         companyRegistrationList.forEach(companyRegistration -> {
             Company company = new Company();
             company.setName(companyRegistration.getCompanyName());
             company.setEmail(companyRegistration.getEmail());
             company.setIsActive(true);
             company.setMemberType(MemberType.DEFAULT);
+            company.setAmountOfFreeCvViews(openjobBusiness.getFreeCvView());
+            company.setAmountOfFreeJobs(openjobBusiness.getFreeJob());
 
             Company savedCompany = save(company);
 

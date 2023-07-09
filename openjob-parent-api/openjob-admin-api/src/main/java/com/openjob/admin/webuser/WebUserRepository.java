@@ -21,4 +21,6 @@ public interface WebUserRepository extends JpaRepository<User, String> {
 
     @Query("select u from User u where u.role=com.openjob.common.enums.Role.USER")
     List<User> findAllUser();
+
+    User findByEmail(String email);
 }

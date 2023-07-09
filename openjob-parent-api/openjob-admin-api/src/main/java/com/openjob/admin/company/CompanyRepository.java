@@ -38,4 +38,7 @@ public interface CompanyRepository extends JpaRepository<Company, String>, JpaSp
 
     @Query("select c.isActive from Company c where c.id=?1")
     boolean checkActiveById(String id);
+
+    @Query("select c.accountBalance from Company c where c.id=?1")
+    double getAccountBalance(String companyId);
 }

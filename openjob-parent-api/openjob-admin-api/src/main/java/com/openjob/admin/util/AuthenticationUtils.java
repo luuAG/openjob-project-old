@@ -1,8 +1,9 @@
-package com.openjob.web.util;
+package com.openjob.admin.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.openjob.admin.webuser.WebUserRepository;
+import com.openjob.admin.webuser.WebUserService;
 import com.openjob.common.model.User;
-import com.openjob.web.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,7 @@ import java.util.Objects;
 @Component
 @RequiredArgsConstructor
 public class AuthenticationUtils {
-    private final UserService userService;
+    private final WebUserRepository userRepo;
 
     public User getLoggedInUser(HttpServletRequest request) throws IOException {
         String accessToken = request.getHeader("authorization");
@@ -26,7 +27,7 @@ public class AuthenticationUtils {
             ObjectMapper mapper = new ObjectMapper();
             Map<String, String> info = mapper.readValue(base64.decode(payloadJWT), Map.class);
             String email = info.get("sub");
-            loggedInUser = userService.getByEmail(email);
+            loggedInUser = userRepo.findByEmail(email);
             if (loggedInUser == null){
                 loggedInUser = new User();
                 loggedInUser.setFirstName(email);

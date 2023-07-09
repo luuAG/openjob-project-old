@@ -1,5 +1,6 @@
 package com.openjob.admin.company;
 
+import com.openjob.admin.business.OpenjobBusinessService;
 import com.openjob.admin.dto.*;
 import com.openjob.admin.setting.SettingService;
 import com.openjob.admin.util.CustomJavaMailSender;
@@ -22,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
@@ -36,6 +38,7 @@ public class CompanyController {
     private final SettingService settingService;
     private final CustomJavaMailSender mailSender;
     private final CompanyRegistrationService companyRegistrationService;
+    private final OpenjobBusinessService openjobBusinessService;
 
     @GetMapping(path = "/company/{id}/hr", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> getHr(@PathVariable("id") String id) {
@@ -59,7 +62,8 @@ public class CompanyController {
 
 
     @PostMapping(path = "/company/create", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CompanyHeadhunterResponseDTO> createHeadHunter(@RequestBody CompanyCreateRequestDTO body) throws SQLException {
+    public ResponseEntity<CompanyHeadhunterResponseDTO> createHeadHunter(@RequestBody CompanyCreateRequestDTO body) {
+        OpenjobBusiness openjobBusiness = openjobBusinessService.get();
         User hr = body.getHeadHunter();
         Company company = body.getHeadHunter().getCompany();
 
@@ -74,6 +78,9 @@ public class CompanyController {
         }
         company.setIsActive(true);
         company.setMemberType(MemberType.DEFAULT);
+        company.setAmountOfFreeCvViews(openjobBusiness.getFreeCvView());
+        company.setAmountOfFreeJobs(openjobBusiness.getFreeJob());
+        company.setEmail(hr.getEmail());
         Company savedCompany = companyService.save(company);
 
         hr.setCompany(savedCompany);
@@ -133,10 +140,11 @@ public class CompanyController {
     @PostMapping(path = "/company/{companyId}/hr/update")
     public ResponseEntity<User> updateHrAccountInfo(
             @PathVariable("companyId") String companyId,
-            @RequestBody User hr) throws IOException {
+            @RequestBody User hr,
+            HttpServletRequest request) throws IOException {
         if (!companyService.existsById(companyId))
             throw new IllegalArgumentException("Company not found!");
-        User updatedUser = hrService.update(hr);
+        User updatedUser = hrService.update(hr, request);
         if (Objects.nonNull(updatedUser))
             return ResponseEntity.ok(updatedUser);
         return ResponseEntity.badRequest().body(null);

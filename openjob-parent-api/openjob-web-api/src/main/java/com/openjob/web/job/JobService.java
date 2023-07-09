@@ -145,7 +145,7 @@ public class JobService {
             JobSkill jobSkill = new JobSkill();
 
             Skill skillFromRequest = JSfromRequest.getSkill();
-            Optional<Skill> skillInDB = skillRepo.findByName(skillFromRequest.getName());
+            Optional<Skill> skillInDB = skillRepo.findByNameAndSpeId(skillFromRequest.getName(), jobDTO.getSpecializationId());
             // if new skill -> save new skill and set to jobSkill
             if (skillInDB.isEmpty()){
                 skillFromRequest.setSpecialization(savedJob.getSpecialization());

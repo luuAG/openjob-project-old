@@ -68,7 +68,7 @@ public class StatisticService {
             final int tempMonth = i;
             int count = (int) users.stream()
                     .filter(user -> {
-                        calendar.setTime(user.getCreatedAt());
+                        calendar.setTime(user.getCreatedAt() == null? new Date() : user.getCreatedAt());
                         return calendar.get(Calendar.MONTH) == tempMonth;
                     })
                     .count();

@@ -4,6 +4,7 @@ import com.openjob.common.enums.MemberType;
 import com.openjob.common.enums.ServiceType;
 import com.openjob.common.model.Company;
 import com.openjob.common.model.Invoice;
+import com.openjob.common.model.OpenjobBusiness;
 import com.openjob.web.business.OpenjobBusinessService;
 import com.openjob.web.trackinginvoice.InvoiceService;
 import lombok.RequiredArgsConstructor;
@@ -52,11 +53,14 @@ public class CompanyService {
     }
 
     public void upgradeMembership(String companyId) {
-        double price = openjobBusinessService.get().getPremiumPrice();
+        OpenjobBusiness openjobBusiness = openjobBusinessService.get();
+        double price = openjobBusiness.getPremiumPrice();
         Company company = getById(companyId);
         company.setMemberType(MemberType.PREMIUM);
         company.setUpdatedAt(new Date());
         company.setAccountBalance(company.getAccountBalance() - price);
+        company.setAmountOfFreeJobs(openjobBusiness.getPremiumFreeJob());
+        company.setAmountOfFreeCvViews(openjobBusiness.getPremiumFreeViewCv());
         companyRepo.save(company);
 
         // tracking

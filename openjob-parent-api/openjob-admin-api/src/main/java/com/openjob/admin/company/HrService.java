@@ -1,8 +1,12 @@
 package com.openjob.admin.company;
 
 import com.openjob.admin.setting.SettingService;
+import com.openjob.admin.trackinginvoice.InvoiceService;
+import com.openjob.admin.util.AuthenticationUtils;
 import com.openjob.admin.util.CustomJavaMailSender;
 import com.openjob.common.enums.MailCase;
+import com.openjob.common.enums.ServiceType;
+import com.openjob.common.model.Invoice;
 import com.openjob.common.model.MailSetting;
 import com.openjob.common.model.User;
 import com.openjob.common.util.CloudinaryUtils;
@@ -12,6 +16,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,6 +29,8 @@ public class HrService {
     private final SettingService settingService;
     private final CustomJavaMailSender mailSender;
     private final CompanyRepository companyRepo;
+    private final AuthenticationUtils authenticationUtils;
+    private final InvoiceService invoiceService;
 
     public void activate(String companyId){
         hrRepo.activate(companyId);
@@ -53,12 +60,25 @@ public class HrService {
         }
     }
 
-    public User update(User hr) throws IOException {
+    public User update(User hr, HttpServletRequest request) throws IOException {
         try {
             if (hrRepo.findById(hr.getId()).isEmpty())
                 return null;
 
             if (hr.getCompany() != null){
+                // tracking updating account balance
+                double oldBalance = companyRepo.getAccountBalance(hr.getCompany().getId());
+                if (hr.getCompany().getAccountBalance() != oldBalance){
+                    Invoice invoice = new Invoice();
+                    invoice.setCompanyId(hr.getCompany().getId());
+                    invoice.setCompanyName(hr.getCompany().getName());
+                    invoice.setServiceType(ServiceType.ADMIN_UPDATE);
+                    invoice.setAmount(hr.getCompany().getAccountBalance() - oldBalance);
+                    invoice.setCreatedAt(new Date());
+                    invoice.setCreatedBy(authenticationUtils.getLoggedInUser(request).getFirstName());
+                    invoiceService.save(invoice);
+                }
+
                 if (Objects.nonNull(hr.getCompany().getLogoUrl()) && hr.getCompany().getLogoUrl().startsWith("data:")){
                     String base64Image = hr.getCompany().getLogoUrl().split(",")[1];
                     byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(base64Image);
