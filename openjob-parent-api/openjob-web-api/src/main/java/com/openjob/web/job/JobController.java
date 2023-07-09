@@ -194,7 +194,7 @@ public class JobController {
     }
 
     @GetMapping(path = "/by-company/{companyId}")
-    public ResponseEntity<JobPaginationDTO> getAll(
+    public ResponseEntity<JobResponsePaginationDTO> getAll(
             @Join(path = "jobSkills", alias = "js")
             @Join(path = "js.skill", alias = "skill")
             @Conjunction(
@@ -219,7 +219,8 @@ public class JobController {
                     })
             Specification<Job> jobSpec,
             PagingModel pagingModel,
-            @PathVariable("companyId") String companyId) {
+            @PathVariable("companyId") String companyId,
+            HttpServletRequest request) {
 
         Specification<Job> companyIdSpec = (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("company").get("id"), companyId);
         if (jobSpec == null)
@@ -227,8 +228,17 @@ public class JobController {
         else
             jobSpec = jobSpec.and(companyIdSpec);
         Page<Job> pageJob = jobService.search(jobSpec, pagingModel.getPageable());
-        return ResponseEntity.ok(new JobPaginationDTO(
-                pageJob.getContent(),
+        List<JobResponseDTO> jobResponseDTOList = pageJob.getContent().stream()
+                .map(job -> {
+                    try {
+                        return jobService.mapJobToJobResponseDTO(job, authenticationUtils.getLoggedInUser(request));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(new JobResponsePaginationDTO(
+                jobResponseDTOList,
                 pageJob.getTotalPages(),
                 pageJob.getTotalElements())
         );

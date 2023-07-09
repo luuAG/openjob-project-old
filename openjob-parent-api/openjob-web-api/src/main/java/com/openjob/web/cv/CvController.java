@@ -12,6 +12,7 @@ import net.kaczmarzyk.spring.data.jpa.domain.Equal;
 import net.kaczmarzyk.spring.data.jpa.domain.Like;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.*;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -38,7 +40,7 @@ public class CvController {
     }
 
     @GetMapping(path = "/match-with-job/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)
-        public ResponseEntity<CvPaginationDTO> getCvMatchedJob(
+        public ResponseEntity<Page<UserCVwithExtraDataDTO>> getCvMatchedJob(
             @PathVariable("jobId") final String jobId,
             @Join(path = "cv", alias = "cv")
             @Join(path = "cv.skills", alias = "cvSkill")
@@ -60,13 +62,15 @@ public class CvController {
         jobCvSpec = jobCvSpec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("job").get("id"), jobId));
 
         Page<JobCV> jobCVPage = jobCvService.searchJobCv(jobCvSpec, pagingModel.getPageable());
-        List<CvDTO> cvDTOs = cvService.mapToCvDto(jobCVPage.getContent());
-        return ResponseEntity.ok(new CvPaginationDTO(
-                cvDTOs,
-                jobCVPage.getTotalPages(),
-                jobCVPage.getTotalElements())
-        );
-        }
+//        List<CvDTO> cvDTOs = cvService.mapToCvDto(jobCVPage.getContent());
+        List<UserCVwithExtraDataDTO> results = jobCVPage.getContent().stream()
+                .map(item ->  {
+                    UserCVwithExtraDataDTO temp = new UserCVwithExtraDataDTO();
+                    temp.setUser(item.getCv().getUser());
+                    return temp;
+                }).collect(Collectors.toList());
+        return ResponseEntity.ok(new PageImpl<>(results));
+    }
 
     @PostMapping(path = "/create-update", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CV> updateCV(@RequestBody CVRequestDTO requestCV, HttpServletRequest request) throws InvocationTargetException, IllegalAccessException, IOException {
@@ -80,7 +84,7 @@ public class CvController {
     }
 
     @GetMapping(path = "/applied-job/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CvPaginationDTO> getCvAppliedJob(
+    public ResponseEntity<Page<UserCVwithExtraDataDTO>> getCvAppliedJob(
             @PathVariable("jobId") final String jobId,
             @Join(path = "cv", alias = "cv")
             @Join(path = "cv.skills", alias = "cvSkill")
@@ -103,12 +107,15 @@ public class CvController {
         jobCvSpec = jobCvSpec.and((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("job").get("id"), jobId));
 
         Page<JobCV> jobCVPage = jobCvService.searchJobCv(jobCvSpec, pagingModel.getPageable());
-        List<CvDTO> cvDTOs = cvService.mapToCvDto(jobCVPage.getContent());
-        return ResponseEntity.ok(new CvPaginationDTO(
-                cvDTOs,
-                jobCVPage.getTotalPages(),
-                jobCVPage.getTotalElements())
-        );
+//        List<CvDTO> cvDTOs = cvService.mapToCvDto(jobCVPage.getContent());
+        List<UserCVwithExtraDataDTO> results = jobCVPage.getContent().stream()
+                .map(item ->  {
+                    UserCVwithExtraDataDTO temp = new UserCVwithExtraDataDTO();
+                    temp.setUser(item.getCv().getUser());
+                    return temp;
+                }).collect(Collectors.toList());
+        return ResponseEntity.ok(new PageImpl<>(results));
+
     }
 
     @PostMapping(path = "/{cvId}/apply/{jobId}", produces = MediaType.APPLICATION_JSON_VALUE)
