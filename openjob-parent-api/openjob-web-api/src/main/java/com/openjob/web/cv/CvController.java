@@ -67,6 +67,7 @@ public class CvController {
                 .map(item ->  {
                     UserCVwithExtraDataDTO temp = new UserCVwithExtraDataDTO();
                     temp.setUser(item.getCv().getUser());
+                    temp.setCvStatus(item.getStatus());
                     return temp;
                 }).collect(Collectors.toList());
         return ResponseEntity.ok(new PageImpl<>(results));
@@ -112,6 +113,7 @@ public class CvController {
                 .map(item ->  {
                     UserCVwithExtraDataDTO temp = new UserCVwithExtraDataDTO();
                     temp.setUser(item.getCv().getUser());
+                    temp.setCvStatus(item.getStatus());
                     return temp;
                 }).collect(Collectors.toList());
         return ResponseEntity.ok(new PageImpl<>(results));

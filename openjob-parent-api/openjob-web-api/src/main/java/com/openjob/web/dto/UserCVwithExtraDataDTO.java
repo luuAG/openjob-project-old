@@ -1,5 +1,6 @@
 package com.openjob.web.dto;
 
+import com.openjob.common.enums.CvStatus;
 import com.openjob.common.model.User;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,4 +10,5 @@ import lombok.Setter;
 public class UserCVwithExtraDataDTO {
     private User user;
     private boolean isChargedToView;
+    private CvStatus cvStatus;
 }
