@@ -2,6 +2,7 @@ package com.openjob.web.statistics;
 
 import com.openjob.common.enums.CvStatus;
 import com.openjob.common.model.JobCvTracking;
+import com.openjob.web.dto.CvStatisticModel;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -18,21 +19,20 @@ public interface JobCvTrackingRepository extends JpaRepository<JobCvTracking, In
     void updateCvStatus(String jobId, String cvId, CvStatus cvStatus);
 
 
-    @Query("SELECT new com.openjob.web.statistics.CvStatisticDTO(c.jobTitle, c.jobCreatedAt, " +
-            "    COUNT(j.cvId), " +
-            "    SUM(CASE WHEN j.cvStatus = com.openjob.common.enums.CvStatus.ACCEPTED THEN 1 ELSE 0 END), " +
-            "    SUM(CASE WHEN j.cvStatus = com.openjob.common.enums.CvStatus.REJECTED THEN 1 ELSE 0 END)) " +
-            "FROM CompanyStatistic c join JobCvTracking j on c.jobId = j.jobId " +
-            "WHERE c.companyId = ?1 " +
-            "GROUP BY c.jobTitle, c.jobCreatedAt")
-    List<CvStatisticDTO> findCvStatistic(String companyId, Pageable pageable);
+//    @Query("SELECT new com.openjob.web.statistics.CvStatisticDTO(c.jobTitle, c.jobCreatedAt, " +
+//            "    COUNT(j.cvId), " +
+//            "    SUM(CASE WHEN j.cvStatus = com.openjob.common.enums.CvStatus.ACCEPTED THEN 1 ELSE 0 END), " +
+//            "    SUM(CASE WHEN j.cvStatus = com.openjob.common.enums.CvStatus.REJECTED THEN 1 ELSE 0 END)) " +
+//            "FROM CompanyStatistic c join JobCvTracking j on c.jobId = j.jobId " +
+//            "WHERE c.companyId = ?1 " +
+//            "GROUP BY c.jobTitle, c.jobCreatedAt")
+    @Query("SELECT new com.openjob.web.dto.CvStatisticModel(c.companyId, c.companyName, c.jobId, c.jobTitle, c.jobCreatedAt, j.cvId, j.cvStatus, j.applyDate) " +
+        "FROM CompanyStatistic c join JobCvTracking j on c.jobId = j.jobId " +
+        "WHERE c.companyId = ?1")
+    List<CvStatisticModel> findCvStatistic(String companyId, Pageable pageable);
 
-    @Query("SELECT new com.openjob.web.statistics.CvStatisticDTO(c.jobTitle, c.jobCreatedAt, " +
-            "    COUNT(j.cvId), " +
-            "    SUM(CASE WHEN j.cvStatus = com.openjob.common.enums.CvStatus.ACCEPTED THEN 1 ELSE 0 END), " +
-            "    SUM(CASE WHEN j.cvStatus = com.openjob.common.enums.CvStatus.REJECTED THEN 1 ELSE 0 END)) " +
+    @Query("SELECT new com.openjob.web.dto.CvStatisticModel(c.companyId, c.companyName, c.jobId, c.jobTitle, c.jobCreatedAt, j.cvId, j.cvStatus, j.applyDate) " +
             "FROM CompanyStatistic c join JobCvTracking j on c.jobId = j.jobId " +
-            "WHERE c.companyId = ?1 AND c.jobCreatedAt >= ?2 AND c.jobCreatedAt <= ?3 " +
-            "GROUP BY c.jobTitle, c.jobCreatedAt")
-    List<CvStatisticDTO> findCvStatisticWithDateRange(String companyId, Date startDate, Date endDate, Pageable pageable);
+            "WHERE c.companyId = ?1 AND c.jobCreatedAt >= ?2 AND c.jobCreatedAt <= ?3")
+    List<CvStatisticModel> findCvStatisticWithDateRange(String companyId, Date startDate, Date endDate, Pageable pageable);
 }

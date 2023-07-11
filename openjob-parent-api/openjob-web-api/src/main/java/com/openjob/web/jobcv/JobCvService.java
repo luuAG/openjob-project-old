@@ -120,7 +120,7 @@ public class JobCvService {
                 jobCvRepo.save(existingJobCv.get());
 
                 // tracking for statistics
-                statisticService.updateCvStatus(jobId, cvId, CvStatus.ACCEPTED);
+                statisticService.updateCvStatus(jobId, cvId, CvStatus.REJECTED);
             } else
                 throw new ResourceNotFoundException("JobCV", "jobId, cvId", jobId + ", " + cvId);
 
